@@ -1,0 +1,40 @@
+From cff39259f72ff35730ba168541167dc2eb03fee9 Mon Sep 17 00:00:00 2001
+From: Richard W.M. Jones <rjones@redhat.com>
+Date: Fri, 7 Jun 2013 08:49:57 +0100
+Subject: [PATCH 29/31] RHEL 6: Add back some state test commands to guestfish (RHBZ#971664).
+
+In RHEL 6, re-add the following commands to ensure there is no
+regression between RHEL 6.4 and RHEL 6.5:
+
+  get-state            get the current state
+  is-busy              is busy processing a command
+  is-launching         is launching subprocess
+  is-ready             is ready to accept commands
+
+(As a side-effect this also adds 'wait-ready' which is a no-op).
+
+These commands have been removed upstream and will be removed
+permanently in RHEL 7.  The reason is that these commands do not do
+anything useful.
+---
+ generator/actions.ml |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/generator/actions.ml b/generator/actions.ml
+index 95f1d7d..b5b8d4d 100644
+--- a/generator/actions.ml
++++ b/generator/actions.ml
+@@ -11136,8 +11136,8 @@ let is_documented { visibility = v } = match v with
+   | VBindTest | VDebug | VInternal -> false
+ 
+ let is_fish { visibility = v } = match v with
+-  | VPublic | VDebug -> true
+-  | VStateTest | VBindTest | VInternal -> false
++  | VPublic | VDebug | VStateTest -> true
++  | VBindTest | VInternal -> false
+ 
+ let external_functions =
+   List.filter is_external all_functions
+-- 
+1.7.1
+

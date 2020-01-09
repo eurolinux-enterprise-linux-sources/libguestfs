@@ -1,0 +1,28 @@
+From cffc09a2d795584174308201fcfc51fe31a0a714 Mon Sep 17 00:00:00 2001
+From: Richard W.M. Jones <rjones@redhat.com>
+Date: Mon, 5 Nov 2012 11:19:19 +0000
+Subject: [PATCH 24/31] RHEL 6: Ignore /etc/release if /etc/redhat-release exists (RHBZ#872454).
+
+If the user has created /etc/release on a RHEL machine, don't
+mis-detect the OS as NetBSD.
+---
+ src/inspect-fs.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/src/inspect-fs.c b/src/inspect-fs.c
+index fd6c783..79bde38 100644
+--- a/src/inspect-fs.c
++++ b/src/inspect-fs.c
+@@ -208,7 +208,8 @@ check_filesystem (guestfs_h *g, const char *device,
+   else if (is_dir_etc &&
+            is_dir_bin &&
+            guestfs_is_file (g, "/etc/fstab") > 0 &&
+-           guestfs_is_file (g, "/etc/release") > 0) {
++           guestfs_is_file (g, "/etc/release") > 0 &&
++           guestfs_is_file (g, "/etc/redhat-release") == 0) {
+     /* Ignore /dev/sda1 which is a shadow of the real root filesystem
+      * that is probably /dev/sda5 (see:
+      * http://www.freebsd.org/doc/handbook/disk-organization.html)
+-- 
+1.7.1
+
