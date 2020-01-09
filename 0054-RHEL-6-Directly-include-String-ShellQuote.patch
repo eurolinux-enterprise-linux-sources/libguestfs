@@ -1,7 +1,7 @@
-From 58a6f9cd6aee5729f577919e2f9ba71fc5f542d5 Mon Sep 17 00:00:00 2001
+From 5c74efa4603196d534aac178c2a424e2a68bdcbd Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Mon, 29 Nov 2010 18:41:38 +0000
-Subject: [PATCH 19/31] RHEL 6: Directly include String::ShellQuote.
+Subject: [PATCH 54/67] RHEL 6: Directly include String::ShellQuote.
 
 Directly include a snippet from String::ShellQuote so that we
 don't need to depend on this external library, which is not
@@ -14,10 +14,10 @@ This affects virt-make-fs.
  2 files changed, 91 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 57bef84..35997d6 100644
+index 2f89a61..e23585e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1420,7 +1420,7 @@ AM_CONDITIONAL([HAVE_LUA],[test "x$LUA_LIBS" != "x"])
+@@ -1423,7 +1423,7 @@ AM_CONDITIONAL([HAVE_LUA],[test "x$LUA_LIBS" != "x"])
  dnl Check for Perl modules needed by Perl virt tools (virt-df, etc.)
  AS_IF([test "x$PERL" != "xno"],[
      missing_perl_modules=no
@@ -27,7 +27,7 @@ index 57bef84..35997d6 100644
          if ! $PERL -M$pm -e1 >&AS_MESSAGE_LOG_FD 2>&1; then
              AC_MSG_RESULT([no])
 diff --git a/tools/virt-make-fs b/tools/virt-make-fs
-index a8cf56b..ef0879f 100755
+index c0df982..02f9c3f 100755
 --- a/tools/virt-make-fs
 +++ b/tools/virt-make-fs
 @@ -27,7 +27,7 @@ use Getopt::Long;

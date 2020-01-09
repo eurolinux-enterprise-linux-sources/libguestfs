@@ -1,7 +1,7 @@
-From e5315dee63070c2ebfca9f5a63476cc9beb1c935 Mon Sep 17 00:00:00 2001
+From dc858681ccb3a88e1a002674d59a2823443c9846 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Thu, 30 May 2013 16:27:23 +0100
-Subject: [PATCH 28/31] RHEL 6: tests/regressions/rhbz895904.sh: Use `` instead of $().
+Subject: [PATCH 63/67] RHEL 6: tests/regressions/rhbz895904.sh: Use `` instead of $().
 
 Apparently bash in RHEL 6 cannot handle this unusual
 multi-line use of $(...), but `` works fine.

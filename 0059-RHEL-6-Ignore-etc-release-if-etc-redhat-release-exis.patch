@@ -1,7 +1,7 @@
-From cffc09a2d795584174308201fcfc51fe31a0a714 Mon Sep 17 00:00:00 2001
+From 4ca622ba3a9dffc84ac17ca27c81c50510f2e4ad Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Mon, 5 Nov 2012 11:19:19 +0000
-Subject: [PATCH 24/31] RHEL 6: Ignore /etc/release if /etc/redhat-release exists (RHBZ#872454).
+Subject: [PATCH 59/67] RHEL 6: Ignore /etc/release if /etc/redhat-release exists (RHBZ#872454).
 
 If the user has created /etc/release on a RHEL machine, don't
 mis-detect the OS as NetBSD.

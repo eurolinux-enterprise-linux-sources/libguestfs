@@ -1,7 +1,7 @@
-From a056e65d88812b779c3f903cb17bd0e6cf8983f7 Mon Sep 17 00:00:00 2001
+From 088e92526e7601efb66e03d3a02a245548015891 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Mon, 10 Jan 2011 16:07:12 +0000
-Subject: [PATCH 17/31] RHEL 6: Emphasize libguestfs-winsupport package (RHBZ#627468).
+Subject: [PATCH 52/67] RHEL 6: Emphasize libguestfs-winsupport package (RHBZ#627468).
 
 This RHEL 6.1-only patch changes the error messages when the
 inspection code cannot find an operating system inside the guest

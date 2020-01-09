@@ -1,7 +1,7 @@
-From 8eca6f73e847abf97cbe78fa9d83333607df9714 Mon Sep 17 00:00:00 2001
+From 2df554b53365148ef0bea1dcfee6e22e36708d7f Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Fri, 7 Jun 2013 11:46:01 +0100
-Subject: [PATCH 30/31] RHEL 6: Pipe 'yes' into ntfsresize (RHBZ#971326).
+Subject: [PATCH 65/67] RHEL 6: Pipe 'yes' into ntfsresize (RHBZ#971326).
 
 This works around a problem in ntfsresize on RHEL 6.  See:
 https://bugzilla.redhat.com/show_bug.cgi?id=971326#c4

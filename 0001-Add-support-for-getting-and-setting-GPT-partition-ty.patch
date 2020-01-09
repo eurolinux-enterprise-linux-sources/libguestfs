@@ -1,7 +1,7 @@
 From e328b0227d3a11e81bf217d389c66e5d1c98e54c Mon Sep 17 00:00:00 2001
 From: Matthew Booth <mbooth@redhat.com>
 Date: Fri, 14 Dec 2012 15:53:27 +0000
-Subject: [PATCH 01/31] Add support for getting and setting GPT partition type GUIDs
+Subject: [PATCH 01/67] Add support for getting and setting GPT partition type GUIDs
 
 New APIs:
   part_set_gpt_type

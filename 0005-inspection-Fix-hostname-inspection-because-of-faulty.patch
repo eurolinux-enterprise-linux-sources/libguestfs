@@ -1,7 +1,7 @@
 From ff8e22fa93e5371fb91da4e6ff704acd7a810fbf Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Fri, 28 Jun 2013 11:25:18 +0100
-Subject: [PATCH 05/31] inspection: Fix hostname inspection because of faulty Augeas path expression (RHBZ#975412).
+Subject: [PATCH 05/67] inspection: Fix hostname inspection because of faulty Augeas path expression (RHBZ#975412).
  (cherry picked from commit 2343840936c900109b6675cc6e605026443ccf0a)
 
 ---

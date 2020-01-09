@@ -1,7 +1,7 @@
 From 0d82913df05944a3497003d370c762cb274cc2b3 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Thu, 29 Aug 2013 13:59:14 +0100
-Subject: [PATCH 14/31] mke2fs: Document that too small blockscount will result in ext2 filesystem (RHBZ#1002032).
+Subject: [PATCH 14/67] mke2fs: Document that too small blockscount will result in ext2 filesystem (RHBZ#1002032).
  (cherry picked from commit 1c8986e45c3f1a7e2391bde2848667332495e3aa)
 
 ---

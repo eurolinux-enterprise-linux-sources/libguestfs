@@ -1,14 +1,14 @@
-From 34140964bbf019b34057c98ed6539c2648888a55 Mon Sep 17 00:00:00 2001
+From 7957e0b8aec0be3d66ce50bffbb0e4deb3f22ed3 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Fri, 17 May 2013 22:26:34 +0100
-Subject: [PATCH 26/31] RHEL 6: Remove check for qemu >= 1.
+Subject: [PATCH 61/67] RHEL 6: Remove check for qemu >= 1.
 
 ---
  configure.ac |    8 --------
  1 files changed, 0 insertions(+), 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 35997d6..9e1d67d 100644
+index e23585e..4641f43 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -698,14 +698,6 @@ working.

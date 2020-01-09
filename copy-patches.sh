@@ -12,7 +12,7 @@ if [ ! -f libguestfs.spec ]; then
     exit 1
 fi
 
-git_checkout=$HOME/d/libguestfs-rhel-6.5
+git_checkout=$HOME/d/libguestfs-rhel-6.6
 if [ ! -d $git_checkout ]; then
     echo "$0: $git_checkout does not exist"
     echo "This script is only for use by the maintainer when preparing a"

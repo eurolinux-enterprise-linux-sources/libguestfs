@@ -14,7 +14,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.20.11
-Release:       2%{?dist}
+Release:       11%{?dist}
 License:       LGPLv2+
 Group:         Development/Libraries
 URL:           http://libguestfs.org/
@@ -23,7 +23,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root
 ExclusiveArch: x86_64
 
 # The RHEL patch repo is in the upstream libguestfs git repository in
-# a branch called 'rhel-6.x' (ie. 'rhel-6.5' for RHEL 6.5).  Note this
+# a branch called 'rhel-6.x' (ie. 'rhel-6.6' for RHEL 6.6).  Note this
 # is a non-fast-forward branch.
 #
 # https://github.com/libguestfs/libguestfs/branches
@@ -50,23 +50,59 @@ Patch0013:     0013-rsync-Document-use-of-glob-rsync-out-in-guestfish-RH.patch
 Patch0014:     0014-mke2fs-Document-that-too-small-blockscount-will-resu.patch
 Patch0015:     0015-fish-Use-UNIX_PATH_MAX-instead-of-hard-coded-value-f.patch
 Patch0016:     0016-fish-CVE-2013-4419-Fix-insecure-temporary-directory-.patch
+Patch0017:     0017-ruby-Fix-.new-method-RHBZ-1046509.patch
+Patch0018:     0018-run-Use-timeout-foreground-option.patch
+Patch0019:     0019-run-Actually-use-timeout-foreground-option-RHBZ-1025.patch
+Patch0020:     0020-tar-in-Fix-places-where-we-didn-t-cancel-the-receive.patch
+Patch0021:     0021-Add-a-regression-test-for-RHBZ-1091803.patch
+Patch0022:     0022-rhbz1091803.sh-manually-create-the-image-instead-of-.patch
+Patch0023:     0023-fuse-In-mount-local-run-test-if-root-filesystem-has-.patch
+Patch0024:     0024-fuse-use-fusermount-instead-of-guestunmount-in-error.patch
+Patch0025:     0025-listfs-If-LDM-not-available-don-t-inhibit-partition-.patch
+Patch0026:     0026-blockdev-Deprecate-blockdev_setbsz-and-make-it-do-no.patch
+Patch0027:     0027-Backport-virt-sysprep-from-libguestfs-1.24.patch
+Patch0028:     0028-sysprep-add-feature-of-deleting-specified-paths.patch
+Patch0029:     0029-builder-sysprep-Describe-password-root-password-opti.patch
+Patch0030:     0030-builder-sysprep-Allow-random-as-a-password-selector.patch
+Patch0031:     0031-builder-sysprep-Allow-accounts-to-be-locked-RHBZ-102.patch
+Patch0032:     0032-sysprep-Add-a-test-suite-for-the-password-option.patch
+Patch0033:     0033-sysprep-adapt-test-virt-sysprep-passwords.sh-to-libg.patch
+Patch0034:     0034-sysprep-allow-to-specify-globbing-for-delete.patch
+Patch0035:     0035-sysprep-mention-globbing-in-help-for-delete.patch
+Patch0036:     0036-firstboot-Send-the-output-to-the-console-as-well-as-.patch
+Patch0037:     0037-builder-Move-is_block_device-function-into-common-ut.patch
+Patch0038:     0038-sparsify-Prevent-overwriting-block-or-char-output-de.patch
+Patch0039:     0039-Fix-some-spelling-mistakes-and-typos-in-documentatio.patch
+Patch0040:     0040-fuse-UID-0-should-override-all-permissions-checks-RH.patch
+Patch0041:     0041-sparsify-Get-free-space-on-TMPDIR-and-give-a-warning.patch
+Patch0042:     0042-sparsify-use-Filename.temp_dir_name-instead-of-get_t.patch
+Patch0043:     0043-sparsify-Advertize-in-machine-readable-that-we-suppo.patch
+Patch0044:     0044-sparsify-Fix-incorrect-reference-to-documentation-fr.patch
+Patch0045:     0045-appliance-Increase-udev-timeout-to-6000s-RHBZ-109657.patch
+Patch0046:     0046-launch-Close-file-descriptors-after-fork-RHBZ-112300.patch
+Patch0047:     0047-mllib-Create-a-common-utility-function-is_directory.patch
+Patch0048:     0048-sparsify-Add-tmp-option-to-allow-specifying-temp-dir.patch
+Patch0049:     0049-sparsify-Add-tmp-prebuilt-file-option.patch
+Patch0050:     0050-sparsify-update-documentation.patch
+Patch0051:     0051-customize-fix-locking-accounts-with-passwords.patch
 
 # RHEL 6 specific patches.
-Patch0017:     0017-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
-Patch0018:     0018-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
-Patch0019:     0019-RHEL-6-Directly-include-String-ShellQuote.patch
-Patch0020:     0020-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
-Patch0021:     0021-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
-Patch0022:     0022-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
-Patch0023:     0023-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
-Patch0024:     0024-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
-Patch0025:     0025-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
-Patch0026:     0026-RHEL-6-Remove-check-for-qemu-1.patch
-Patch0027:     0027-RHEL-6-Revert-Use-pkg-config-for-Python.patch
-Patch0028:     0028-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
-Patch0029:     0029-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
-Patch0030:     0030-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
-Patch0031:     0031-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
+Patch0052:     0052-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
+Patch0053:     0053-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
+Patch0054:     0054-RHEL-6-Directly-include-String-ShellQuote.patch
+Patch0055:     0055-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
+Patch0056:     0056-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
+Patch0057:     0057-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
+Patch0058:     0058-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
+Patch0059:     0059-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
+Patch0060:     0060-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
+Patch0061:     0061-RHEL-6-Remove-check-for-qemu-1.patch
+Patch0062:     0062-RHEL-6-Revert-Use-pkg-config-for-Python.patch
+Patch0063:     0063-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
+Patch0064:     0064-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
+Patch0065:     0065-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
+Patch0066:     0066-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
+Patch0067:     0067-RHEL-6-disable-fstrim-API-RHBZ-982979.patch
 
 # Basic build requirements:
 BuildRequires: perl(Pod::Simple)
@@ -116,6 +152,9 @@ BuildRequires: /usr/bin/wget
 # the version of this library with the new locations.
 BuildRequires: krb5-libs >= 1.10.3-5.el6
 
+# openldap removed libldif, see RHBZ#1099105
+BuildRequires: openldap >= 2.4.39-8.el6
+
 # Build requirements for the appliance.
 # sed 's/^ *//' < appliance/packagelist | sort
 BuildRequires: acl
@@ -134,6 +173,7 @@ BuildRequires: e2fsprogs
 BuildRequires: file
 BuildRequires: findutils
 BuildRequires: gawk
+BuildRequires: gdisk
 #BuildRequires: gfs2-utils
 #BuildRequires: gfs-utils
 BuildRequires: grep
@@ -203,6 +243,7 @@ Requires:      e2fsprogs
 Requires:      file
 Requires:      findutils
 Requires:      gawk
+Requires:      gdisk
 #Requires:      gfs2-utils
 #Requires:      gfs-utils
 Requires:      grep
@@ -1003,6 +1044,63 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 08 2014 Richard W.M. Jones <rjones@redhat.com> - 1:1.20.11-11
+- virt-sysprep: Fix locking accounts with passwords.
+  resolves: rhbz#1037166
+- Update copy-patches script to RHEL 6.6.
+
+* Tue Aug 05 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-10
+- virt-sparsify: allow specifying temporary file or block device
+  resolves: rhbz#1117540
+
+* Mon Aug 04 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-9
+- Close all the file descriptors before launching qemu
+  resolves: rhbz#1123794
+
+* Mon Jun 23 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-8
+- Raise timeout for udev in the appliance to 6000s
+  resolves: rhbz#1096579
+
+* Fri Jun 20 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-7
+- FUSE: fix access as root to files and directories not owned by root
+  resolves: rhbz#1106548
+- virt-sparsify: check for available space before starting
+  resolves: rhbz#1097359
+- Enable gdisk support to make part-get-gpt-type and part-set-gpt-type work
+  resolves: rhbz#965495
+
+* Wed Jun 18 2014 Richard W.M. Jones <rjones@redhat.com> - 1:1.20.11-6
+- Rebuild against openldap >= 2.4.39 (RHBZ#1099105).
+
+* Thu May 29 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-5
+- Exclude fstrim from perl documentation coverage as well
+  related: rhbz#982979
+
+* Wed May 28 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-4
+- Don't inhibit partition detection if LDM not available
+  resolves: rhbz#1079182
+- Deprecate blockdev_setbsz and make it do nothing
+  resolves: rhbz#624335
+- Disable fstrim API
+  resolves: rhbz#982979
+- Backport virt-sysprep from libguestfs 1.24, with few backports from
+  greater versions too
+  resolves: rhbz#1037166
+- virt-sparsify: don't overwrite block or char devices if used as output files
+  resolves: rhbz#1056558
+- fix few typos in the documentation
+  resolves: rhbz#1099332
+
+* Tue May  6 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-3
+- Fix .new method in Ruby bindings.
+  resolves: rhbz#1072062
+- Properly use timeout --foreground when running tests
+  resolves: rhbz#1025269
+- Fix cancellation on errors in tar-in
+  resolves: rhbz#1091805
+- Check whether something has been mounted to / when using mount-local* APIs
+  resolves: rhbz#1057510
+
 * Wed Oct 16 2013 Richard W.M. Jones <rjones@redhat.com> - 1:1.20.11-2
 - Fix CVE-2013-4419: insecure temporary directory handling for
   guestfish's network socket

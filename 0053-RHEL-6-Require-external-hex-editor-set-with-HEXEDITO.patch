@@ -1,7 +1,7 @@
-From 86324efc47fed793a78c70a5d2940ac1ea26ad9b Mon Sep 17 00:00:00 2001
+From 11247dec5145a40095dac8d23d9711acf49e92e5 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Fri, 14 Jan 2011 15:13:53 +0000
-Subject: [PATCH 18/31] RHEL 6: Require external hex editor set with $HEXEDITOR.
+Subject: [PATCH 53/67] RHEL 6: Require external hex editor set with $HEXEDITOR.
 
 RHEL 6 doesn't have the hexedit program or any suitable replacement.
 Require that the user sets $HEXEDITOR to make this command work.
@@ -44,10 +44,10 @@ index af72ebb..c46b747 100644
    snprintf (buf, sizeof buf, "/dev/fd/%d", fd);
  
 diff --git a/generator/actions.ml b/generator/actions.ml
-index 040b38f..e720930 100644
+index 4d16db4..e66ec73 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
-@@ -10933,7 +10933,7 @@ See L</WILDCARDS AND GLOBBING>." };
+@@ -10936,7 +10936,7 @@ See L</WILDCARDS AND GLOBBING>." };
   hexedit <filename|device> <max>
   hexedit <filename|device> <start> <max>
  
@@ -56,7 +56,7 @@ index 040b38f..e720930 100644
  or block device.
  
  This command works by downloading potentially the whole file or
-@@ -10957,9 +10957,10 @@ To edit the superblock of an ext2 filesystem on C</dev/sda1>, do:
+@@ -10960,9 +10960,10 @@ To edit the superblock of an ext2 filesystem on C</dev/sda1>, do:
  
  (assuming the superblock is in the standard location).
  

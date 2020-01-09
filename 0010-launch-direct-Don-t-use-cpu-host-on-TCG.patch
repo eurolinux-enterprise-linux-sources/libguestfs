@@ -1,7 +1,7 @@
 From 32077eec20a1fa16809083e436e3092dac3b59c9 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Mon, 19 Aug 2013 15:00:39 +0100
-Subject: [PATCH 10/31] launch: direct: Don't use -cpu host on TCG.
+Subject: [PATCH 10/67] launch: direct: Don't use -cpu host on TCG.
 
 qemu -cpu \? documents this as:
 

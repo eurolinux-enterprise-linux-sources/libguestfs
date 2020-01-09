@@ -1,7 +1,7 @@
 From 06093d75f32a0e3b502107c7c63d5f29eed57c72 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Mon, 24 Jun 2013 21:06:58 +0100
-Subject: [PATCH 07/31] sysprep: New operation to remove RPM database files.
+Subject: [PATCH 07/67] sysprep: New operation to remove RPM database files.
 
 See:
 https://lists.fedoraproject.org/pipermail/devel/2013-June/184389.html

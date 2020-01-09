@@ -1,7 +1,7 @@
 From c986c011533a5c75d2d3869fac5befb21271f8a2 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Thu, 29 Aug 2013 13:26:51 +0100
-Subject: [PATCH 11/31] daemon: tar: Use a temporary file to pass excludes to tar command (RHBZ#1001875).
+Subject: [PATCH 11/67] daemon: tar: Use a temporary file to pass excludes to tar command (RHBZ#1001875).
 
 Use tar -X option instead of tar --exclude=... option.
 (cherry picked from commit 91c162586cc2170ea224016307016153f3d081b5)

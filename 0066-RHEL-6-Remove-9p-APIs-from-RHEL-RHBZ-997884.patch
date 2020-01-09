@@ -1,7 +1,7 @@
-From 8aa3741ac5e5099b27754e74b6f0b15df5d7d867 Mon Sep 17 00:00:00 2001
+From ba9670574c75555494c443a428493571101569b4 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Thu, 18 Jul 2013 18:31:53 +0100
-Subject: [PATCH 31/31] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
+Subject: [PATCH 66/67] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
 
 (cherry picked from commit 5f7b0f81793f38191634f4460b1c18b97990db44)
 ---
@@ -15,7 +15,7 @@ Subject: [PATCH 31/31] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
  delete mode 100644 daemon/9p.c
 
 diff --git a/Makefile.am b/Makefile.am
-index b3fe403..ff57cbb 100644
+index fab3c13..de9bf1b 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -51,7 +51,7 @@ SUBDIRS += tests/btrfs
@@ -267,10 +267,10 @@ index 8da8b8f..a899d99 100644
  	actions.h \
  	available.c \
 diff --git a/generator/actions.ml b/generator/actions.ml
-index b5b8d4d..1cbc2d1 100644
+index 4c70d23..e5904d0 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
-@@ -8460,29 +8460,6 @@ This returns true iff the device exists and contains all zero bytes.
+@@ -8463,29 +8463,6 @@ This returns true iff the device exists and contains all zero bytes.
  Note that for large devices this can take a long time to run." };
  
    { defaults with
@@ -321,7 +321,7 @@ index 25c383e..471f941 100644
    src/optargs-btrfs_filesystem_resize.c \
    src/optargs-compress_out.c \
 diff --git a/po/POTFILES b/po/POTFILES
-index 7b28d38..027373c 100644
+index 74fdecf..a4cadc3 100644
 --- a/po/POTFILES
 +++ b/po/POTFILES
 @@ -3,7 +3,6 @@ align/scan.c

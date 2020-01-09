@@ -1,7 +1,7 @@
-From 3df4f2408a7b180a7f476932df13b77fdb91fc77 Mon Sep 17 00:00:00 2001
+From 3ad27de466b7643f23829102c06f1b0fa82e60f3 Mon Sep 17 00:00:00 2001
 From: Richard W.M. Jones <rjones@redhat.com>
 Date: Wed, 19 Sep 2012 15:02:27 +0100
-Subject: [PATCH 22/31] RHEL 6: Exclude iptables from the appliance (RHBZ#858648).
+Subject: [PATCH 57/67] RHEL 6: Exclude iptables from the appliance (RHBZ#858648).
 
 ---
  appliance/excludelist.in |    3 +++
