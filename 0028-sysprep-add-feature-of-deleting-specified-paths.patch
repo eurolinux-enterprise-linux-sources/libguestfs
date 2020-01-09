@@ -1,7 +1,7 @@
 From 9b9152b9892c24396169d02d09a2f28514a375bd Mon Sep 17 00:00:00 2001
 From: Wanlong Gao <gaowanlong@cn.fujitsu.com>
 Date: Tue, 22 Oct 2013 16:17:25 +0800
-Subject: [PATCH 028/117] sysprep: add feature of deleting specified paths
+Subject: [PATCH 028/118] sysprep: add feature of deleting specified paths
 
 Signed-off-by: Wanlong Gao <gaowanlong@cn.fujitsu.com>
 Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
@@ -95,5 +95,5 @@ index 0000000..7cf1c39
 +
 +let () = register_operation op
 -- 
-2.5.0
+2.7.4
 

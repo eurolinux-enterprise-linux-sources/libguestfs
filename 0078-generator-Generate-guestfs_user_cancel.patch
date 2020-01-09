@@ -1,7 +1,7 @@
 From c62dfde5e9133b5cd2f2ed89050aa0116f8f2d9b Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 4 Mar 2013 13:28:15 +0000
-Subject: [PATCH 078/117] generator: Generate guestfs_user_cancel.
+Subject: [PATCH 078/118] generator: Generate guestfs_user_cancel.
 
 This function is now generated, so bindings in various languages
 are made automatically.
@@ -342,5 +342,5 @@ index 93f5517..820c39c 100644
 +  return 0;
 +}
 -- 
-2.5.0
+2.7.4
 

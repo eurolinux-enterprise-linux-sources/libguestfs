@@ -1,7 +1,7 @@
 From 05e7c15997d29db0d251335c61037e23b481098c Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 5 Dec 2014 15:23:28 +0100
-Subject: [PATCH 079/117] sysprep: user-account: mark "changed file" if users
+Subject: [PATCH 079/118] sysprep: user-account: mark "changed file" if users
  were removed
 
 Removing an user causes /etc/passwd, /etc/shadow, and /etc/group to
@@ -42,5 +42,5 @@ index fc39bc8..b44fbfb 100644
    else []
  
 -- 
-2.5.0
+2.7.4
 

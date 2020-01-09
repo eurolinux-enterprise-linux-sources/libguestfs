@@ -1,7 +1,7 @@
 From d697cdaf48b347d5da39ba015a3c87ece52b9fa1 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 13 Nov 2014 05:01:54 -0500
-Subject: [PATCH 070/117] customize: firstboot: make sure to run Linux scripts
+Subject: [PATCH 070/118] customize: firstboot: make sure to run Linux scripts
  only once
 
 If a script does not finish, hangs, etc, it would be executed again at
@@ -59,5 +59,5 @@ index 9e4c7b6..ea79cb8 100644
  let firstboot_service = sprintf "\
  [Unit]
 -- 
-2.5.0
+2.7.4
 

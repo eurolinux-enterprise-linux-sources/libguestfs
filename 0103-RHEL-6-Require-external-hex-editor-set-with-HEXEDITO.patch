@@ -1,7 +1,7 @@
-From 30ba442171596f1c1a121dec6101ed320c026d61 Mon Sep 17 00:00:00 2001
+From c9dfbd36913ab546b2d83114e7a7829d3a49b93f Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 14 Jan 2011 15:13:53 +0000
-Subject: [PATCH 102/117] RHEL 6: Require external hex editor set with
+Subject: [PATCH 103/118] RHEL 6: Require external hex editor set with
  $HEXEDITOR.
 
 RHEL 6 doesn't have the hexedit program or any suitable replacement.
@@ -72,5 +72,5 @@ index f0c157d..5f1bd40 100644
  See also L</hexdump>." };
  
 -- 
-2.5.0
+2.7.4
 

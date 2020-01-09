@@ -1,7 +1,7 @@
 From a8423fb1a178b53ccccb7bd1fccd03c4942839c6 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 26 Aug 2014 14:31:05 +0200
-Subject: [PATCH 052/117] daemon: add add_sprintf
+Subject: [PATCH 052/118] daemon: add add_sprintf
 
 Bring the add_sprintf function for stringsbuf from the library.
 
@@ -56,5 +56,5 @@ index bba13f8..e78dd4d 100644
  {
    return add_string_nodup (sb, NULL);
 -- 
-2.5.0
+2.7.4
 

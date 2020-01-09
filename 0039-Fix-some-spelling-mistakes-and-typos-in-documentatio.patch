@@ -1,7 +1,7 @@
 From f9dd1191ac3f6bd94ab1288ce791f5d53b8e059a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 29 May 2014 05:30:55 -0400
-Subject: [PATCH 039/117] Fix some spelling mistakes and typos in documentation
+Subject: [PATCH 039/118] Fix some spelling mistakes and typos in documentation
  (RHBZ#1099284).
 
 (cherry picked from commit a21dfc483c5102334d8c490a50077ec201ffe2e4)
@@ -60,5 +60,5 @@ index a8cf56b..c0df982 100755
  extra space won't actually be allocated in the image until you try to
  store something in it.
 -- 
-2.5.0
+2.7.4
 

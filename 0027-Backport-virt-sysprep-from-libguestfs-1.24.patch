@@ -1,7 +1,7 @@
 From f82e17b4a6c7fe35c16d45ad9c555d0ad90af2be Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 14 May 2014 10:24:41 -0400
-Subject: [PATCH 027/117] Backport virt-sysprep from libguestfs 1.24
+Subject: [PATCH 027/118] Backport virt-sysprep from libguestfs 1.24
 
 Copy the virt-sysprep code from libguestfs 1.24.x, bringing all the
 features of it to libguestfs 1.20.x. This is done as single commit
@@ -5170,5 +5170,5 @@ index eec80f9..445141f 100755
  upload fstab.tmp.$$ /etc/fstab
  write /etc/debian_version "5.0.1"
 -- 
-2.5.0
+2.7.4
 

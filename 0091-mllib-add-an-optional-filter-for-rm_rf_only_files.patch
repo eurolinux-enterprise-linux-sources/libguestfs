@@ -1,7 +1,7 @@
 From 5ed2fd75e784a60e6a4af2a1a555710370bc4646 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 30 Jun 2015 20:59:31 +0200
-Subject: [PATCH 091/117] mllib: add an optional filter for rm_rf_only_files
+Subject: [PATCH 091/118] mllib: add an optional filter for rm_rf_only_files
 
 This way it is possible to use rm_rf_only_files, but not removing
 specific files.
@@ -37,5 +37,5 @@ index 3a33f7f..6b1352e 100644
    )
  
 -- 
-2.5.0
+2.7.4
 

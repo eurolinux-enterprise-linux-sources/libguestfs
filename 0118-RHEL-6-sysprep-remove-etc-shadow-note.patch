@@ -1,7 +1,7 @@
-From 668f25091dde6d1ba90a4993171280d74dd6f21e Mon Sep 17 00:00:00 2001
+From a416b277040c721159ac45f257c8cd37588a0f52 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 15 Jan 2015 10:56:53 -0500
-Subject: [PATCH 117/117] RHEL 6: sysprep: remove /etc/shadow note
+Subject: [PATCH 118/118] RHEL 6: sysprep: remove /etc/shadow note
 
 Once RHBZ#1160261 is in and we can require the augeas providing it,
 virt-sysprep will remove users from /etc/shadow too; hence, remove
@@ -39,5 +39,5 @@ index b394296..ed4f7b9 100644
  }
  
 -- 
-2.5.0
+2.7.4
 

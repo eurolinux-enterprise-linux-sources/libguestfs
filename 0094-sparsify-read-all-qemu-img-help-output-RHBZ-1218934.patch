@@ -1,7 +1,7 @@
 From 4408178b9510e26ef1f9e81484dc5a0a5125e6bf Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 12 Nov 2015 13:20:08 +0100
-Subject: [PATCH 094/117] sparsify: read all 'qemu-img --help' output
+Subject: [PATCH 094/118] sparsify: read all 'qemu-img --help' output
  (RHBZ#1218934)
 
 It seems like qemu-img might sometimes not like when all of its output
@@ -38,5 +38,5 @@ index 2475bb0..de35a11 100644
      sscanf line "qemu-img version %d.%d" (
        fun major minor ->
 -- 
-2.5.0
+2.7.4
 

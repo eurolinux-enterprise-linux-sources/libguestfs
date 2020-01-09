@@ -1,7 +1,7 @@
 From 770279b3792e04a979c1a333992267dd239ba4d3 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 27 May 2014 11:48:44 +0100
-Subject: [PATCH 045/117] appliance: Increase udev timeout to 6000s
+Subject: [PATCH 045/118] appliance: Increase udev timeout to 6000s
  (RHBZ#1096579).
 
 If the image is located on NFS, and the NFS mount is performing a
@@ -30,5 +30,5 @@ index 1583075..caf1c6f 100644
       "%s"               /* lpj */
       " acpi=off"        /* we don't need ACPI, turn it off */
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
 From f95ef5d3dad3e830c7794ac528cfd1f93a85a41e Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 31 Oct 2014 17:37:22 +0100
-Subject: [PATCH 073/117] fish: fix dir completion on filesystems w/o
+Subject: [PATCH 073/118] fish: fix dir completion on filesystems w/o
  dirent.d_type (RHBZ#1153844).
 
 On filesystems whose dirent.d_type is DT_UNKNOWN or some unknown value,
@@ -35,5 +35,5 @@ index e79a90c..20ac56f 100644
                    }
                  }
 -- 
-2.5.0
+2.7.4
 

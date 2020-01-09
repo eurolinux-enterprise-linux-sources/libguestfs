@@ -1,7 +1,7 @@
-From c923cd78a8c04045016b7891c0e72af6586a24ef Mon Sep 17 00:00:00 2001
+From eb6b36a91b458cdfde2c247f0eee1a347478d9a6 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 17 May 2013 22:26:34 +0100
-Subject: [PATCH 110/117] RHEL 6: Remove check for qemu >= 1.
+Subject: [PATCH 111/118] RHEL 6: Remove check for qemu >= 1.
 
 ---
  configure.ac | 8 --------
@@ -27,5 +27,5 @@ index e23585e..4641f43 100644
      if $QEMU -nographic -machine accel=kvm:tcg -device \? >&AS_MESSAGE_LOG_FD 2>&1; then
          AC_MSG_RESULT([yes])
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
-From efe89463fcfb61b54d36ca85e39758e20a87f587 Mon Sep 17 00:00:00 2001
+From 384bcefafb8c2a23dfff135e18008a0ee8405706 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 27 Sep 2012 10:22:26 +0100
-Subject: [PATCH 107/117] RHEL 6: In mount-local docs, change refs to
+Subject: [PATCH 108/118] RHEL 6: In mount-local docs, change refs to
  libguestfs 1.18 -> RHEL 6.4.
 
 We backported the libguestfs 1.18 / mount-local functionality
@@ -44,5 +44,5 @@ index 9f67167..6c78dab 100644
  using libguestfs file system calls.
  
 -- 
-2.5.0
+2.7.4
 

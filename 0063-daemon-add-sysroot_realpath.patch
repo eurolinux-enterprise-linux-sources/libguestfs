@@ -1,7 +1,7 @@
 From fc8b1e24c6816735fd7e9c345cb12ca9f51063f7 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 21 May 2014 15:01:50 +0200
-Subject: [PATCH 063/117] daemon: add sysroot_realpath
+Subject: [PATCH 063/118] daemon: add sysroot_realpath
 
 Similar to sysroot_path, but first resolves (using realpath) the given
 path within sysroot.
@@ -57,5 +57,5 @@ index e78dd4d..69c3f53 100644
  xwrite (int sock, const void *v_buf, size_t len)
  {
 -- 
-2.5.0
+2.7.4
 

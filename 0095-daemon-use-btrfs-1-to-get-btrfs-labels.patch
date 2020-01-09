@@ -1,7 +1,7 @@
 From 72445c575eba3cd4e0b880c20f5935fe720cb47f Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 14 Jan 2015 18:55:13 +0100
-Subject: [PATCH 095/117] daemon: use btrfs(1) to get btrfs labels
+Subject: [PATCH 095/118] daemon: use btrfs(1) to get btrfs labels
 
 blkid(1) (or actually, libblkid) seems to handle filesystem labels up
 to 127 characters. Considering that btrfs labels can be up to 255
@@ -96,5 +96,5 @@ index 022591f..5087091 100644
   * NB: you don't need to prefix the string with the current command,
   * it is added automatically by the client-side RPC stubs.
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
 From 007095f6020b30b32e9cde6cf5826b7300749e19 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 13:26:16 +0000
-Subject: [PATCH 056/117] java: run: Add java/.libs to LD_LIBRARY_PATH so JVM
+Subject: [PATCH 056/118] java: run: Add java/.libs to LD_LIBRARY_PATH so JVM
  finds the right JNI file.
 
 (cherry picked from commit 6aa64ee3a3f1c990b5f9ce537f2b840273c3c1ba)
@@ -50,5 +50,5 @@ index a642d14..873b230 100755
  export LD_LIBRARY_PATH
  
 -- 
-2.5.0
+2.7.4
 

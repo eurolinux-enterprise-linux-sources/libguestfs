@@ -1,7 +1,7 @@
-From 0148ad50750bd17d7369b69dc4de307823a83f53 Mon Sep 17 00:00:00 2001
+From d17c1d63222753474780ac4c1b772623a2b9cac0 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 18 Jul 2013 18:31:53 +0100
-Subject: [PATCH 115/117] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
+Subject: [PATCH 116/118] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
 
 (cherry picked from commit 5f7b0f81793f38191634f4460b1c18b97990db44)
 ---
@@ -341,5 +341,5 @@ index 74fdecf..a4cadc3 100644
  gobject/src/optargs-ntfsclone_out.c
  gobject/src/optargs-ntfsfix.c
 -- 
-2.5.0
+2.7.4
 

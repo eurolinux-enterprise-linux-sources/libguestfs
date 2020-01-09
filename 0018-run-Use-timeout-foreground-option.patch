@@ -1,7 +1,7 @@
 From 8a27be0451c657639bd9c3f0d1b94cdb82db0d4f Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 19 Dec 2013 08:21:53 +0000
-Subject: [PATCH 018/117] run: Use timeout --foreground option.
+Subject: [PATCH 018/118] run: Use timeout --foreground option.
 
 If timeout doesn't have this option (RHEL 6) don't use timeout at all.
 
@@ -35,5 +35,5 @@ index d82ba56..c6bc9c4 100755
  
  pid=$$
 -- 
-2.5.0
+2.7.4
 

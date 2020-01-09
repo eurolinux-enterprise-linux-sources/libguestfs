@@ -1,7 +1,7 @@
 From 13671bbf26e08d25e4e2da5016bd07575e1a6a01 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 16 Jan 2015 10:52:56 -0500
-Subject: [PATCH 082/117] drives: Remove check for ':' in filename
+Subject: [PATCH 082/118] drives: Remove check for ':' in filename
  (RHBZ#1128942).
 
 Modern qemu can now handle this properly.  ':' is only special if what
@@ -87,5 +87,5 @@ index cc0b8a1..016d62f 100755
  rm -f -- test1.img "${filenames[@]}"
  
 -- 
-2.5.0
+2.7.4
 

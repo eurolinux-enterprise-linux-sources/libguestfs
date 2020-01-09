@@ -1,7 +1,7 @@
 From 78c740cb140ac96ca1b3deb48f8564a0ed054019 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 29 Aug 2013 13:36:56 +0100
-Subject: [PATCH 012/117] Add a regression test of tar-out excludes option
+Subject: [PATCH 012/118] Add a regression test of tar-out excludes option
  (RHBZ#1001875). (cherry picked from commit
  1b34d6171bb4aaa1134a9d867918d7163cc7e069)
 
@@ -96,5 +96,5 @@ index 0000000..b17ca78
 +
 +rm test1.img rhbz1001875-[123].tar
 -- 
-2.5.0
+2.7.4
 

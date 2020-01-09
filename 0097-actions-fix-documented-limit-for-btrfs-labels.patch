@@ -1,7 +1,7 @@
 From 591964ce83c12b7faf0aa65908106e767e35f524 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 5 Oct 2015 11:41:03 +0200
-Subject: [PATCH 097/117] actions: fix documented limit for btrfs labels
+Subject: [PATCH 097/118] actions: fix documented limit for btrfs labels
 
 Our documentation of set-label says that labels for btrfs are limited
 to 256 characters, while btrfs-filesystem(1) says:
@@ -32,5 +32,5 @@ index cc18036..f0c157d 100644
  label on its parent filesystem.  The filesystem must not be mounted
  when trying to set the label.
 -- 
-2.5.0
+2.7.4
 

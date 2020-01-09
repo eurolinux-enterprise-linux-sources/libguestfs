@@ -1,7 +1,7 @@
 From 78927c760df4cffd705bc019f0e7ba42ee8a50bc Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 30 Apr 2015 11:15:37 +0200
-Subject: [PATCH 088/117] inspection: Support Fedora 17+ in old inspection code
+Subject: [PATCH 088/118] inspection: Support Fedora 17+ in old inspection code
  (RHBZ#1216305)
 
 Recognize grub2 as a bootloader, and /bin being a symlink to
@@ -37,5 +37,5 @@ index 11045b9..cd03112 100644
              $r{content} = "linux-root";
              $r{is_root} = 1;
 -- 
-2.5.0
+2.7.4
 

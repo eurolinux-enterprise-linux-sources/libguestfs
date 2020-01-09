@@ -1,7 +1,7 @@
 From 0fb49d7afe04278edc8dd8b6648cb8c3df98e0de Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 19 Jun 2014 10:37:36 -0400
-Subject: [PATCH 041/117] sparsify: Get free space on TMPDIR and give a warning
+Subject: [PATCH 041/118] sparsify: Get free space on TMPDIR and give a warning
  if we estimate it is too little.
 
 (cherry picked from commit 7c463ac477168df5d4e4eb472ba01fa18b89c1a6)
@@ -289,5 +289,5 @@ index b6c4cce..84e94c5 100644
  
  Compress the output file.  This I<only> works if the output format is
 -- 
-2.5.0
+2.7.4
 

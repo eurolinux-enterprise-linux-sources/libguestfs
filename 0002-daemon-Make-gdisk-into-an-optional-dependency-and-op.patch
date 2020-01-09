@@ -1,7 +1,7 @@
 From 2042024e57a804a580f912b8487270c3bcc1d3f1 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 18 Dec 2012 11:51:42 +0000
-Subject: [PATCH 002/117] daemon: Make gdisk into an optional dependency and
+Subject: [PATCH 002/118] daemon: Make gdisk into an optional dependency and
  optgroup.
 
 Also document that gdisk is a dependency at all.
@@ -74,5 +74,5 @@ index e479f03..1530040 100644
        InitGPT, Always, TestOutput (
          [["part_set_gpt_type"; "/dev/sda"; "1";
 -- 
-2.5.0
+2.7.4
 

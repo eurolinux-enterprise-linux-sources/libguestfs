@@ -1,7 +1,7 @@
-From 4fb7f7203aedf52ee4cc29c0e54536098564493a Mon Sep 17 00:00:00 2001
+From 11b256a69c20d6055a243adf2ebcf04bfe62f539 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 10 Jan 2011 16:07:12 +0000
-Subject: [PATCH 101/117] RHEL 6: Emphasize libguestfs-winsupport package
+Subject: [PATCH 102/118] RHEL 6: Emphasize libguestfs-winsupport package
  (RHBZ#627468).
 
 This RHEL 6.1-only patch changes the error messages when the
@@ -119,5 +119,5 @@ index e9a91e3..808115a 100644
  
      return \%oses;
 -- 
-2.5.0
+2.7.4
 

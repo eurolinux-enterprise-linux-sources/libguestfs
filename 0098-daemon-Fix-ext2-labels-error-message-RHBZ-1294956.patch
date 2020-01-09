@@ -1,7 +1,7 @@
 From 6ed4d7120cb73e4d3dbc9c0a1375f0ace25f1c63 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 4 Jan 2016 15:33:45 +0000
-Subject: [PATCH 098/117] daemon: Fix ext2 labels error message (RHBZ#1294956).
+Subject: [PATCH 098/118] daemon: Fix ext2 labels error message (RHBZ#1294956).
 
 (cherry picked from commit 1007b2555c71f8cb93cbda1604ce221a4101027d)
 ---
@@ -45,5 +45,5 @@ index d1ce6a4..7d9e2e4 100644
      return -1;
    }
 -- 
-2.5.0
+2.7.4
 

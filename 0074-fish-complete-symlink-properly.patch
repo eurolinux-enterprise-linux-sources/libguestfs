@@ -1,7 +1,7 @@
 From 8f2f6c3fb184c6a5ade34a74c5b58f96cd27cf19 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 31 Oct 2014 17:45:04 +0100
-Subject: [PATCH 074/117] fish: complete symlink properly
+Subject: [PATCH 074/118] fish: complete symlink properly
 
 When an entry is a symlink, check whether it points to a directory, so
 the entry for it can be completed correctly.
@@ -24,5 +24,5 @@ index 20ac56f..fbf49e3 100644
                        CLEANUP_FREE char *rp = guestfs_realpath (g, words[nr_words].name);
                        if (rp)
 -- 
-2.5.0
+2.7.4
 

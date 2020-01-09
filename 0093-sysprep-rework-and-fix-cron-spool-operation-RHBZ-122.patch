@@ -1,7 +1,7 @@
 From f859a936afaa8740310c1f7874dde33fcc6c20a6 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 1 Jul 2015 14:53:31 +0200
-Subject: [PATCH 093/117] sysprep: rework and fix cron-spool operation
+Subject: [PATCH 093/118] sysprep: rework and fix cron-spool operation
  (RHBZ#1229305)
 
 When cleaning the directories with cron/at jobs, remove only files
@@ -67,5 +67,5 @@ index 1a036dd..1197d3a 100644
  
  let op = {
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
 From 32077eec20a1fa16809083e436e3092dac3b59c9 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 19 Aug 2013 15:00:39 +0100
-Subject: [PATCH 010/117] launch: direct: Don't use -cpu host on TCG.
+Subject: [PATCH 010/118] launch: direct: Don't use -cpu host on TCG.
 
 qemu -cpu \? documents this as:
 
@@ -87,5 +87,5 @@ index a667b1d..67f967d 100644
      if (g->smp > 1) {
        snprintf (buf, sizeof buf, "%d", g->smp);
 -- 
-2.5.0
+2.7.4
 

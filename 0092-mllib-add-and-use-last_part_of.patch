@@ -1,7 +1,7 @@
 From 058d9865c07a0dfaf8ea7dea3d7bf4306ae88609 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 1 Jul 2015 14:35:31 +0200
-Subject: [PATCH 092/117] mllib: add and use last_part_of
+Subject: [PATCH 092/118] mllib: add and use last_part_of
 
 Collect this small snippet to get the part of a string after the last
 occurrency of a character; replace with it the current snippets doing
@@ -49,5 +49,5 @@ index b44fbfb..b394296 100644
             * next line currently does nothing, but should start to
             * work in a future version.
 -- 
-2.5.0
+2.7.4
 

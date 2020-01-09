@@ -1,7 +1,7 @@
 From 98d16f48a517b6a063862f46dffe74216a2f8c5a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 14:25:14 +0000
-Subject: [PATCH 059/117] java: Factor out common field code in RStructList.
+Subject: [PATCH 059/118] java: Factor out common field code in RStructList.
 
 No functional change.
 
@@ -77,5 +77,5 @@ index 746b3cd..b07173b 100644
    ) cols;
    pr "\n";
 -- 
-2.5.0
+2.7.4
 

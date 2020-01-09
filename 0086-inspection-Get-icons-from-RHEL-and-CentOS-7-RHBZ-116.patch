@@ -1,7 +1,7 @@
 From 761f2e24ed9032ae7029732998505d302d4b9df4 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 17 Nov 2014 10:25:33 +0000
-Subject: [PATCH 086/117] inspection: Get icons from RHEL and CentOS 7
+Subject: [PATCH 086/118] inspection: Get icons from RHEL and CentOS 7
  (RHBZ#1164619).
 
 (cherry picked from commit c8a608ecf8576bb754749db982714fa35cedfbe4)
@@ -52,5 +52,5 @@ index 57562aa..60b0fb5 100644
  
  #define DEBIAN_ICON "/usr/share/pixmaps/debian-logo.png"
 -- 
-2.5.0
+2.7.4
 

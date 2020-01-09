@@ -1,7 +1,7 @@
 From 268910fc8302bdc66cf9b69f39fb1a0e2622c20f Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 16 Dec 2014 15:52:32 +0100
-Subject: [PATCH 080/117] sysprep: recommend use of --selinux-relabel
+Subject: [PATCH 080/118] sysprep: recommend use of --selinux-relabel
 
 Add a small documentation paragraph in the "SELINUX" section
 recommending the usage of --selinux-relabel for guests using SELinux.
@@ -28,5 +28,5 @@ index 1636770..70894cf 100755
  
  Windows 8 "fast startup" can prevent virt-sysprep from working.
 -- 
-2.5.0
+2.7.4
 

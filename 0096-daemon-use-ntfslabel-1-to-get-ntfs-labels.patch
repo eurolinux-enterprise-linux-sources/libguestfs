@@ -1,7 +1,7 @@
 From c79cc9de1b1720ab24956a509afb24306dd2aa19 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 14 Jan 2015 18:59:57 +0100
-Subject: [PATCH 096/117] daemon: use ntfslabel(1) to get ntfs labels
+Subject: [PATCH 096/118] daemon: use ntfslabel(1) to get ntfs labels
 
 blkid(1) (or actually, libblkid) seems to handle filesystem labels up
 to 127 characters. Considering that btrfs labels can be up to 128
@@ -91,5 +91,5 @@ index e48670e..9a8e045 100644
  do_ntfs_3g_probe (int rw, const char *device)
  {
 -- 
-2.5.0
+2.7.4
 

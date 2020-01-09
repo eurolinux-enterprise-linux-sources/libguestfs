@@ -1,7 +1,7 @@
 From 818fee392a2ed972704438685a235ad91334b9b1 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 9 Oct 2013 12:07:39 +0100
-Subject: [PATCH 015/117] fish: Use UNIX_PATH_MAX instead of hard-coded value
+Subject: [PATCH 015/118] fish: Use UNIX_PATH_MAX instead of hard-coded value
  for max length of socket buf. (cherry picked from commit
  9f1bcbca55661632176dea4e1dadc4dea0ca7f21)
 
@@ -32,5 +32,5 @@ index 14c6034..6246506 100644
    int sock;
    FILE *fp;
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
 From e328b0227d3a11e81bf217d389c66e5d1c98e54c Mon Sep 17 00:00:00 2001
 From: Matthew Booth <mbooth@redhat.com>
 Date: Fri, 14 Dec 2012 15:53:27 +0000
-Subject: [PATCH 001/117] Add support for getting and setting GPT partition
+Subject: [PATCH 001/118] Add support for getting and setting GPT partition
  type GUIDs
 
 New APIs:
@@ -246,5 +246,5 @@ index bc97af3..b7eb0c0 100644
       * as ext2, empty [except for lost+found] and mounted on /.
       * No LVM.
 -- 
-2.5.0
+2.7.4
 

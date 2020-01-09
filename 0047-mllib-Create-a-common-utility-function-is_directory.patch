@@ -1,7 +1,7 @@
 From 1ca1fb11588e6254d7c89ce277328a5186d7567a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 11 Jul 2014 13:38:37 +0100
-Subject: [PATCH 047/117] mllib: Create a common utility function is_directory.
+Subject: [PATCH 047/118] mllib: Create a common utility function is_directory.
 
 This is a wrapper around Sys.is_directory which doesn't throw
 exceptions.
@@ -27,5 +27,5 @@ index c3a9382..77f2d31 100644
 +  try Sys.is_directory path
 +  with Sys_error _ -> false
 -- 
-2.5.0
+2.7.4
 

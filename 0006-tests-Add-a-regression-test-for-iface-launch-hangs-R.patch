@@ -1,7 +1,7 @@
 From dc538bb167249e6d384e3e0bfa60550e9f6adf39 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 19 Jun 2013 13:26:18 +0100
-Subject: [PATCH 006/117] tests: Add a regression test for iface launch hangs
+Subject: [PATCH 006/118] tests: Add a regression test for iface launch hangs
  (RHBZ#975797).
 
 Cherry picked from commit d8a3185823e608dbddbc6185209951140b8f3b33
@@ -88,5 +88,5 @@ index 0000000..8303309
 +
 +rm test1.img test2.img test3.img
 -- 
-2.5.0
+2.7.4
 

@@ -1,7 +1,7 @@
 From 1edb4e2035f9bd07f21ccb463fa41f1f3eb546b9 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 5 Aug 2014 13:34:28 +0200
-Subject: [PATCH 050/117] sparsify: update documentation
+Subject: [PATCH 050/118] sparsify: update documentation
 
 - remove mention of --in-place, not present in this version
 - in TMPDIR, remove the version for --tmp (it is provided in the current
@@ -34,5 +34,5 @@ index 64f3a8a..c88445c 100644
  You should ensure there is enough free space in the worst case for a
  full copy of the source disk (I<virtual> size), or else set C<$TMPDIR>
 -- 
-2.5.0
+2.7.4
 

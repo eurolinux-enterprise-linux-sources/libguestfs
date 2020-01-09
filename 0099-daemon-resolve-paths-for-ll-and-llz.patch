@@ -1,7 +1,7 @@
 From a049873d7b37c481075ab4ec32af13157b6225d7 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 15 Jan 2016 11:27:48 +0100
-Subject: [PATCH 099/117] daemon: resolve paths for ll and llz
+Subject: [PATCH 099/118] daemon: resolve paths for ll and llz
 
 Resolve in the guest the given path, so absolute symlinks can be listed
 using appliance tools without resolution errors.
@@ -73,5 +73,5 @@ index 96e7bf2..0e2f110 100644
      reply_with_perror ("malloc");
      return NULL;
 -- 
-2.5.0
+2.7.4
 

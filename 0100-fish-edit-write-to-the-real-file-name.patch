@@ -1,7 +1,7 @@
 From f994faadd4ad27793c6a8b8e6350d0fc2e3c86f5 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 1 Sep 2014 11:46:57 +0200
-Subject: [PATCH 100/117] fish: edit: write to the real file name
+Subject: [PATCH 100/118] fish: edit: write to the real file name
 
 When saving, resolve the path of the file being edited and use that as
 real target to write to. Otherwise, if the file name is a symlink then
@@ -152,5 +152,5 @@ index b9acf45..6f5bda4 100755
      echo "$output"
      exit 1
 -- 
-2.5.0
+2.7.4
 

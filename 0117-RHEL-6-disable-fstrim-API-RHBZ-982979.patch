@@ -1,7 +1,7 @@
-From 9df008580feacd7e941b836f29d275395ef46ec6 Mon Sep 17 00:00:00 2001
+From 2904e8cb1896e282ac78a743dc43c7ce9c27a6e1 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 13 May 2014 09:15:51 -0400
-Subject: [PATCH 116/117] RHEL 6: disable fstrim API (RHBZ#982979).
+Subject: [PATCH 117/118] RHEL 6: disable fstrim API (RHBZ#982979).
 
 The combination of qemu, kernel & virtio-scsi in RHEL 6 is too old to
 make fstrim work properly.
@@ -51,5 +51,5 @@ index dd82ee8..ea149d5 100644
          ]
  });
 -- 
-2.5.0
+2.7.4
 

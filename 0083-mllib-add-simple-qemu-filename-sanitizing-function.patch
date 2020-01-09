@@ -1,7 +1,7 @@
 From 859b6bdb8ea67200ce1d5a6295d7f48583528b88 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 16 Jan 2015 19:19:16 +0100
-Subject: [PATCH 083/117] mllib: add simple qemu filename sanitizing function
+Subject: [PATCH 083/118] mllib: add simple qemu filename sanitizing function
 
 It mimics a bit in OCaml the logic used in
 commit a95214b1985e694946e3426120a6fdc13a3f081f (for the main library)
@@ -36,5 +36,5 @@ index 77f2d31..3a33f7f 100644
 +  else
 +    filename
 -- 
-2.5.0
+2.7.4
 
