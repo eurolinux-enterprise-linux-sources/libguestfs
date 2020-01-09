@@ -1,7 +1,7 @@
-From b164dd32eb6122f415f07b5629b8064abd5a0071 Mon Sep 17 00:00:00 2001
+From 399716f6f53c7bb80384a39d2e8810a7fd86ed64 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Jun 2013 08:49:57 +0100
-Subject: [PATCH 098/102] RHEL 6: Add back some state test commands to
+Subject: [PATCH 113/117] RHEL 6: Add back some state test commands to
  guestfish (RHBZ#971664).
 
 In RHEL 6, re-add the following commands to ensure there is no
@@ -22,7 +22,7 @@ anything useful.
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/generator/actions.ml b/generator/actions.ml
-index 34fdfa4..40791a4 100644
+index 5b9a6b0..eae675a 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
 @@ -11211,8 +11211,8 @@ let is_documented { visibility = v } = match v with
@@ -37,5 +37,5 @@ index 34fdfa4..40791a4 100644
  let external_functions =
    List.filter is_external all_functions
 -- 
-1.9.3
+2.5.0
 

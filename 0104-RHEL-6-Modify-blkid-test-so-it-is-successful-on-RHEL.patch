@@ -1,7 +1,7 @@
-From f5d95b753f6f198a421f93fb192431d4ec79e00c Mon Sep 17 00:00:00 2001
+From c9a2056a14003f3324a2cbf42e808712ee6677f1 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 25 Jan 2012 14:29:58 +0000
-Subject: [PATCH 089/102] RHEL 6: Modify blkid test so it is successful on RHEL
+Subject: [PATCH 104/117] RHEL 6: Modify blkid test so it is successful on RHEL
  6-era blkid.
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 089/102] RHEL 6: Modify blkid test so it is successful on RHEL
  1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/generator/actions.ml b/generator/actions.ml
-index 1f4e071..34fdfa4 100644
+index 5f1bd40..5b9a6b0 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
 @@ -9000,11 +9000,7 @@ device is stopped, but it is not destroyed or zeroed." };
@@ -26,5 +26,5 @@ index 1f4e071..34fdfa4 100644
      shortdesc = "print block device attributes";
      longdesc = "\
 -- 
-1.9.3
+2.5.0
 

@@ -1,7 +1,7 @@
 From ccf641a31548ebefe6cbb289620d0dcf4015c77e Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 26 Aug 2014 16:12:24 +0200
-Subject: [PATCH 054/102] daemon: lvm-filter: use augeas for setting the filter
+Subject: [PATCH 054/117] daemon: lvm-filter: use augeas for setting the filter
 
 The way to set the filter for lvm devices was to open lvm.conf, look
 for uncommented "filter =" lines and replace the configuration there.
@@ -403,5 +403,5 @@ index ed10a48..2b9d933 100644
  
    if (rescan () == -1)
 -- 
-1.9.3
+2.5.0
 

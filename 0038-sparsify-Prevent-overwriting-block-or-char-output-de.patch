@@ -1,7 +1,7 @@
 From b82303e7023524d5dabe0d7632d4213bd0583a5a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 14 May 2014 12:22:02 -0400
-Subject: [PATCH 038/102] sparsify: Prevent overwriting block or char output
+Subject: [PATCH 038/117] sparsify: Prevent overwriting block or char output
  devices (RHBZ#1056290).
 
 virt-sparsify doesn't work if the output is a block device, and cannot
@@ -34,5 +34,5 @@ index a32ef83..f6c404e 100644
      debug_gc, format, ignores, machine_readable,
      option, quiet, verbose, trace, zeroes
 -- 
-1.9.3
+2.5.0
 

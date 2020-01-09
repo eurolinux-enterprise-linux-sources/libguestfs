@@ -1,7 +1,7 @@
-From 35b8584e89f67d9d787140fe8150720e3cec7561 Mon Sep 17 00:00:00 2001
+From 4fb7f7203aedf52ee4cc29c0e54536098564493a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 10 Jan 2011 16:07:12 +0000
-Subject: [PATCH 086/102] RHEL 6: Emphasize libguestfs-winsupport package
+Subject: [PATCH 101/117] RHEL 6: Emphasize libguestfs-winsupport package
  (RHBZ#627468).
 
 This RHEL 6.1-only patch changes the error messages when the
@@ -95,10 +95,10 @@ index 12ceaa7..ecccc71 100644
      exit (EXIT_FAILURE);
    }
 diff --git a/perl/lib/Sys/Guestfs/Lib.pm b/perl/lib/Sys/Guestfs/Lib.pm
-index 11045b9..fcb2843 100644
+index e9a91e3..808115a 100644
 --- a/perl/lib/Sys/Guestfs/Lib.pm
 +++ b/perl/lib/Sys/Guestfs/Lib.pm
-@@ -831,7 +831,18 @@ sub inspect_operating_systems
+@@ -836,7 +836,18 @@ sub inspect_operating_systems
  
      # If we didn't find any operating systems then it's an error (RHBZ#591142).
      if (0 == keys %oses) {
@@ -119,5 +119,5 @@ index 11045b9..fcb2843 100644
  
      return \%oses;
 -- 
-1.9.3
+2.5.0
 

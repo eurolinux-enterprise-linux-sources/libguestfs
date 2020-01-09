@@ -1,7 +1,7 @@
-From c75a9c8a5ed3c613370c87375f9460422ba70167 Mon Sep 17 00:00:00 2001
+From a7ab89948c3ffaa3bfdfcb9a7cf76405068ed311 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 19 Sep 2012 15:02:27 +0100
-Subject: [PATCH 091/102] RHEL 6: Exclude iptables from the appliance
+Subject: [PATCH 106/117] RHEL 6: Exclude iptables from the appliance
  (RHBZ#858648).
 
 ---
@@ -23,5 +23,5 @@ index aa4c406..c43006e 100644
  
  #ifdef DEBIAN
 -- 
-1.9.3
+2.5.0
 

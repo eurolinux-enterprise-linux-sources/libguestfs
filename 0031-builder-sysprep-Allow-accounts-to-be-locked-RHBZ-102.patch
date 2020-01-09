@@ -1,7 +1,7 @@
 From a804aef95d8491d03e4a992cf0aabe7619afff4c Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 21 Nov 2013 17:13:22 +0000
-Subject: [PATCH 031/102] builder/sysprep: Allow accounts to be locked
+Subject: [PATCH 031/117] builder/sysprep: Allow accounts to be locked
  (RHBZ#1028660).
 
 This allows you to select both locked accounts and disabled
@@ -177,5 +177,5 @@ index 0cd834a..ef0e985 100644
        };
  
 -- 
-1.9.3
+2.5.0
 

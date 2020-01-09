@@ -1,7 +1,7 @@
-From e50a757b2dbb0ab3704055b83833d9eaa4202c0b Mon Sep 17 00:00:00 2001
+From ab6553cc79eb5734ca473137a02af460d5c86b73 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Jun 2013 11:46:01 +0100
-Subject: [PATCH 099/102] RHEL 6: Pipe 'yes' into ntfsresize (RHBZ#971326).
+Subject: [PATCH 114/117] RHEL 6: Pipe 'yes' into ntfsresize (RHBZ#971326).
 
 This works around a problem in ntfsresize on RHEL 6.  See:
 https://bugzilla.redhat.com/show_bug.cgi?id=971326#c4
@@ -10,10 +10,10 @@ https://bugzilla.redhat.com/show_bug.cgi?id=971326#c4
  1 file changed, 21 insertions(+), 17 deletions(-)
 
 diff --git a/daemon/ntfs.c b/daemon/ntfs.c
-index e48670e..22a952a 100644
+index 9a8e045..45a5833 100644
 --- a/daemon/ntfs.c
 +++ b/daemon/ntfs.c
-@@ -69,13 +69,9 @@ int
+@@ -93,13 +93,9 @@ int
  do_ntfsresize (const char *device, int64_t size, int force)
  {
    CLEANUP_FREE char *err = NULL;
@@ -29,7 +29,7 @@ index e48670e..22a952a 100644
  
    if (optargs_bitmask & GUESTFS_NTFSRESIZE_SIZE_BITMASK) {
      if (size <= 0) {
-@@ -83,20 +79,28 @@ do_ntfsresize (const char *device, int64_t size, int force)
+@@ -107,20 +103,28 @@ do_ntfsresize (const char *device, int64_t size, int force)
        return -1;
      }
  
@@ -70,5 +70,5 @@ index e48670e..22a952a 100644
    }
  
 -- 
-1.9.3
+2.5.0
 

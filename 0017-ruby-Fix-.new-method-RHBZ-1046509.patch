@@ -1,7 +1,7 @@
 From af4c9fa086aee5b41d7c5864bff34e01223ecd4f Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 27 Dec 2013 09:45:49 +0000
-Subject: [PATCH 017/102] ruby: Fix .new method (RHBZ#1046509).
+Subject: [PATCH 017/117] ruby: Fix .new method (RHBZ#1046509).
 
 The .new method was unintentionally broken in
 commit 9466060201600db47016133d80af22eb38091a49.
@@ -326,5 +326,5 @@ index 290deac..5eb373e 100644
      close_invoked = 0
      close = Proc.new {| event, event_handle, buf, array |
 -- 
-1.9.3
+2.5.0
 

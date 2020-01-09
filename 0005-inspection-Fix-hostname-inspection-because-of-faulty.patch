@@ -1,7 +1,7 @@
 From ff8e22fa93e5371fb91da4e6ff704acd7a810fbf Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 28 Jun 2013 11:25:18 +0100
-Subject: [PATCH 005/102] inspection: Fix hostname inspection because of faulty
+Subject: [PATCH 005/117] inspection: Fix hostname inspection because of faulty
  Augeas path expression (RHBZ#975412). (cherry picked from commit
  2343840936c900109b6675cc6e605026443ccf0a)
 
@@ -146,5 +146,5 @@ index d18e2e2..3bcbe8f 100644
  is_partition (guestfs_h *g, const char *partition)
  {
 -- 
-1.9.3
+2.5.0
 

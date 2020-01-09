@@ -1,7 +1,7 @@
 From c55002103ab7e418df43b2c6a290ed02e35a09ea Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sat, 26 Oct 2013 17:09:06 +0100
-Subject: [PATCH 036/102] firstboot: Send the output to the console as well as
+Subject: [PATCH 036/117] firstboot: Send the output to the console as well as
  to the log file.
 
 For systemd:
@@ -59,5 +59,5 @@ index 0207cc1..9e4c7b6 100644
  [Install]
  WantedBy=default.target
 -- 
-1.9.3
+2.5.0
 

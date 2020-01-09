@@ -1,7 +1,7 @@
 From cfcd8613dcf57678458fd6e6a9adc8304229d19b Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 23 Jul 2014 15:01:44 +0100
-Subject: [PATCH 081/102] sparsify: Relax requirement that output device cannot
+Subject: [PATCH 081/117] sparsify: Relax requirement that output device cannot
  be block device (RHBZ#1122557).
 
 To fix RHBZ#1056290, I prevented virt-sparsify being used if the
@@ -38,5 +38,5 @@ index d01899b..d6b1193 100644
      error (f_"output '%s' cannot be a character device, it must be a regular file")
        outdisk;
 -- 
-1.9.3
+2.5.0
 

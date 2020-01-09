@@ -1,7 +1,7 @@
 From d6822f1d19b7c8f6e91869b811a301277ff88ab9 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 19 Aug 2013 14:59:19 +0100
-Subject: [PATCH 009/102] launch: direct: Specify -cpu host,+kvmclock.
+Subject: [PATCH 009/117] launch: direct: Specify -cpu host,+kvmclock.
 
 '-cpu host' makes the CPU look like the host CPU.  This is useful
 because it means the appliance can use all the host CPU's features,
@@ -56,5 +56,5 @@ index bb9c832..a667b1d 100644
        snprintf (buf, sizeof buf, "%d", g->smp);
        add_cmdline (g, "-smp");
 -- 
-1.9.3
+2.5.0
 

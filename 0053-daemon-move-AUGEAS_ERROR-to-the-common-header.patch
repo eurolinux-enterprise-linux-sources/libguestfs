@@ -1,7 +1,7 @@
 From 063449df4341ee6647e17ea1714c49f938e419e1 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Tue, 26 Aug 2014 14:39:28 +0200
-Subject: [PATCH 053/102] daemon: move AUGEAS_ERROR to the common header
+Subject: [PATCH 053/117] daemon: move AUGEAS_ERROR to the common header
 
 Other than for current aug_* API, it will be useful for further code
 using augeas directly.
@@ -69,5 +69,5 @@ index f2e3c7a..e6208b1 100644
  #define CLEANUP_FREE __attribute__((cleanup(cleanup_free)))
  #define CLEANUP_FREE_STRING_LIST                        \
 -- 
-1.9.3
+2.5.0
 

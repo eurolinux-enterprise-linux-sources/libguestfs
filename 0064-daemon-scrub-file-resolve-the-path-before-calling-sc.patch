@@ -1,7 +1,7 @@
 From 915ba9801bdbcde8ddafdecb07552704bd42489c Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 21 May 2014 15:03:17 +0200
-Subject: [PATCH 064/102] daemon: scrub-file: resolve the path before calling
+Subject: [PATCH 064/117] daemon: scrub-file: resolve the path before calling
  scrub (RHBZ#1099490).
 
 Resolve the given path within the chroot, so scrub can be invoked
@@ -58,5 +58,5 @@ index 4d16db4..8786c4a 100644
      shortdesc = "scrub (securely wipe) a file";
      longdesc = "\
 -- 
-1.9.3
+2.5.0
 

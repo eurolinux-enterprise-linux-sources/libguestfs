@@ -1,7 +1,7 @@
 From 19bea5e464388cab00adf1b84199eb408deca4a4 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 24 Jan 2014 10:20:14 +0000
-Subject: [PATCH 023/102] fuse: In mount-local-run, test if root filesystem has
+Subject: [PATCH 023/117] fuse: In mount-local-run, test if root filesystem has
  been mounted (RHBZ#1057504).
 
 It is never normally valid to use the mount-local* APIs when you
@@ -52,5 +52,5 @@ index 6edb757..1a31153 100644
  
    /* Enter the main loop. */
 -- 
-1.9.3
+2.5.0
 

@@ -1,7 +1,7 @@
 From 895fed6cc081dc8c49169ee8aa6ea823e384e1c9 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 28 Jun 2013 11:23:55 +0100
-Subject: [PATCH 004/102] Augeas >= 1.0.0 is now required. (cherry picked from
+Subject: [PATCH 004/117] Augeas >= 1.0.0 is now required. (cherry picked from
  commit 2c4e7ad135b0a14021fad2b942f66b78af0041e0)
 
 ---
@@ -178,5 +178,5 @@ index c2f8dba..d18e2e2 100644
      return -1;
  
 -- 
-1.9.3
+2.5.0
 

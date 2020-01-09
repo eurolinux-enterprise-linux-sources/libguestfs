@@ -1,7 +1,7 @@
-From 876b9424f792f26ca1e367cfdf3dcb674a5da99e Mon Sep 17 00:00:00 2001
+From 9de5649184f5b59355f8d60ab00d24a4dc9b1986 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 5 Nov 2012 11:19:19 +0000
-Subject: [PATCH 093/102] RHEL 6: Ignore /etc/release if /etc/redhat-release
+Subject: [PATCH 108/117] RHEL 6: Ignore /etc/release if /etc/redhat-release
  exists (RHBZ#872454).
 
 If the user has created /etc/release on a RHEL machine, don't
@@ -25,5 +25,5 @@ index fd6c783..79bde38 100644
       * that is probably /dev/sda5 (see:
       * http://www.freebsd.org/doc/handbook/disk-organization.html)
 -- 
-1.9.3
+2.5.0
 

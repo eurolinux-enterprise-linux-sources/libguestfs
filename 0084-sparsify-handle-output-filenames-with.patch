@@ -1,7 +1,7 @@
 From 458f73561247747f6dc0ab14542c55864be0b421 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 16 Jan 2015 19:25:26 +0100
-Subject: [PATCH 084/102] sparsify: handle output filenames with ':'
+Subject: [PATCH 084/117] sparsify: handle output filenames with ':'
 
 With commit a594b7f90a682e2a9327b142138edb76ad8ba8ff the checks for
 input and output files with ':' were removed; while the input file is
@@ -31,5 +31,5 @@ index d6b1193..84d5a5f 100644
      printf "%s\n%!" cmd;
    if Sys.command cmd <> 0 then
 -- 
-1.9.3
+2.5.0
 

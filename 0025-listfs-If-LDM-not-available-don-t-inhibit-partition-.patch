@@ -1,7 +1,7 @@
 From 22720e12cb02e5f45b18e8a44a93e75b7e66b296 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 13 May 2014 08:54:16 -0400
-Subject: [PATCH 025/102] listfs: If LDM not available, don't inhibit partition
+Subject: [PATCH 025/117] listfs: If LDM not available, don't inhibit partition
  detection (RHBZ#1079182).
 
 If a disk has type 0x42 partition (which would indicate LDM), but LDM
@@ -54,5 +54,5 @@ index b87a021..d53b3828 100644
      ldmvols = guestfs_list_ldm_volumes (g);
      if (ldmvols == NULL) goto error;
 -- 
-1.9.3
+2.5.0
 

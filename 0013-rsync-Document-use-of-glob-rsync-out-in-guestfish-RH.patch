@@ -1,7 +1,7 @@
 From cac3862a38f77b795f794ad05f4b1d36a8d0fcd2 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 29 Aug 2013 13:49:26 +0100
-Subject: [PATCH 013/102] rsync: Document use of glob + rsync-out in guestfish
+Subject: [PATCH 013/117] rsync: Document use of glob + rsync-out in guestfish
  (RHBZ#1001876). (cherry picked from commit
  c04fbbda3e1d2bf98e241a95e069ac1fe202c14f)
 
@@ -30,5 +30,5 @@ index 1530040..d86413b 100644
    { defaults with
      name = "ls0";
 -- 
-1.9.3
+2.5.0
 

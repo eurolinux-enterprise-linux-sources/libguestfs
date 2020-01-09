@@ -1,7 +1,7 @@
-From d94d94c677a87a8cc44fb6870453ec4fa1e6c5e6 Mon Sep 17 00:00:00 2001
+From ac11ae617db7bf5ec5c33f9c721aefc257e3468a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 30 May 2013 16:27:23 +0100
-Subject: [PATCH 097/102] RHEL 6: tests/regressions/rhbz895904.sh: Use ``
+Subject: [PATCH 112/117] RHEL 6: tests/regressions/rhbz895904.sh: Use ``
  instead of $().
 
 Apparently bash in RHEL 6 cannot handle this unusual
@@ -33,5 +33,5 @@ index 6440620..394f37a 100755
  if [ "$output" != "4294967295 0 ./file1
  1219131554 3 ./subdir/file2" ]; then
 -- 
-1.9.3
+2.5.0
 

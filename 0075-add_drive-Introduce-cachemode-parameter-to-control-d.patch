@@ -1,7 +1,7 @@
 From 4d503e38f3ece700269e360ea876379d1c459976 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sat, 31 Aug 2013 22:24:40 +0100
-Subject: [PATCH 075/102] add_drive: Introduce 'cachemode' parameter to control
+Subject: [PATCH 075/117] add_drive: Introduce 'cachemode' parameter to control
  drive caching.
 
 This commit adds an optional 'cachemode' parameter to the 'add_drive'
@@ -331,5 +331,5 @@ index 6188671..a19d5ba 100644
  
    if (drv->disk_label) {
 -- 
-1.9.3
+2.5.0
 

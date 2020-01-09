@@ -1,7 +1,7 @@
 From 6a54124c89176d076636da9a4168b842c9383b7a Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 5 May 2014 10:07:35 -0400
-Subject: [PATCH 024/102] fuse: use fusermount instead of guestunmount in error
+Subject: [PATCH 024/117] fuse: use fusermount instead of guestunmount in error
  message
 
 guestunmount does not exist in libguestfs 1.20.x.
@@ -25,5 +25,5 @@ index 1a31153..e65be13 100644
      return -1;
    }
 -- 
-1.9.3
+2.5.0
 

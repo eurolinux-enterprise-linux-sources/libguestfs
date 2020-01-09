@@ -1,7 +1,7 @@
 From 958cf46f0ed57efe4a224b218a66fc77753f8d15 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 15:04:13 +0000
-Subject: [PATCH 062/102] java: Add regression test for RStruct/RStructList
+Subject: [PATCH 062/117] java: Add regression test for RStruct/RStructList
  (RHBZ#1073906).
 
 (cherry picked from commit 1ba2e3e14aa6d58bff26646a1328969fda44610f)
@@ -107,5 +107,5 @@ index 0000000..ddf2f24
 +    }
 +}
 -- 
-1.9.3
+2.5.0
 

@@ -1,7 +1,7 @@
-From cff44de37596cdafad962264e998ea0c4abe83ad Mon Sep 17 00:00:00 2001
+From 390567176b8305dd26407831f27b0f8a955b7f21 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 29 May 2013 21:50:00 +0100
-Subject: [PATCH 096/102] RHEL 6: Revert "Use pkg-config for Python"
+Subject: [PATCH 111/117] RHEL 6: Revert "Use pkg-config for Python"
 
 Python in RHEL 6 does not contain the required pkg-config files.
 
@@ -94,5 +94,5 @@ index e9a9b85..2caa07f 100644
  
  libguestfsmod_la_CFLAGS = \
 -- 
-1.9.3
+2.5.0
 

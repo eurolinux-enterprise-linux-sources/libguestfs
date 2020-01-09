@@ -1,7 +1,7 @@
 From d0968bf50451005c61306e61165b35d166d87a19 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 12 Jun 2014 13:28:03 +0100
-Subject: [PATCH 040/102] fuse: UID 0 should override all permissions checks
+Subject: [PATCH 040/117] fuse: UID 0 should override all permissions checks
  (RHBZ#1106548).
 
 Previously if you were root, and you tried to change directory into a
@@ -99,5 +99,5 @@ index e65be13..5e9378e 100644
    return ok ? 0 : -EACCES;
  }
 -- 
-1.9.3
+2.5.0
 

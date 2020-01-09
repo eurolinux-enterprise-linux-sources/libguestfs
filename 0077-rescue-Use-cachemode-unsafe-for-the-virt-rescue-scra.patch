@@ -1,7 +1,7 @@
 From 31b5db7fe469e2b44258469360af8e68b9726578 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sat, 31 Aug 2013 22:48:04 +0100
-Subject: [PATCH 077/102] rescue: Use cachemode "unsafe" for the virt-rescue
+Subject: [PATCH 077/117] rescue: Use cachemode "unsafe" for the virt-rescue
  --scratch option.
 
 (cherry picked from commit 3f0748f1fc64e42517c0d4535c27b1f32da86023)
@@ -63,5 +63,5 @@ index ad520d5..ca0770f 100644
    *drvs = drv;
  }
 -- 
-1.9.3
+2.5.0
 

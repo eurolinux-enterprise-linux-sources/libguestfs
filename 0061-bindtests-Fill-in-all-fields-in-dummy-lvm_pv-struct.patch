@@ -1,7 +1,7 @@
 From 6a6bc460f72856a666f62d689f6292a27e9ac4fe Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 15:04:47 +0000
-Subject: [PATCH 061/102] bindtests: Fill in all fields in dummy lvm_pv struct.
+Subject: [PATCH 061/117] bindtests: Fill in all fields in dummy lvm_pv struct.
 
 Used for testing RStruct/RStructList return values, but only
 in GObject and Java bindings.
@@ -72,5 +72,5 @@ index 86edd4c..f95cd17 100644
           | RHashtable _ ->
               pr "  char **strs;\n";
 -- 
-1.9.3
+2.5.0
 

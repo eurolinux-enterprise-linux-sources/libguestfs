@@ -1,7 +1,7 @@
-From bebcb32a294f27124ca6ece66d9e6e9f53b17d78 Mon Sep 17 00:00:00 2001
+From 30ba442171596f1c1a121dec6101ed320c026d61 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 14 Jan 2011 15:13:53 +0000
-Subject: [PATCH 087/102] RHEL 6: Require external hex editor set with
+Subject: [PATCH 102/117] RHEL 6: Require external hex editor set with
  $HEXEDITOR.
 
 RHEL 6 doesn't have the hexedit program or any suitable replacement.
@@ -45,7 +45,7 @@ index af72ebb..c46b747 100644
    snprintf (buf, sizeof buf, "/dev/fd/%d", fd);
  
 diff --git a/generator/actions.ml b/generator/actions.ml
-index cc18036..1f4e071 100644
+index f0c157d..5f1bd40 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
 @@ -11008,7 +11008,7 @@ See L</WILDCARDS AND GLOBBING>." };
@@ -72,5 +72,5 @@ index cc18036..1f4e071 100644
  See also L</hexdump>." };
  
 -- 
-1.9.3
+2.5.0
 

@@ -1,7 +1,7 @@
 From 3bebe598abaa490c6f0743b8fb0447e113913ac3 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 9 Dec 2013 19:37:51 +0100
-Subject: [PATCH 035/102] sysprep: mention globbing in help for --delete
+Subject: [PATCH 035/117] sysprep: mention globbing in help for --delete
 
 Followup of ed4bcb119cb908e98ecc1107dcd8b740ee2f484f.
 
@@ -29,5 +29,5 @@ index 59d5485..3db3f57 100644
        { extra_argspec = ("--delete", Arg.String add_paths, s_"path" ^ " " ^ s_"File or directory to be removed on guest");
          extra_pod_argval = Some "PATHNAME";
 -- 
-1.9.3
+2.5.0
 

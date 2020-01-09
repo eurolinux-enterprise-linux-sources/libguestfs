@@ -1,7 +1,7 @@
 From 1b74ffcf88f7f2f34c442194a34cc465d1e24477 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 18 Jun 2013 15:12:02 +0100
-Subject: [PATCH 003/102] utils: Add utility functions guestfs___concat_strings
+Subject: [PATCH 003/117] utils: Add utility functions guestfs___concat_strings
  and guestfs__join_strings.
 
 These concatenate strings or join them with a separator in between.
@@ -128,5 +128,5 @@ index 54d9d7e..f8d2509 100644
   * string must be freed by the caller.
   */
 -- 
-1.9.3
+2.5.0
 

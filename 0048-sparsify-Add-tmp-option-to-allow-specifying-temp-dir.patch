@@ -1,7 +1,7 @@
 From afbf06d20a26d6d4a613918869d59568594a0082 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 11 Jul 2014 13:26:33 +0100
-Subject: [PATCH 048/102] sparsify: Add --tmp option to allow specifying temp
+Subject: [PATCH 048/117] sparsify: Add --tmp option to allow specifying temp
  directory or block device.
 
 Add the virt-sparsify --tmp option.
@@ -260,5 +260,5 @@ index 84e94c5..0514d80 100644
  full copy of the source disk (I<virtual> size), or else set C<$TMPDIR>
  to point to another directory that has enough space.
 -- 
-1.9.3
+2.5.0
 

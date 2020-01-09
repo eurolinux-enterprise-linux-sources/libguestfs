@@ -1,7 +1,7 @@
 From 855af1d931c55151b516a0578f2082a8ebafc58c Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 13 Nov 2014 05:03:45 -0500
-Subject: [PATCH 071/102] customize: firstboot: fix Linux log output
+Subject: [PATCH 071/117] customize: firstboot: fix Linux log output
 
 Pass -a to each tee invocation, otherwise just the last one (so only for
 the last script executed) will appear in the log file.
@@ -37,5 +37,5 @@ index ea79cb8..cbb2a16 100644
    done
    rm -f $d_done/*
 -- 
-1.9.3
+2.5.0
 

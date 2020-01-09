@@ -1,7 +1,7 @@
 From ee2edd789b8e8b315682c6d9a09231c62cbc4e41 Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 2 Jun 2014 21:24:35 +0200
-Subject: [PATCH 065/102] fish: list also aliases in the guestfish help
+Subject: [PATCH 065/117] fish: list also aliases in the guestfish help
  (RHBZ#1103877).
 
 Output also the aliases (telling which function they refer to) in
@@ -77,5 +77,5 @@ index 90408b0..b4a536d 100644
    pr "          _(\"Use -h <cmd> / help <cmd> to show detailed help for a command.\"));\n";
    pr "}\n";
 -- 
-1.9.3
+2.5.0
 

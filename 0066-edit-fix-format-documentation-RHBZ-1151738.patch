@@ -1,7 +1,7 @@
 From 0e1b178cf1d53db22936b7ff7d4482b183fd0edc Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 13 Oct 2014 11:02:14 +0200
-Subject: [PATCH 066/102] edit: fix --format documentation (RHBZ#1151738).
+Subject: [PATCH 066/117] edit: fix --format documentation (RHBZ#1151738).
 
 Use only --format=FMT as a way to specify a format, as the version
 without the equal sign will not work for that.
@@ -25,5 +25,5 @@ index 4bc2dce..6387919 100644
  =item B<--format>
  
 -- 
-1.9.3
+2.5.0
 

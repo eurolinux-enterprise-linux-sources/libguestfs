@@ -1,7 +1,7 @@
 From 9c3926752b941c22361685b5482b35693c573813 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 14:34:55 +0000
-Subject: [PATCH 060/102] java: Use correct Set*Field JNI accessors to set
+Subject: [PATCH 060/117] java: Use correct Set*Field JNI accessors to set
  fields of the appropriate type.
 
 Using the wrong accessors (somehow - I have no idea how) caused other
@@ -47,5 +47,5 @@ index b07173b..d86304a 100644
    pr "\n";
    pr "    (*env)->SetObjectArrayElement (env, jr, i, jfl);\n";
 -- 
-1.9.3
+2.5.0
 

@@ -1,7 +1,7 @@
 From 3269b4ab250f9405254cd9aa858f418f964e6f80 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 7 Mar 2014 13:49:52 +0000
-Subject: [PATCH 057/102] java: Fix bogus construction of all RStructList
+Subject: [PATCH 057/117] java: Fix bogus construction of all RStructList
  returned values (RHBZ#1073906).
 
 Thanks Maarten on IRC for spotting the problem.
@@ -25,5 +25,5 @@ index 6ff6313..73ca3df 100644
    pr "  guestfs_free_%s_list (r);\n" typ;
    pr "  return jr;\n"
 -- 
-1.9.3
+2.5.0
 

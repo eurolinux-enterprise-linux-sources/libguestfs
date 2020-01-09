@@ -1,7 +1,7 @@
-From 4cb27caa5e854d6d5fb1a38935e7e7fadb59ae3c Mon Sep 17 00:00:00 2001
+From 7f82d9cf5be9eecb80c0f67401b02b65acb3ec41 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 1 Mar 2012 17:04:36 +0000
-Subject: [PATCH 090/102] RHEL 6: Remove libguestfs live (RHBZ#798980).
+Subject: [PATCH 105/117] RHEL 6: Remove libguestfs live (RHBZ#798980).
 
 This isn't supported in RHEL 6.
 ---
@@ -38,5 +38,5 @@ index 9bd64fa..679e1a6 100644
  static int
  shutdown_unix (guestfs_h *g, int check_for_errors)
 -- 
-1.9.3
+2.5.0
 

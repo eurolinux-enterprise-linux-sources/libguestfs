@@ -14,7 +14,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.20.11
-Release:       14%{?dist}
+Release:       17%{?dist}
 License:       LGPLv2+
 Group:         Development/Libraries
 URL:           http://libguestfs.org/
@@ -119,25 +119,40 @@ Patch0082:     0082-drives-Remove-check-for-in-filename-RHBZ-1128942.patch
 Patch0083:     0083-mllib-add-simple-qemu-filename-sanitizing-function.patch
 Patch0084:     0084-sparsify-handle-output-filenames-with.patch
 Patch0085:     0085-sparsify-remove-checks-for-in-filenames.patch
+Patch0086:     0086-inspection-Get-icons-from-RHEL-and-CentOS-7-RHBZ-116.patch
+Patch0087:     0087-inspection-Allow-etc-favicon.png-to-be-a-symbolic-li.patch
+Patch0088:     0088-inspection-Support-Fedora-17-in-old-inspection-code-.patch
+Patch0089:     0089-inspection-recognize-xfs-as-Linux-filesystem-RHBZ-12.patch
+Patch0090:     0090-inspection-read-UUID-and-label-for-xfs-RHBZ-1216305.patch
+Patch0091:     0091-mllib-add-an-optional-filter-for-rm_rf_only_files.patch
+Patch0092:     0092-mllib-add-and-use-last_part_of.patch
+Patch0093:     0093-sysprep-rework-and-fix-cron-spool-operation-RHBZ-122.patch
+Patch0094:     0094-sparsify-read-all-qemu-img-help-output-RHBZ-1218934.patch
+Patch0095:     0095-daemon-use-btrfs-1-to-get-btrfs-labels.patch
+Patch0096:     0096-daemon-use-ntfslabel-1-to-get-ntfs-labels.patch
+Patch0097:     0097-actions-fix-documented-limit-for-btrfs-labels.patch
+Patch0098:     0098-daemon-Fix-ext2-labels-error-message-RHBZ-1294956.patch
+Patch0099:     0099-daemon-resolve-paths-for-ll-and-llz.patch
+Patch0100:     0100-fish-edit-write-to-the-real-file-name.patch
 
 # RHEL 6 specific patches.
-Patch0086:     0086-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
-Patch0087:     0087-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
-Patch0088:     0088-RHEL-6-Directly-include-String-ShellQuote.patch
-Patch0089:     0089-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
-Patch0090:     0090-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
-Patch0091:     0091-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
-Patch0092:     0092-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
-Patch0093:     0093-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
-Patch0094:     0094-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
-Patch0095:     0095-RHEL-6-Remove-check-for-qemu-1.patch
-Patch0096:     0096-RHEL-6-Revert-Use-pkg-config-for-Python.patch
-Patch0097:     0097-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
-Patch0098:     0098-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
-Patch0099:     0099-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
-Patch0100:     0100-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
-Patch0101:     0101-RHEL-6-disable-fstrim-API-RHBZ-982979.patch
-Patch0102:     0102-RHEL-6-sysprep-remove-etc-shadow-note.patch
+Patch0101:     0101-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
+Patch0102:     0102-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
+Patch0103:     0103-RHEL-6-Directly-include-String-ShellQuote.patch
+Patch0104:     0104-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
+Patch0105:     0105-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
+Patch0106:     0106-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
+Patch0107:     0107-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
+Patch0108:     0108-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
+Patch0109:     0109-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
+Patch0110:     0110-RHEL-6-Remove-check-for-qemu-1.patch
+Patch0111:     0111-RHEL-6-Revert-Use-pkg-config-for-Python.patch
+Patch0112:     0112-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
+Patch0113:     0113-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
+Patch0114:     0114-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
+Patch0115:     0115-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
+Patch0116:     0116-RHEL-6-disable-fstrim-API-RHBZ-982979.patch
+Patch0117:     0117-RHEL-6-sysprep-remove-etc-shadow-note.patch
 
 # Basic build requirements:
 BuildRequires: perl(Pod::Simple)
@@ -1079,6 +1094,28 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Jan 19 2016 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-17
+- Mention ext2/3/4 in set-label error messages for ext labels.
+  resolves: rhbz#1294956
+- Fix handling of symlinks in ll and llz, and when editing files in guestfish
+  and virt-edit.
+  resolves: rhbz#1293276
+
+* Tue Nov 10 2015 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-16
+- Fix the old inspection code to handle some features of RHEL 7 images:
+  handle /bin as symlink to /usr/bin, grub2 in boot partition, and
+  recognize xfs as filesystem (reading UUID and label for it).
+  resolves: rhbz#1216305
+- Fix reading of icon in RHEL 7 guests.
+  resolves: rhbz#1216298
+- virt-sysprep: don't delete /var/spool/at/.SEQ
+  resolves: rhbz#1229305
+- virt-sparsify: read all the output of `qemu-img --help`
+  resolves: rhbz#1218934
+- Fix getting long labels for NTFS and btrfs filesystems; also correct the
+  documented maximum length of btrfs labels.
+  resolves: rhbz#1164729
+
 * Mon Jan 19 2015 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-14
 - Raise augeas (Build)Requires to >= 1.0.0-8.el6, which fixes
   rhbz#1160261, so virt-sysprep can remove users from /etc/shadow;
