@@ -1,15 +1,16 @@
-From 11247dec5145a40095dac8d23d9711acf49e92e5 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From bebcb32a294f27124ca6ece66d9e6e9f53b17d78 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 14 Jan 2011 15:13:53 +0000
-Subject: [PATCH 53/67] RHEL 6: Require external hex editor set with $HEXEDITOR.
+Subject: [PATCH 087/102] RHEL 6: Require external hex editor set with
+ $HEXEDITOR.
 
 RHEL 6 doesn't have the hexedit program or any suitable replacement.
 Require that the user sets $HEXEDITOR to make this command work.
 (cherry picked from commit 1ee31426e13446bc5fcce242eb496a01d8a78d8c)
 ---
- fish/guestfish.pod   |    3 +--
- fish/hexedit.c       |    6 ++++--
- generator/actions.ml |    9 +++++----
+ fish/guestfish.pod   | 3 +--
+ fish/hexedit.c       | 6 ++++--
+ generator/actions.ml | 9 +++++----
  3 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/fish/guestfish.pod b/fish/guestfish.pod
@@ -44,10 +45,10 @@ index af72ebb..c46b747 100644
    snprintf (buf, sizeof buf, "/dev/fd/%d", fd);
  
 diff --git a/generator/actions.ml b/generator/actions.ml
-index 4d16db4..e66ec73 100644
+index cc18036..1f4e071 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
-@@ -10936,7 +10936,7 @@ See L</WILDCARDS AND GLOBBING>." };
+@@ -11008,7 +11008,7 @@ See L</WILDCARDS AND GLOBBING>." };
   hexedit <filename|device> <max>
   hexedit <filename|device> <start> <max>
  
@@ -56,7 +57,7 @@ index 4d16db4..e66ec73 100644
  or block device.
  
  This command works by downloading potentially the whole file or
-@@ -10960,9 +10960,10 @@ To edit the superblock of an ext2 filesystem on C</dev/sda1>, do:
+@@ -11032,9 +11032,10 @@ To edit the superblock of an ext2 filesystem on C</dev/sda1>, do:
  
  (assuming the superblock is in the standard location).
  
@@ -71,5 +72,5 @@ index 4d16db4..e66ec73 100644
  See also L</hexdump>." };
  
 -- 
-1.7.1
+1.9.3
 

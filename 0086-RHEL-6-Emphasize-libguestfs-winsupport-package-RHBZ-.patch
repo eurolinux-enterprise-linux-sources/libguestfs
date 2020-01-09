@@ -1,7 +1,8 @@
-From 088e92526e7601efb66e03d3a02a245548015891 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From 35b8584e89f67d9d787140fe8150720e3cec7561 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 10 Jan 2011 16:07:12 +0000
-Subject: [PATCH 52/67] RHEL 6: Emphasize libguestfs-winsupport package (RHBZ#627468).
+Subject: [PATCH 086/102] RHEL 6: Emphasize libguestfs-winsupport package
+ (RHBZ#627468).
 
 This RHEL 6.1-only patch changes the error messages when the
 inspection code cannot find an operating system inside the guest
@@ -49,9 +50,9 @@ Output from guestfish (ie. C core inspection API) now looks like this:
  guest is running Microsoft Windows, please try again after installing
  'libguestfs-winsupport'.
 ---
- fish/inspect.c              |   15 +++++++++++++++
- perl/lib/Sys/Guestfs/Lib.pm |   13 ++++++++++++-
- 2 files changed, 27 insertions(+), 1 deletions(-)
+ fish/inspect.c              | 15 +++++++++++++++
+ perl/lib/Sys/Guestfs/Lib.pm | 13 ++++++++++++-
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/fish/inspect.c b/fish/inspect.c
 index 12ceaa7..ecccc71 100644
@@ -118,5 +119,5 @@ index 11045b9..fcb2843 100644
  
      return \%oses;
 -- 
-1.7.1
+1.9.3
 

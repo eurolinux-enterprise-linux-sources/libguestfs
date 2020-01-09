@@ -1,7 +1,8 @@
 From b9fe96e901cf318981dd0285cbb3728201993411 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 8 Oct 2013 10:00:33 +0100
-Subject: [PATCH 26/67] blockdev: Deprecate blockdev_setbsz and make it do nothing (RHBZ#624334).
+Subject: [PATCH 026/102] blockdev: Deprecate blockdev_setbsz and make it do
+ nothing (RHBZ#624334).
 
 This call never did anything.  Don't use it.  Also I have submitted a
 patch upstream to remove the corresponding option from blockdev.
@@ -12,8 +13,8 @@ useless.
 Thanks: Masayoshi Mizuma
 (cherry picked from commit 4fc44a0157a1bcd4c618e0eb8afd7c553ed0f31d)
 ---
- daemon/blockdev.c    |    7 ++-----
- generator/actions.ml |   17 ++++++++++-------
+ daemon/blockdev.c    |  7 ++-----
+ generator/actions.ml | 17 ++++++++++-------
  2 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/daemon/blockdev.c b/daemon/blockdev.c
@@ -73,5 +74,5 @@ index 040b38f..340c0de 100644
    { defaults with
      name = "blockdev_getsz";
 -- 
-1.7.1
+1.9.3
 

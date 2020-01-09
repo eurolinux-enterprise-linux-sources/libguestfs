@@ -1,7 +1,8 @@
 From e328b0227d3a11e81bf217d389c66e5d1c98e54c Mon Sep 17 00:00:00 2001
 From: Matthew Booth <mbooth@redhat.com>
 Date: Fri, 14 Dec 2012 15:53:27 +0000
-Subject: [PATCH 01/67] Add support for getting and setting GPT partition type GUIDs
+Subject: [PATCH 001/102] Add support for getting and setting GPT partition
+ type GUIDs
 
 New APIs:
   part_set_gpt_type
@@ -9,12 +10,12 @@ New APIs:
 
 Cherry picked from commit 956e30effa25eee00fb9e8f5303a6a1fe7409037.
 ---
- appliance/packagelist.in |    1 +
- daemon/parted.c          |  125 ++++++++++++++++++++++++++++++++++++++++++++++
- generator/actions.ml     |   31 +++++++++++
- generator/tests_c_api.ml |    7 +++
- generator/types.ml       |    5 ++
- 5 files changed, 169 insertions(+), 0 deletions(-)
+ appliance/packagelist.in |   1 +
+ daemon/parted.c          | 125 +++++++++++++++++++++++++++++++++++++++++++++++
+ generator/actions.ml     |  31 ++++++++++++
+ generator/tests_c_api.ml |   7 +++
+ generator/types.ml       |   5 ++
+ 5 files changed, 169 insertions(+)
 
 diff --git a/appliance/packagelist.in b/appliance/packagelist.in
 index 1ba5bf3..9b13500 100644
@@ -245,5 +246,5 @@ index bc97af3..b7eb0c0 100644
       * as ext2, empty [except for lost+found] and mounted on /.
       * No LVM.
 -- 
-1.7.1
+1.9.3
 

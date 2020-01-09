@@ -1,7 +1,8 @@
 From fbd92a079b58880eec3eba48a36bdeef19e2c7ed Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 4 Aug 2014 10:21:18 -0400
-Subject: [PATCH 46/67] launch: Close file descriptors after fork (RHBZ#1123007).
+Subject: [PATCH 046/102] launch: Close file descriptors after fork
+ (RHBZ#1123007).
 
 This refactors existing code to close file descriptors in the recovery
 process, and also adds code to close file descriptors between the
@@ -23,8 +24,8 @@ we don't close stderr.
 
 (cherry picked from commit e1c508c29f929134bfcb0f83b402a02e8ff94caa)
 ---
- src/guestfs-internal-frontend.h |   16 +++++++++++++++-
- src/launch-appliance.c          |   17 +++++++++--------
+ src/guestfs-internal-frontend.h | 16 +++++++++++++++-
+ src/launch-appliance.c          | 17 +++++++++--------
  2 files changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/src/guestfs-internal-frontend.h b/src/guestfs-internal-frontend.h
@@ -100,5 +101,5 @@ index 67f967d..89c01ac 100644
        /* It would be nice to be able to put this in the same process
         * group as qemu (ie. setpgid (0, qemu_pid)).  However this is
 -- 
-1.7.1
+1.9.3
 

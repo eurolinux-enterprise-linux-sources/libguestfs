@@ -1,7 +1,7 @@
 From 3f9c537b97d70c59d27da1a01e3e2f4a726b5b80 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 11 Jul 2014 13:45:01 +0100
-Subject: [PATCH 49/67] sparsify: Add --tmp prebuilt:file option.
+Subject: [PATCH 049/102] sparsify: Add --tmp prebuilt:file option.
 
 This option allows oVirt to pass a prebuilt qcow2 file to use as the
 temporary overlay.  The file must be qcow2, and must have indisk as a
@@ -16,9 +16,9 @@ Note this only applies in copying mode.
 
 (cherry picked from commit 13be9eabed2202be6480662a137a5bc2d3477219)
 ---
- sparsify/sparsify.ml       |   93 ++++++++++++++++++++++++++------------------
- sparsify/virt-sparsify.pod |   27 +++++++++++++
- 2 files changed, 82 insertions(+), 38 deletions(-)
+ sparsify/sparsify.ml       | 91 +++++++++++++++++++++++++++-------------------
+ sparsify/virt-sparsify.pod | 27 ++++++++++++++
+ 2 files changed, 81 insertions(+), 37 deletions(-)
 
 diff --git a/sparsify/sparsify.ml b/sparsify/sparsify.ml
 index 50f51cf..99ce869 100644
@@ -191,5 +191,5 @@ index 0514d80..64f3a8a 100644
  
  =item B<--verbose>
 -- 
-1.7.1
+1.9.3
 

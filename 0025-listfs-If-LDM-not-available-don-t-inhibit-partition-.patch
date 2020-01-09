@@ -1,18 +1,19 @@
 From 22720e12cb02e5f45b18e8a44a93e75b7e66b296 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 13 May 2014 08:54:16 -0400
-Subject: [PATCH 25/67] listfs: If LDM not available, don't inhibit partition detection (RHBZ#1079182).
+Subject: [PATCH 025/102] listfs: If LDM not available, don't inhibit partition
+ detection (RHBZ#1079182).
 
 If a disk has type 0x42 partition (which would indicate LDM), but LDM
 is not available then try parsing the partition anyway.  It might be
 parseable as plain old NTFS.
 (cherry picked from commit 47ec61e9af19f8a750750ad498adc10fa7ae0521)
 ---
- src/listfs.c |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
+ src/listfs.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/src/listfs.c b/src/listfs.c
-index b87a021..d53b382 100644
+index b87a021..d53b3828 100644
 --- a/src/listfs.c
 +++ b/src/listfs.c
 @@ -49,6 +49,9 @@ guestfs__list_filesystems (guestfs_h *g)
@@ -53,5 +54,5 @@ index b87a021..d53b382 100644
      ldmvols = guestfs_list_ldm_volumes (g);
      if (ldmvols == NULL) goto error;
 -- 
-1.7.1
+1.9.3
 

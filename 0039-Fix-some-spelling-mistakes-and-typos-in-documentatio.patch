@@ -1,13 +1,14 @@
 From f9dd1191ac3f6bd94ab1288ce791f5d53b8e059a Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 29 May 2014 05:30:55 -0400
-Subject: [PATCH 39/67] Fix some spelling mistakes and typos in documentation (RHBZ#1099284).
+Subject: [PATCH 039/102] Fix some spelling mistakes and typos in documentation
+ (RHBZ#1099284).
 
 (cherry picked from commit a21dfc483c5102334d8c490a50077ec201ffe2e4)
 ---
- generator/actions.ml      |    2 +-
- guestfs-release-notes.pod |    4 ++--
- tools/virt-make-fs        |    2 +-
+ generator/actions.ml      | 2 +-
+ guestfs-release-notes.pod | 4 ++--
+ tools/virt-make-fs        | 2 +-
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/generator/actions.ml b/generator/actions.ml
@@ -59,5 +60,5 @@ index a8cf56b..c0df982 100755
  extra space won't actually be allocated in the image until you try to
  store something in it.
 -- 
-1.7.1
+1.9.3
 

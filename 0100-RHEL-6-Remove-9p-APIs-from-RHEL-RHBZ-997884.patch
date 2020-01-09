@@ -1,17 +1,17 @@
-From ba9670574c75555494c443a428493571101569b4 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From e7ee2ddda8741aa492f6767676f0d1e0fa87f454 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 18 Jul 2013 18:31:53 +0100
-Subject: [PATCH 66/67] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
+Subject: [PATCH 100/102] RHEL 6: Remove 9p APIs from RHEL (RHBZ#997884).
 
 (cherry picked from commit 5f7b0f81793f38191634f4460b1c18b97990db44)
 ---
- Makefile.am          |    2 +-
- daemon/9p.c          |  221 --------------------------------------------------
- daemon/Makefile.am   |    1 -
- generator/actions.ml |   23 -----
- gobject/Makefile.inc |    2 -
- po/POTFILES          |    2 -
- 6 files changed, 1 insertions(+), 250 deletions(-)
+ Makefile.am          |   2 +-
+ daemon/9p.c          | 221 ---------------------------------------------------
+ daemon/Makefile.am   |   1 -
+ generator/actions.ml |  23 ------
+ gobject/Makefile.inc |   2 -
+ po/POTFILES          |   2 -
+ 6 files changed, 1 insertion(+), 250 deletions(-)
  delete mode 100644 daemon/9p.c
 
 diff --git a/Makefile.am b/Makefile.am
@@ -267,10 +267,10 @@ index 8da8b8f..a899d99 100644
  	actions.h \
  	available.c \
 diff --git a/generator/actions.ml b/generator/actions.ml
-index 4c70d23..e5904d0 100644
+index 40791a4..bf3f909 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
-@@ -8463,29 +8463,6 @@ This returns true iff the device exists and contains all zero bytes.
+@@ -8535,29 +8535,6 @@ This returns true iff the device exists and contains all zero bytes.
  Note that for large devices this can take a long time to run." };
  
    { defaults with
@@ -341,5 +341,5 @@ index 74fdecf..a4cadc3 100644
  gobject/src/optargs-ntfsclone_out.c
  gobject/src/optargs-ntfsfix.c
 -- 
-1.7.1
+1.9.3
 

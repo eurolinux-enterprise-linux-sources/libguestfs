@@ -1,17 +1,18 @@
-From 08ac02e2d9b0219cd3b7c7f622f09b07eff7bd26 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From f5d95b753f6f198a421f93fb192431d4ec79e00c Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 25 Jan 2012 14:29:58 +0000
-Subject: [PATCH 55/67] RHEL 6: Modify blkid test so it is successful on RHEL 6-era blkid.
+Subject: [PATCH 089/102] RHEL 6: Modify blkid test so it is successful on RHEL
+ 6-era blkid.
 
 ---
- generator/actions.ml |    6 +-----
- 1 files changed, 1 insertions(+), 5 deletions(-)
+ generator/actions.ml | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/generator/actions.ml b/generator/actions.ml
-index e66ec73..862c8bb 100644
+index 1f4e071..34fdfa4 100644
 --- a/generator/actions.ml
 +++ b/generator/actions.ml
-@@ -8928,11 +8928,7 @@ device is stopped, but it is not destroyed or zeroed." };
+@@ -9000,11 +9000,7 @@ device is stopped, but it is not destroyed or zeroed." };
        InitScratchFS, Always, TestOutputHashtable (
          [["blkid"; "/dev/sdb1"]],
          ["TYPE", "ext2";
@@ -25,5 +26,5 @@ index e66ec73..862c8bb 100644
      shortdesc = "print block device attributes";
      longdesc = "\
 -- 
-1.7.1
+1.9.3
 

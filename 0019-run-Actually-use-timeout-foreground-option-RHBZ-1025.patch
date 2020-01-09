@@ -1,7 +1,8 @@
 From 900b75cd1e09768fd64ecc065171ea3885bb18fb Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 27 Jan 2014 21:58:42 +0000
-Subject: [PATCH 19/67] run: Actually use timeout --foreground option (RHBZ#1025269).
+Subject: [PATCH 019/102] run: Actually use timeout --foreground option
+ (RHBZ#1025269).
 
 The following commit managed to not actually add the --foreground
 option to the timeout command, just test for it.  Add it this time.
@@ -17,8 +18,8 @@ option to the timeout command, just test for it.  Add it this time.
     Attempt to fix RHBZ#1025269.
 (cherry picked from commit e3f72805d108c601280b889692c47d7d825e6079)
 ---
- run.in |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ run.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/run.in b/run.in
 index c6bc9c4..a642d14 100755
@@ -34,5 +35,5 @@ index c6bc9c4..a642d14 100755
      fi
  fi
 -- 
-1.7.1
+1.9.3
 

@@ -1,11 +1,12 @@
-From 5eb6a6b440a72555705e73fa4a56ec19c09ed4d4 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From cc7e4cc5e584b2d052a37c8a8747246f32ef26c6 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 17 May 2013 22:26:16 +0100
-Subject: [PATCH 60/67] RHEL 6: Modify ruby Rakefile.in to work with older Ruby.
+Subject: [PATCH 094/102] RHEL 6: Modify ruby Rakefile.in to work with older
+ Ruby.
 
 ---
- ruby/Rakefile.in |    7 +------
- 1 files changed, 1 insertions(+), 6 deletions(-)
+ ruby/Rakefile.in | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/ruby/Rakefile.in b/ruby/Rakefile.in
 index a74e191..3f34acb 100644
@@ -26,5 +27,5 @@ index a74e191..3f34acb 100644
  # Used to be rake/gempackagetask.  Now it's rubygems/package_task.  Also
  # we need to use the appropriate class name below.
 -- 
-1.7.1
+1.9.3
 

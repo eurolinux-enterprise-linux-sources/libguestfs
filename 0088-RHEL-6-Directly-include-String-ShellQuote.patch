@@ -1,7 +1,7 @@
-From 5c74efa4603196d534aac178c2a424e2a68bdcbd Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From d34ae6ed892e609f1124786f308ae1fd380776d2 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 29 Nov 2010 18:41:38 +0000
-Subject: [PATCH 54/67] RHEL 6: Directly include String::ShellQuote.
+Subject: [PATCH 088/102] RHEL 6: Directly include String::ShellQuote.
 
 Directly include a snippet from String::ShellQuote so that we
 don't need to depend on this external library, which is not
@@ -9,8 +9,8 @@ included in RHEL 6.1.
 
 This affects virt-make-fs.
 ---
- configure.ac       |    2 +-
- tools/virt-make-fs |   91 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ configure.ac       |  2 +-
+ tools/virt-make-fs | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
  2 files changed, 91 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
@@ -140,5 +140,5 @@ index c0df982..02f9c3f 100755
 +program is free software; you can redistribute it and/or modify it
 +under the same terms as Perl itself.
 -- 
-1.7.1
+1.9.3
 

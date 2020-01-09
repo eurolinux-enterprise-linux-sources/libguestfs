@@ -1,12 +1,13 @@
 From 86f6ab0130f396365e123e27610c1adb49851f9c Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 5 May 2014 09:17:46 -0400
-Subject: [PATCH 22/67] rhbz1091803.sh: manually create the image instead of using 'scratch'
+Subject: [PATCH 022/102] rhbz1091803.sh: manually create the image instead of
+ using 'scratch'
 
 'add-drive-scratch' is new in >= 1.26.
 ---
- tests/regressions/rhbz1091803.sh |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
+ tests/regressions/rhbz1091803.sh | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/tests/regressions/rhbz1091803.sh b/tests/regressions/rhbz1091803.sh
 index e9be95d..d1d0ae1 100755
@@ -34,5 +35,5 @@ index e9be95d..d1d0ae1 100755
 +
 +rm rhbz1091803.img
 -- 
-1.7.1
+1.9.3
 

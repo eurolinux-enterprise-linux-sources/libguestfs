@@ -1,13 +1,14 @@
 From 1d4f02b9283e421c0835a820513105a7dcc53bca Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 28 Apr 2014 09:51:00 +0100
-Subject: [PATCH 20/67] tar-in: Fix places where we didn't cancel the receive (FileIn) correctly along error paths (RHBZ#1091803).
+Subject: [PATCH 020/102] tar-in: Fix places where we didn't cancel the receive
+ (FileIn) correctly along error paths (RHBZ#1091803).
 
 Thanks: Bo Fan.
 (cherry picked from commit efd159a063410b3d9d13814222abed231ec42f90)
 ---
- daemon/tar.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ daemon/tar.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/daemon/tar.c b/daemon/tar.c
 index da19de7..464ec3b 100644
@@ -60,5 +61,5 @@ index da19de7..464ec3b 100644
      return -1;
    }
 -- 
-1.7.1
+1.9.3
 

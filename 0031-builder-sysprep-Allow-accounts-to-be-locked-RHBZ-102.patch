@@ -1,7 +1,8 @@
 From a804aef95d8491d03e4a992cf0aabe7619afff4c Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 21 Nov 2013 17:13:22 +0000
-Subject: [PATCH 31/67] builder/sysprep: Allow accounts to be locked (RHBZ#1028660).
+Subject: [PATCH 031/102] builder/sysprep: Allow accounts to be locked
+ (RHBZ#1028660).
 
 This allows you to select both locked accounts and disabled
 passwords.  The two are subtly different concepts.
@@ -19,9 +20,9 @@ probably not useful.  The shadow password field will contain "!!*".
 
 (cherry picked from commit 3712249f9659121277a0d2ca0549e02bc38e0cad)
 ---
- mllib/password.ml                     |   49 +++++++++++++++++++++++++--------
- mllib/password.mli                    |   11 +++++--
- sysprep/sysprep_operation_password.ml |   33 ++++++++++++++++++++++
+ mllib/password.ml                     | 49 ++++++++++++++++++++++++++---------
+ mllib/password.mli                    | 11 +++++---
+ sysprep/sysprep_operation_password.ml | 33 +++++++++++++++++++++++
  3 files changed, 78 insertions(+), 15 deletions(-)
 
 diff --git a/mllib/password.ml b/mllib/password.ml
@@ -176,5 +177,5 @@ index 0cd834a..ef0e985 100644
        };
  
 -- 
-1.7.1
+1.9.3
 

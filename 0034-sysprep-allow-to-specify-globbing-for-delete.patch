@@ -1,7 +1,7 @@
 From 405263ab9642bb025b5af699de1b1599f7b0ffce Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Mon, 9 Dec 2013 16:19:12 +0100
-Subject: [PATCH 34/67] sysprep: allow to specify globbing for --delete
+Subject: [PATCH 034/102] sysprep: allow to specify globbing for --delete
 
 Adapt the globbing part from the old --remote-path work previously
 proposed for sysprep [1], allowing --delete to perform globbing when
@@ -11,8 +11,8 @@ deleting paths.
 
 (cherry picked from commit ed4bcb119cb908e98ecc1107dcd8b740ee2f484f)
 ---
- sysprep/sysprep_operation_delete.ml |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ sysprep/sysprep_operation_delete.ml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/sysprep/sysprep_operation_delete.ml b/sysprep/sysprep_operation_delete.ml
 index de78a87..59d5485 100644
@@ -30,5 +30,5 @@ index de78a87..59d5485 100644
  
  let op = {
 -- 
-1.7.1
+1.9.3
 

@@ -1,7 +1,8 @@
 From 770279b3792e04a979c1a333992267dd239ba4d3 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 27 May 2014 11:48:44 +0100
-Subject: [PATCH 45/67] appliance: Increase udev timeout to 6000s (RHBZ#1096579).
+Subject: [PATCH 045/102] appliance: Increase udev timeout to 6000s
+ (RHBZ#1096579).
 
 If the image is located on NFS, and the NFS mount is performing a
 large copy, then all other NFS operations stop.  This delay can be
@@ -12,8 +13,8 @@ reality we want udev to wait indefinitely).
 
 (cherry picked from commit ef49b297cc56668da01efa637fb80007a76d23dd)
 ---
- src/launch.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ src/launch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/launch.c b/src/launch.c
 index 1583075..caf1c6f 100644
@@ -29,5 +30,5 @@ index 1583075..caf1c6f 100644
       "%s"               /* lpj */
       " acpi=off"        /* we don't need ACPI, turn it off */
 -- 
-1.7.1
+1.9.3
 

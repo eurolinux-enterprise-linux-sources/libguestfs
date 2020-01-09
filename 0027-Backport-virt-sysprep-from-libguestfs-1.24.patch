@@ -1,7 +1,7 @@
 From f82e17b4a6c7fe35c16d45ad9c555d0ad90af2be Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Wed, 14 May 2014 10:24:41 -0400
-Subject: [PATCH 27/67] Backport virt-sysprep from libguestfs 1.24
+Subject: [PATCH 027/102] Backport virt-sysprep from libguestfs 1.24
 
 Copy the virt-sysprep code from libguestfs 1.24.x, bringing all the
 features of it to libguestfs 1.20.x. This is done as single commit
@@ -13,93 +13,93 @@ Move existing files (where possible) or import them from 1.24.x,
 adapting the current ocaml-based tools to the updated functions in
 mllib.
 ---
- .gitignore                                         |    8 +-
- Makefile.am                                        |    2 +-
- configure.ac                                       |   17 +-
- mllib/Makefile.am                                  |  164 ++++++++
- mllib/common_utils.ml                              |  410 ++++++++++++++++++++
- mllib/common_utils_tests.ml                        |   80 ++++
- mllib/config.ml.in                                 |   20 +
- mllib/crypt-c.c                                    |   44 ++
- mllib/crypt.ml                                     |   19 +
- mllib/crypt.mli                                    |   22 +
- mllib/firstboot.ml                                 |  169 ++++++++
- mllib/firstboot.mli                                |   27 ++
- mllib/hostname.ml                                  |   80 ++++
- mllib/hostname.mli                                 |   21 +
- mllib/password.ml                                  |  142 +++++++
- mllib/password.mli                                 |   35 ++
- mllib/progress-c.c                                 |  106 +++++
- mllib/progress.ml                                  |   58 +++
- mllib/progress.mli                                 |   19 +
- mllib/random_seed.ml                               |   96 +++++
- mllib/random_seed.mli                              |   21 +
- mllib/tTY.ml                                       |   19 +
- mllib/tTY.mli                                      |   23 ++
- mllib/tty-c.c                                      |   38 ++
- mllib/urandom.ml                                   |   69 ++++
- mllib/urandom.mli                                  |   26 ++
- po/POTFILES                                        |    5 +-
- po/POTFILES-ml                                     |    9 +-
- resize/Makefile.am                                 |   39 +--
- resize/common_utils.ml                             |  248 ------------
- resize/common_utils_tests.ml                       |   78 ----
- resize/progress-c.c                                |  106 -----
- resize/progress.ml                                 |   58 ---
- resize/progress.mli                                |   19 -
- resize/resize.ml                                   |    3 +-
- resize/tTY.ml                                      |   19 -
- resize/tTY.mli                                     |   23 --
- resize/tty-c.c                                     |   38 --
- sparsify/Makefile.am                               |   20 +-
- sparsify/sparsify.ml                               |    1 +
- sysprep/Makefile.am                                |   55 ++-
- sysprep/firstboot.ml                               |  161 --------
- sysprep/firstboot.mli                              |   27 --
- sysprep/main.ml                                    |   31 +-
- sysprep/sysprep_operation.ml                       |   86 +++-
- sysprep/sysprep_operation.mli                      |   25 +-
- sysprep/sysprep_operation_abrt_data.ml             |   17 +-
- sysprep/sysprep_operation_bash_history.ml          |   21 +-
- sysprep/sysprep_operation_blkid_tab.ml             |   16 +-
- sysprep/sysprep_operation_ca_certificates.ml       |   16 +-
- sysprep/sysprep_operation_crash_data.ml            |   17 +-
- sysprep/sysprep_operation_cron_spool.ml            |   18 +-
- sysprep/sysprep_operation_dhcp_client_state.ml     |   16 +-
- sysprep/sysprep_operation_dhcp_server_state.ml     |   16 +-
- sysprep/sysprep_operation_dovecot_data.ml          |   16 +-
- sysprep/sysprep_operation_firewall_rules.ml        |   57 +++
- sysprep/sysprep_operation_firstboot.ml             |   61 ++--
- sysprep/sysprep_operation_flag_reconfiguration.ml  |   17 +-
- sysprep/sysprep_operation_hostname.ml              |   89 +----
- sysprep/sysprep_operation_kerberos_data.ml         |   16 +-
- sysprep/sysprep_operation_logfiles.ml              |   29 +-
- sysprep/sysprep_operation_lvm_uuids.ml             |   17 +-
- sysprep/sysprep_operation_machine_id.ml            |   17 +-
- sysprep/sysprep_operation_mail_spool.ml            |   16 +-
- sysprep/sysprep_operation_net_hostname.ml          |   17 +-
- sysprep/sysprep_operation_net_hwaddr.ml            |   17 +-
- sysprep/sysprep_operation_pacct_log.ml             |   17 +-
- sysprep/sysprep_operation_package_manager_cache.ml |   25 +-
- sysprep/sysprep_operation_pam_data.ml              |   16 +-
- sysprep/sysprep_operation_password.ml              |  162 ++++++++
- sysprep/sysprep_operation_puppet_data_log.ml       |   16 +-
- sysprep/sysprep_operation_random_seed.ml           |   44 +--
- sysprep/sysprep_operation_rhn_systemid.ml          |   16 +-
- sysprep/sysprep_operation_rpm_db.ml                |   17 +-
- sysprep/sysprep_operation_samba_db_log.ml          |   16 +-
- sysprep/sysprep_operation_script.ml                |   39 +-
- sysprep/sysprep_operation_smolt_uuid.ml            |   16 +-
- sysprep/sysprep_operation_ssh_hostkeys.ml          |   17 +-
- sysprep/sysprep_operation_ssh_userdir.ml           |   21 +-
- sysprep/sysprep_operation_sssd_db_log.ml           |   16 +-
- sysprep/sysprep_operation_tmp_files.ml             |   52 +++
- sysprep/sysprep_operation_udev_persistent_net.ml   |   17 +-
- sysprep/sysprep_operation_user_account.ml          |   21 +-
- sysprep/sysprep_operation_utmp.ml                  |   17 +-
- sysprep/sysprep_operation_yum_uuid.ml              |   17 +-
- tests/guests/guest-aux/make-debian-img.sh          |    1 +
- tests/guests/guest-aux/make-ubuntu-img.sh          |    1 +
+ .gitignore                                         |   8 +-
+ Makefile.am                                        |   2 +-
+ configure.ac                                       |  17 +-
+ mllib/Makefile.am                                  | 164 +++++++++
+ mllib/common_utils.ml                              | 410 +++++++++++++++++++++
+ mllib/common_utils_tests.ml                        |  80 ++++
+ mllib/config.ml.in                                 |  20 +
+ mllib/crypt-c.c                                    |  44 +++
+ mllib/crypt.ml                                     |  19 +
+ mllib/crypt.mli                                    |  22 ++
+ mllib/firstboot.ml                                 | 169 +++++++++
+ mllib/firstboot.mli                                |  27 ++
+ mllib/hostname.ml                                  |  80 ++++
+ mllib/hostname.mli                                 |  21 ++
+ mllib/password.ml                                  | 142 +++++++
+ mllib/password.mli                                 |  35 ++
+ mllib/progress-c.c                                 | 106 ++++++
+ mllib/progress.ml                                  |  58 +++
+ mllib/progress.mli                                 |  19 +
+ mllib/random_seed.ml                               |  96 +++++
+ mllib/random_seed.mli                              |  21 ++
+ mllib/tTY.ml                                       |  19 +
+ mllib/tTY.mli                                      |  23 ++
+ mllib/tty-c.c                                      |  38 ++
+ mllib/urandom.ml                                   |  69 ++++
+ mllib/urandom.mli                                  |  26 ++
+ po/POTFILES                                        |   5 +-
+ po/POTFILES-ml                                     |   9 +-
+ resize/Makefile.am                                 |  39 +-
+ resize/common_utils.ml                             | 248 -------------
+ resize/common_utils_tests.ml                       |  78 ----
+ resize/progress-c.c                                | 106 ------
+ resize/progress.ml                                 |  58 ---
+ resize/progress.mli                                |  19 -
+ resize/resize.ml                                   |   3 +-
+ resize/tTY.ml                                      |  19 -
+ resize/tTY.mli                                     |  23 --
+ resize/tty-c.c                                     |  38 --
+ sparsify/Makefile.am                               |  20 +-
+ sparsify/sparsify.ml                               |   1 +
+ sysprep/Makefile.am                                |  55 ++-
+ sysprep/firstboot.ml                               | 161 --------
+ sysprep/firstboot.mli                              |  27 --
+ sysprep/main.ml                                    |  31 +-
+ sysprep/sysprep_operation.ml                       |  86 +++--
+ sysprep/sysprep_operation.mli                      |  25 +-
+ sysprep/sysprep_operation_abrt_data.ml             |  17 +-
+ sysprep/sysprep_operation_bash_history.ml          |  21 +-
+ sysprep/sysprep_operation_blkid_tab.ml             |  16 +-
+ sysprep/sysprep_operation_ca_certificates.ml       |  16 +-
+ sysprep/sysprep_operation_crash_data.ml            |  17 +-
+ sysprep/sysprep_operation_cron_spool.ml            |  18 +-
+ sysprep/sysprep_operation_dhcp_client_state.ml     |  16 +-
+ sysprep/sysprep_operation_dhcp_server_state.ml     |  16 +-
+ sysprep/sysprep_operation_dovecot_data.ml          |  16 +-
+ sysprep/sysprep_operation_firewall_rules.ml        |  57 +++
+ sysprep/sysprep_operation_firstboot.ml             |  61 ++-
+ sysprep/sysprep_operation_flag_reconfiguration.ml  |  17 +-
+ sysprep/sysprep_operation_hostname.ml              |  89 ++---
+ sysprep/sysprep_operation_kerberos_data.ml         |  16 +-
+ sysprep/sysprep_operation_logfiles.ml              |  29 +-
+ sysprep/sysprep_operation_lvm_uuids.ml             |  17 +-
+ sysprep/sysprep_operation_machine_id.ml            |  17 +-
+ sysprep/sysprep_operation_mail_spool.ml            |  16 +-
+ sysprep/sysprep_operation_net_hostname.ml          |  17 +-
+ sysprep/sysprep_operation_net_hwaddr.ml            |  17 +-
+ sysprep/sysprep_operation_pacct_log.ml             |  17 +-
+ sysprep/sysprep_operation_package_manager_cache.ml |  25 +-
+ sysprep/sysprep_operation_pam_data.ml              |  16 +-
+ sysprep/sysprep_operation_password.ml              | 162 ++++++++
+ sysprep/sysprep_operation_puppet_data_log.ml       |  16 +-
+ sysprep/sysprep_operation_random_seed.ml           |  44 +--
+ sysprep/sysprep_operation_rhn_systemid.ml          |  16 +-
+ sysprep/sysprep_operation_rpm_db.ml                |  17 +-
+ sysprep/sysprep_operation_samba_db_log.ml          |  16 +-
+ sysprep/sysprep_operation_script.ml                |  39 +-
+ sysprep/sysprep_operation_smolt_uuid.ml            |  16 +-
+ sysprep/sysprep_operation_ssh_hostkeys.ml          |  17 +-
+ sysprep/sysprep_operation_ssh_userdir.ml           |  21 +-
+ sysprep/sysprep_operation_sssd_db_log.ml           |  16 +-
+ sysprep/sysprep_operation_tmp_files.ml             |  52 +++
+ sysprep/sysprep_operation_udev_persistent_net.ml   |  17 +-
+ sysprep/sysprep_operation_user_account.ml          |  21 +-
+ sysprep/sysprep_operation_utmp.ml                  |  17 +-
+ sysprep/sysprep_operation_yum_uuid.ml              |  17 +-
+ tests/guests/guest-aux/make-debian-img.sh          |   1 +
+ tests/guests/guest-aux/make-ubuntu-img.sh          |   1 +
  87 files changed, 2536 insertions(+), 1320 deletions(-)
  create mode 100644 mllib/Makefile.am
  create mode 100644 mllib/common_utils.ml
@@ -5170,5 +5170,5 @@ index eec80f9..445141f 100755
  upload fstab.tmp.$$ /etc/fstab
  write /etc/debian_version "5.0.1"
 -- 
-1.7.1
+1.9.3
 

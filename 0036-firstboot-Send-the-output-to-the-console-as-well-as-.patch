@@ -1,7 +1,8 @@
 From c55002103ab7e418df43b2c6a290ed02e35a09ea Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sat, 26 Oct 2013 17:09:06 +0100
-Subject: [PATCH 36/67] firstboot: Send the output to the console as well as to the log file.
+Subject: [PATCH 036/102] firstboot: Send the output to the console as well as
+ to the log file.
 
 For systemd:
 Currently stdout+stderr go to the journal (these are effectively
@@ -20,8 +21,8 @@ With this change, the output goes to the console and the log file.
 (cherry picked from commit f114e28cc80eabdcf47c97e7e3895065cdfe4886)
 (cherry picked from commit e0a88763ad882bcbad2b66adeafee33be2179a2d)
 ---
- mllib/firstboot.ml |   10 ++++++----
- 1 files changed, 6 insertions(+), 4 deletions(-)
+ mllib/firstboot.ml | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/mllib/firstboot.ml b/mllib/firstboot.ml
 index 0207cc1..9e4c7b6 100644
@@ -58,5 +59,5 @@ index 0207cc1..9e4c7b6 100644
  [Install]
  WantedBy=default.target
 -- 
-1.7.1
+1.9.3
 

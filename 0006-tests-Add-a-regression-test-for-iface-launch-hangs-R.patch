@@ -1,14 +1,15 @@
 From dc538bb167249e6d384e3e0bfa60550e9f6adf39 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 19 Jun 2013 13:26:18 +0100
-Subject: [PATCH 06/67] tests: Add a regression test for iface launch hangs (RHBZ#975797).
+Subject: [PATCH 006/102] tests: Add a regression test for iface launch hangs
+ (RHBZ#975797).
 
 Cherry picked from commit d8a3185823e608dbddbc6185209951140b8f3b33
 and some corrections made for libguestfs 1.20.
 ---
- tests/regressions/Makefile.am   |    1 +
- tests/regressions/rhbz975797.sh |   57 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+), 0 deletions(-)
+ tests/regressions/Makefile.am   |  1 +
+ tests/regressions/rhbz975797.sh | 57 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
  create mode 100755 tests/regressions/rhbz975797.sh
 
 diff --git a/tests/regressions/Makefile.am b/tests/regressions/Makefile.am
@@ -87,5 +88,5 @@ index 0000000..8303309
 +
 +rm test1.img test2.img test3.img
 -- 
-1.7.1
+1.9.3
 

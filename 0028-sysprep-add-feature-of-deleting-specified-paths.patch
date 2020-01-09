@@ -1,16 +1,16 @@
 From 9b9152b9892c24396169d02d09a2f28514a375bd Mon Sep 17 00:00:00 2001
 From: Wanlong Gao <gaowanlong@cn.fujitsu.com>
 Date: Tue, 22 Oct 2013 16:17:25 +0800
-Subject: [PATCH 28/67] sysprep: add feature of deleting specified paths
+Subject: [PATCH 028/102] sysprep: add feature of deleting specified paths
 
 Signed-off-by: Wanlong Gao <gaowanlong@cn.fujitsu.com>
 Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
 (cherry picked from commit e4c9212a8e9fe9c2a75ce5035a4c3bce53261018)
 ---
- po/POTFILES-ml                      |    1 +
- sysprep/Makefile.am                 |    1 +
- sysprep/sysprep_operation_delete.ml |   51 +++++++++++++++++++++++++++++++++++
- 3 files changed, 53 insertions(+), 0 deletions(-)
+ po/POTFILES-ml                      |  1 +
+ sysprep/Makefile.am                 |  1 +
+ sysprep/sysprep_operation_delete.ml | 51 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 53 insertions(+)
  create mode 100644 sysprep/sysprep_operation_delete.ml
 
 diff --git a/po/POTFILES-ml b/po/POTFILES-ml
@@ -95,5 +95,5 @@ index 0000000..7cf1c39
 +
 +let () = register_operation op
 -- 
-1.7.1
+1.9.3
 

@@ -14,7 +14,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.20.11
-Release:       11%{?dist}
+Release:       14%{?dist}
 License:       LGPLv2+
 Group:         Development/Libraries
 URL:           http://libguestfs.org/
@@ -85,24 +85,59 @@ Patch0048:     0048-sparsify-Add-tmp-option-to-allow-specifying-temp-dir.patch
 Patch0049:     0049-sparsify-Add-tmp-prebuilt-file-option.patch
 Patch0050:     0050-sparsify-update-documentation.patch
 Patch0051:     0051-customize-fix-locking-accounts-with-passwords.patch
+Patch0052:     0052-daemon-add-add_sprintf.patch
+Patch0053:     0053-daemon-move-AUGEAS_ERROR-to-the-common-header.patch
+Patch0054:     0054-daemon-lvm-filter-use-augeas-for-setting-the-filter.patch
+Patch0055:     0055-daemon-Check-return-value-of-end_stringsbuf.patch
+Patch0056:     0056-java-run-Add-java-.libs-to-LD_LIBRARY_PATH-so-JVM-fi.patch
+Patch0057:     0057-java-Fix-bogus-construction-of-all-RStructList-retur.patch
+Patch0058:     0058-java-Split-long-lines-in-generated-output-and-add-ot.patch
+Patch0059:     0059-java-Factor-out-common-field-code-in-RStructList.patch
+Patch0060:     0060-java-Use-correct-Set-Field-JNI-accessors-to-set-fiel.patch
+Patch0061:     0061-bindtests-Fill-in-all-fields-in-dummy-lvm_pv-struct.patch
+Patch0062:     0062-java-Add-regression-test-for-RStruct-RStructList-RHB.patch
+Patch0063:     0063-daemon-add-sysroot_realpath.patch
+Patch0064:     0064-daemon-scrub-file-resolve-the-path-before-calling-sc.patch
+Patch0065:     0065-fish-list-also-aliases-in-the-guestfish-help-RHBZ-11.patch
+Patch0066:     0066-edit-fix-format-documentation-RHBZ-1151738.patch
+Patch0067:     0067-ls-in-CSV-mode-always-have-a-checksum-field-RHBZ-115.patch
+Patch0068:     0068-cat-diff-avoid-double-slashes-in-paths-RHBZ-1151910.patch
+Patch0069:     0069-lib-fix-newline-in-error-output-RHBZ-923355.patch
+Patch0070:     0070-customize-firstboot-make-sure-to-run-Linux-scripts-o.patch
+Patch0071:     0071-customize-firstboot-fix-Linux-log-output.patch
+Patch0072:     0072-Fix-description-of-set_append-and-get_append-APIs-RH.patch
+Patch0073:     0073-fish-fix-dir-completion-on-filesystems-w-o-dirent.d_.patch
+Patch0074:     0074-fish-complete-symlink-properly.patch
+Patch0075:     0075-add_drive-Introduce-cachemode-parameter-to-control-d.patch
+Patch0076:     0076-sparsify-Use-cachemode-unsafe-for-the-overlay-disk.patch
+Patch0077:     0077-rescue-Use-cachemode-unsafe-for-the-virt-rescue-scra.patch
+Patch0078:     0078-generator-Generate-guestfs_user_cancel.patch
+Patch0079:     0079-sysprep-user-account-mark-changed-file-if-users-were.patch
+Patch0080:     0080-sysprep-recommend-use-of-selinux-relabel.patch
+Patch0081:     0081-sparsify-Relax-requirement-that-output-device-cannot.patch
+Patch0082:     0082-drives-Remove-check-for-in-filename-RHBZ-1128942.patch
+Patch0083:     0083-mllib-add-simple-qemu-filename-sanitizing-function.patch
+Patch0084:     0084-sparsify-handle-output-filenames-with.patch
+Patch0085:     0085-sparsify-remove-checks-for-in-filenames.patch
 
 # RHEL 6 specific patches.
-Patch0052:     0052-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
-Patch0053:     0053-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
-Patch0054:     0054-RHEL-6-Directly-include-String-ShellQuote.patch
-Patch0055:     0055-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
-Patch0056:     0056-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
-Patch0057:     0057-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
-Patch0058:     0058-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
-Patch0059:     0059-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
-Patch0060:     0060-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
-Patch0061:     0061-RHEL-6-Remove-check-for-qemu-1.patch
-Patch0062:     0062-RHEL-6-Revert-Use-pkg-config-for-Python.patch
-Patch0063:     0063-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
-Patch0064:     0064-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
-Patch0065:     0065-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
-Patch0066:     0066-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
-Patch0067:     0067-RHEL-6-disable-fstrim-API-RHBZ-982979.patch
+Patch0086:     0086-RHEL-6-Emphasize-libguestfs-winsupport-package-RHBZ-.patch
+Patch0087:     0087-RHEL-6-Require-external-hex-editor-set-with-HEXEDITO.patch
+Patch0088:     0088-RHEL-6-Directly-include-String-ShellQuote.patch
+Patch0089:     0089-RHEL-6-Modify-blkid-test-so-it-is-successful-on-RHEL.patch
+Patch0090:     0090-RHEL-6-Remove-libguestfs-live-RHBZ-798980.patch
+Patch0091:     0091-RHEL-6-Exclude-iptables-from-the-appliance-RHBZ-8586.patch
+Patch0092:     0092-RHEL-6-In-mount-local-docs-change-refs-to-libguestfs.patch
+Patch0093:     0093-RHEL-6-Ignore-etc-release-if-etc-redhat-release-exis.patch
+Patch0094:     0094-RHEL-6-Modify-ruby-Rakefile.in-to-work-with-older-Ru.patch
+Patch0095:     0095-RHEL-6-Remove-check-for-qemu-1.patch
+Patch0096:     0096-RHEL-6-Revert-Use-pkg-config-for-Python.patch
+Patch0097:     0097-RHEL-6-tests-regressions-rhbz895904.sh-Use-instead-o.patch
+Patch0098:     0098-RHEL-6-Add-back-some-state-test-commands-to-guestfis.patch
+Patch0099:     0099-RHEL-6-Pipe-yes-into-ntfsresize-RHBZ-971326.patch
+Patch0100:     0100-RHEL-6-Remove-9p-APIs-from-RHEL-RHBZ-997884.patch
+Patch0101:     0101-RHEL-6-disable-fstrim-API-RHBZ-982979.patch
+Patch0102:     0102-RHEL-6-sysprep-remove-etc-shadow-note.patch
 
 # Basic build requirements:
 BuildRequires: perl(Pod::Simple)
@@ -159,7 +194,7 @@ BuildRequires: openldap >= 2.4.39-8.el6
 # sed 's/^ *//' < appliance/packagelist | sort
 BuildRequires: acl
 BuildRequires: attr
-BuildRequires: augeas-libs
+BuildRequires: augeas-libs >= 1.0.0-8.el6
 BuildRequires: bash
 BuildRequires: binutils
 BuildRequires: btrfs-progs
@@ -229,7 +264,7 @@ BuildRequires: yajl
 # Must match the above set of BuildRequires exactly!
 Requires:      acl
 Requires:      attr
-Requires:      augeas-libs >= 1.0.0-5
+Requires:      augeas-libs >= 1.0.0-8.el6
 Requires:      bash
 Requires:      binutils
 Requires:      btrfs-progs
@@ -299,7 +334,7 @@ Requires:      yajl
 # Although libguestfs will build against older versions of augeas, we require
 # the latest available version during the build so that the supermin appliance
 # will pick up all available lenses.
-BuildRequires: augeas-devel >= 1.0.0-5.el6
+BuildRequires: augeas-devel >= 1.0.0-8.el6
 
 # These are only required if you want to build the bindings for
 # different languages:
@@ -1044,6 +1079,54 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jan 19 2015 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-14
+- Raise augeas (Build)Requires to >= 1.0.0-8.el6, which fixes
+  rhbz#1160261, so virt-sysprep can remove users from /etc/shadow;
+  also remove note about that lack.
+  resolves: rhbz#1138630
+- Make sure that libguesfs (the library itself), and virt-sparsify in
+  particular, can handle filenames with ':'.
+  resolves: rhbz#1128942
+
+* Tue Dec 16 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-13
+- guestfish: fix Tab completion with some filesystems (e.g. xfs).
+  resolves: rhbz#1153846
+- Improve drive caching by selecting the caching mode.
+  resolves: rhbz#1038977
+- Generate user-cancel automatically, so there is also documentation for it.
+  resolves: rhbz#1100533
+- virt-sysprep: make sure to trigger autorelabel by default when removing
+  users.
+  resolves: rhbz#1153855
+- virt-sysprep: recommend usage of --selinux-relabel with SELinux guests.
+  related: rhbz#1153855
+- virt-sparsify: allow block devices as output.
+  resolves: rhbz#1122557
+
+* Tue Dec 02 2014 Pino Toscano <ptoscano@redhat.com> - 1:1.20.11-12
+- Fix lvm-set-filter to work with newer lvm2 versions.
+  resolves: rhbz#1168751
+- Fix handling of structs in the Java bindings.
+  resolves: rhbz#1074005
+- Fix scrub-file so it can work on symlinks.
+  resolves: rhbz#1091859
+- Show also aliases in the output of `guestfish -h`.
+  resolves: rhbz#1100530
+- Fix typo in the man page of virt-edit.
+  resolves: rhbz#1151739
+- virt-ls: always output the checksum field in CSV mode.
+  resolves: rhbz#1151901
+- virt-ls: avoid double slashes in directory output.
+  resolves: rhbz#1151911
+- Fix newline character in error output.
+  resolves: rhbz#1153974
+- Fix virt-sysprep firstboot scripts to not be run more than once.
+  resolves: rhbz#1159651
+- Fix logging of virt-sysprep firstboot scripts.
+  resolves: rhbz#1160203
+- Fix description of 'set_append' and 'get_append' APIs.
+  resolves: rhbz#1164734
+
 * Mon Sep 08 2014 Richard W.M. Jones <rjones@redhat.com> - 1:1.20.11-11
 - virt-sysprep: Fix locking accounts with passwords.
   resolves: rhbz#1037166

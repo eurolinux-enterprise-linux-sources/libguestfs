@@ -1,7 +1,8 @@
 From 19bea5e464388cab00adf1b84199eb408deca4a4 Mon Sep 17 00:00:00 2001
-From: Richard W.M. Jones <rjones@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 24 Jan 2014 10:20:14 +0000
-Subject: [PATCH 23/67] fuse: In mount-local-run, test if root filesystem has been mounted (RHBZ#1057504).
+Subject: [PATCH 023/102] fuse: In mount-local-run, test if root filesystem has
+ been mounted (RHBZ#1057504).
 
 It is never normally valid to use the mount-local* APIs when you
 haven't mounted some filesystems in the libguestfs namespace.
@@ -24,8 +25,8 @@ the side effect of running the NEED_ROOT macro in the daemon.  (There
 is no simple equivalent of NEED_ROOT on the library side.)
 (cherry picked from commit 0e2489974b91e4728d544fe2aa08c2a1c9deb365)
 ---
- src/fuse.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+ src/fuse.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/src/fuse.c b/src/fuse.c
 index 6edb757..1a31153 100644
@@ -51,5 +52,5 @@ index 6edb757..1a31153 100644
  
    /* Enter the main loop. */
 -- 
-1.7.1
+1.9.3
 
