@@ -21,7 +21,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.40.2
-Release:       5%{?dist}
+Release:       5%{?dist}.1
 License:       LGPLv2+
 
 # Source and patches.
@@ -1289,6 +1289,11 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 
 
 %changelog
+* Mon Jul 22 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.40.2-5.el7_7.1
+- v2v: fix a couple of Python 2 porting issues in the nbdkit Python script
+  for 'rhv-upload'
+  resolves: rhbz#1726168
+
 * Tue Jun 04 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.40.2-5
 - Rebase to libguestfs 1.40.2 in RHEL 7.7.
   resolves: rhbz#1621895

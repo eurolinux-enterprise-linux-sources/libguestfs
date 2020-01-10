@@ -1,4 +1,4 @@
-From 171a127e9b67baa841462875ec2f37f0bec0132e Mon Sep 17 00:00:00 2001
+From 7e37aba0cce21ad9abdf742528e605fa1cbc2e5e Mon Sep 17 00:00:00 2001
 From: Nir Soffer <nirsof@gmail.com>
 Date: Fri, 15 Jun 2018 22:57:32 +0300
 Subject: [PATCH] RHEL 7: v2v: rhv-upload: Disable Nagle algorithm
@@ -39,19 +39,19 @@ This change is needed only for python 2.
  1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
-index a7fb88dd3..566b2ba9a 100644
+index 2e8486848..9e71021ea 100644
 --- a/v2v/rhv-upload-plugin.py
 +++ b/v2v/rhv-upload-plugin.py
-@@ -25,7 +25,7 @@ import ssl
- import sys
+@@ -26,7 +26,7 @@ import sys
  import time
+ import errno
  
 -from httplib import HTTPSConnection, HTTPConnection
 +from httplib import HTTPSConnection as _HTTPSConnection, HTTPConnection
  from urlparse import urlparse
  
  import ovirtsdk4 as sdk
-@@ -51,6 +51,18 @@ def byteify(input):
+@@ -52,6 +52,18 @@ def byteify(input):
          return input
  params = None
  

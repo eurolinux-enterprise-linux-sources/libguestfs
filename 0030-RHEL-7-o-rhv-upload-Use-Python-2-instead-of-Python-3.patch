@@ -1,16 +1,17 @@
-From 6ac10b37563221ca9974439a80b3b02329b60e8d Mon Sep 17 00:00:00 2001
+From 2c47e8f0329a210d26083c7ea7fd14a5553f70b1 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Fri, 9 Mar 2018 12:15:44 +0000
+Date: Mon, 22 Jul 2019 13:32:54 +0200
 Subject: [PATCH] RHEL 7: -o rhv-upload: Use Python 2 instead of Python 3.
 
+[Pino: few additional bits edited by me]
 ---
  v2v/output_rhv_upload.ml      |  2 +-
  v2v/python_script.ml          |  2 +-
- v2v/rhv-upload-createvm.py    | 20 ++++++++++++++++----
- v2v/rhv-upload-plugin.py      | 35 ++++++++++++++++++++++++-----------
- v2v/rhv-upload-precheck.py    | 22 +++++++++++++++++-----
+ v2v/rhv-upload-createvm.py    | 20 ++++++++++++---
+ v2v/rhv-upload-plugin.py      | 46 +++++++++++++++++++++++------------
+ v2v/rhv-upload-precheck.py    | 22 +++++++++++++----
  v2v/test-v2v-python-syntax.sh |  2 +-
- 6 files changed, 60 insertions(+), 23 deletions(-)
+ 6 files changed, 67 insertions(+), 27 deletions(-)
 
 diff --git a/v2v/output_rhv_upload.ml b/v2v/output_rhv_upload.ml
 index 3d6d99008..051ce086f 100644
@@ -83,7 +84,7 @@ index 1d0e8c95d..3f2fae4c6 100644
  # What is passed in is a password file, read the actual password.
  with open(params['output_password'], 'r') as fp:
 diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
-index b63d127f5..a7fb88dd3 100644
+index b63d127f5..2e8486848 100644
 --- a/v2v/rhv-upload-plugin.py
 +++ b/v2v/rhv-upload-plugin.py
 @@ -1,5 +1,6 @@
@@ -94,7 +95,7 @@ index b63d127f5..a7fb88dd3 100644
  # Copyright (C) 2018 Red Hat Inc.
  #
  # This program is free software; you can redistribute it and/or modify
-@@ -16,7 +17,7 @@
+@@ -16,16 +17,17 @@
  # with this program; if not, write to the Free Software Foundation, Inc.,
  # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  
@@ -103,9 +104,10 @@ index b63d127f5..a7fb88dd3 100644
  import json
  import logging
  import socket
-@@ -24,8 +25,8 @@ import ssl
+ import ssl
  import sys
  import time
++import errno
  
 -from http.client import HTTPSConnection, HTTPConnection
 -from urllib.parse import urlparse
@@ -114,7 +116,7 @@ index b63d127f5..a7fb88dd3 100644
  
  import ovirtsdk4 as sdk
  import ovirtsdk4.types as types
-@@ -37,14 +38,25 @@ timeout = 5*60
+@@ -37,14 +39,25 @@ timeout = 5*60
  # Parameters are passed in via a JSON doc from the OCaml code.
  # Because this Python code ships embedded inside virt-v2v there
  # is no formal API here.
@@ -142,7 +144,7 @@ index b63d127f5..a7fb88dd3 100644
      else:
          raise RuntimeError("unknown configuration key '%s'" % key)
  
-@@ -54,13 +66,14 @@ def config_complete():
+@@ -54,13 +67,14 @@ def config_complete():
  
  def debug(s):
      if params['verbose']:
@@ -159,7 +161,7 @@ index b63d127f5..a7fb88dd3 100644
              vdsm_id = f.readline().strip()
      except Exception as e:
          # This is most likely not an oVirt host.
-@@ -111,7 +124,7 @@ def open(readonly):
+@@ -111,7 +125,7 @@ def open(readonly):
      username = parsed.username or "admin@internal"
  
      # Read the password from file.
@@ -168,7 +170,7 @@ index b63d127f5..a7fb88dd3 100644
          password = fp.read()
      password = password.rstrip()
  
-@@ -244,7 +257,7 @@ def open(readonly):
+@@ -244,7 +258,7 @@ def open(readonly):
          # New imageio never needs authentication.
          needs_auth = False
  
@@ -177,7 +179,31 @@ index b63d127f5..a7fb88dd3 100644
          can_flush = "flush" in j['features']
          can_trim = "trim" in j['features']
          can_zero = "zero" in j['features']
-@@ -533,7 +546,7 @@ def close(h):
+@@ -369,8 +383,9 @@ def pwrite(h, buf, offset):
+ 
+     try:
+         http.send(buf)
+-    except BrokenPipeError:
+-        pass
++    except EnvironmentError as e:
++        if e.errno != errno.EPIPE:
++            raise
+ 
+     r = http.getresponse()
+     if r.status != 200:
+@@ -432,8 +447,9 @@ def emulate_zero(h, count, offset):
+                 http.send(buf)
+                 count -= len(buf)
+             http.send(memoryview(buf)[:count])
+-        except BrokenPipeError:
+-            pass
++        except EnvironmentError as e:
++            if e.errno != errno.EPIPE:
++                raise
+ 
+         r = http.getresponse()
+         if r.status != 200:
+@@ -533,7 +549,7 @@ def close(h):
              pass
  
          # Write the disk ID file.  Only do this on successful completion.
