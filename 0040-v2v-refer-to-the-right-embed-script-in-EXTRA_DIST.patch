@@ -1,0 +1,28 @@
+From 2b18ec6b5680bd557a78f958c8eb75698d0737cc Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 20 Apr 2018 13:00:56 +0200
+Subject: [PATCH] v2v: refer to the right embed script in EXTRA_DIST
+
+Fixes commit cc04573927cca97de60d544d37467e67c25867a7.
+
+(cherry picked from commit cf49fe100338aeac281c7cbcdfe743177ceb0606)
+---
+ v2v/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/v2v/Makefile.am b/v2v/Makefile.am
+index affc00a8b..0f8c5120b 100644
+--- a/v2v/Makefile.am
++++ b/v2v/Makefile.am
+@@ -31,7 +31,7 @@ EXTRA_DIST = \
+ 	$(SOURCES_MLI) $(SOURCES_ML) $(SOURCES_C) \
+ 	copy_to_local.ml \
+ 	copy_to_local.mli \
+-	embed-code.sh \
++	embed.sh \
+ 	rhv-upload-createvm.py \
+ 	rhv-upload-plugin.py \
+ 	rhv-upload-precheck.py \
+-- 
+2.17.2
+

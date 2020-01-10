@@ -1,0 +1,46 @@
+From adae4d57b007b99cb246c3a3e8b02189b19ce2c4 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 27 Jul 2018 12:10:38 +0200
+Subject: [PATCH] daemon: inspect: ignore fstab devs that cannot be resolved
+ (RHBZ#1608131)
+
+If the /etc/fstab of a guest contains devices specified with UUID or
+LABEL, then the new OCaml inspection code will report the findfs failure
+as general failure of the inspection.  OTOH, the old C inspection code
+simply ignored all the devices that cannot be resolved.
+
+Hence, restore the old behaviour by ignoring unresolvable devices.
+---
+ daemon/inspect_fs_unix_fstab.ml | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/daemon/inspect_fs_unix_fstab.ml b/daemon/inspect_fs_unix_fstab.ml
+index edb797e3f..170440d2c 100644
+--- a/daemon/inspect_fs_unix_fstab.ml
++++ b/daemon/inspect_fs_unix_fstab.ml
+@@ -115,12 +115,20 @@ and check_fstab_entry md_map root_mountable os_type aug entry =
+       if String.is_prefix spec "UUID=" then (
+         let uuid = String.sub spec 5 (String.length spec - 5) in
+         let uuid = shell_unquote uuid in
+-        Mountable.of_device (Findfs.findfs_uuid uuid)
++        (* Just ignore the device if the UUID cannot be resolved. *)
++        try
++          Mountable.of_device (Findfs.findfs_uuid uuid)
++        with
++          Failure _ -> return None
+       )
+       else if String.is_prefix spec "LABEL=" then (
+         let label = String.sub spec 6 (String.length spec - 6) in
+         let label = shell_unquote label in
+-        Mountable.of_device (Findfs.findfs_label label)
++        (* Just ignore the device if the label cannot be resolved. *)
++        try
++          Mountable.of_device (Findfs.findfs_label label)
++        with
++          Failure _ -> return None
+       )
+       (* Resolve /dev/root to the current device.
+        * Do the same for the / partition of the *BSD
+-- 
+2.17.2
+

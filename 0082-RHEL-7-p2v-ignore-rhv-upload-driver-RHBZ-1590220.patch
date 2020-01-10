@@ -1,0 +1,33 @@
+From 66fa28613d7574cb2883478c541ed05e0f452058 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Thu, 19 Jul 2018 13:30:17 +0200
+Subject: [PATCH] RHEL 7: p2v: ignore 'rhv-upload' driver (RHBZ#1590220)
+
+The 'rhv-upload' output mode requires few options, and virt-p2v does not
+have the GUI bits for specifying them.
+---
+ p2v/ssh.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/p2v/ssh.c b/p2v/ssh.c
+index 15f53b692..654121a22 100644
+--- a/p2v/ssh.c
++++ b/p2v/ssh.c
+@@ -1021,8 +1021,12 @@ add_input_driver (const char *name, size_t len)
+ static void
+ add_output_driver (const char *name, size_t len)
+ {
+-  /* Ignore the 'vdsm' driver, since that should only be used by VDSM. */
+-  if (len != 4 || memcmp (name, "vdsm", 4) != 0)
++  /* Ignore the 'vdsm' driver, since that should only be used by VDSM.
++   * Ignore the 'rhv-upload' driver, since we do not support passing all the
++   * options for it.
++   */
++  if ((len != 4 || memcmp (name, "vdsm", 4) != 0) &&
++      (len != 10 || memcmp (name, "rhv-upload", 10) != 0))
+     add_option ("output", &output_drivers, name, len);
+ }
+ 
+-- 
+2.17.2
+

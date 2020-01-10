@@ -1,0 +1,58 @@
+From 0595e70eaf58a80095db24f4d119148cde577ae7 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 2 Mar 2018 16:22:35 +0100
+Subject: [PATCH] RHEL 7: move VIRTIO_DEVICE_NAME() macro to guestfs-internal.h
+
+This way it can be used also in other places than launch-direct.c.
+---
+ lib/guestfs-internal.h | 11 +++++++++++
+ lib/launch-direct.c    | 11 -----------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/lib/guestfs-internal.h b/lib/guestfs-internal.h
+index adeb9478a..8e4e30a20 100644
+--- a/lib/guestfs-internal.h
++++ b/lib/guestfs-internal.h
+@@ -136,6 +136,17 @@
+ /* Maximum size of Windows explorer.exe.  2.6MB on Windows 7. */
+ #define MAX_WINDOWS_EXPLORER_SIZE (4 * 1000 * 1000)
+ 
++/* Differences in qemu device names on ARMv7 (virtio-mmio), s/390x
++ * (CCW) vs normal hardware with PCI.
++ */
++#if defined(__arm__)
++#define VIRTIO_DEVICE_NAME(type) type "-device"
++#elif defined(__s390x__)
++#define VIRTIO_DEVICE_NAME(type) type "-ccw"
++#else
++#define VIRTIO_DEVICE_NAME(type) type "-pci"
++#endif
++
+ /* Machine types. */
+ #ifdef __arm__
+ #define MACHINE_TYPE "virt"
+diff --git a/lib/launch-direct.c b/lib/launch-direct.c
+index 47e8f37de..f6c494d69 100644
+--- a/lib/launch-direct.c
++++ b/lib/launch-direct.c
+@@ -49,17 +49,6 @@
+ #include "guestfs_protocol.h"
+ #include "qemuopts.h"
+ 
+-/* Differences in qemu device names on ARMv7 (virtio-mmio), s/390x
+- * (CCW) vs normal hardware with PCI.
+- */
+-#if defined(__arm__)
+-#define VIRTIO_DEVICE_NAME(type) type "-device"
+-#elif defined(__s390x__)
+-#define VIRTIO_DEVICE_NAME(type) type "-ccw"
+-#else
+-#define VIRTIO_DEVICE_NAME(type) type "-pci"
+-#endif
+-
+ /* Per-handle data. */
+ struct backend_direct_data {
+   pid_t pid;                    /* Qemu PID. */
+-- 
+2.17.2
+

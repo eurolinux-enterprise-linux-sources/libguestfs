@@ -1,0 +1,35 @@
+From 128f7736445649001261195b5dfeb0e7d34bbedc Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Thu, 22 Mar 2018 10:28:36 +0000
+Subject: [PATCH] v2v: cmdline: Move definition to before its only use.
+
+(cherry picked from commit 3167ce1f91667de4c4fe1885bb33c06ee6fa38c5)
+---
+ v2v/cmdline.ml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/v2v/cmdline.ml b/v2v/cmdline.ml
+index bfdc250fc..9bd0e8afc 100644
+--- a/v2v/cmdline.ml
++++ b/v2v/cmdline.ml
+@@ -81,7 +81,6 @@ let parse_cmdline () =
+   let set_vdsm_compat s = vdsm_compat := s in
+ 
+   let vdsm_ovf_flavour = ref Create_ovf.RHVExportStorageDomain in
+-  let ovf_flavours_str = String.concat "|" Create_ovf.ovf_flavours in
+   let set_vdsm_ovf_flavour arg =
+     vdsm_ovf_flavour := Create_ovf.ovf_flavour_of_string arg in
+ 
+@@ -183,7 +182,8 @@ let parse_cmdline () =
+   let i_options =
+     String.concat "|" (Modules_list.input_modules ())
+   and o_options =
+-    String.concat "|" (Modules_list.output_modules ()) in
++    String.concat "|" (Modules_list.output_modules ())
++  and ovf_flavours_str = String.concat "|" Create_ovf.ovf_flavours in
+ 
+   let argspec = [
+     [ S 'b'; L"bridge" ], Getopt.String ("in:out", add_bridge),
+-- 
+2.17.2
+

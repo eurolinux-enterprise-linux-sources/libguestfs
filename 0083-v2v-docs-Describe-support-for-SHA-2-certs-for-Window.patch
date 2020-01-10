@@ -1,0 +1,40 @@
+From 5731e864c4f6ae58f48972b7c1771e9eefc57bf2 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 3 Sep 2018 14:30:21 +0100
+Subject: [PATCH] v2v: docs: Describe support for SHA-2 certs for Windows 7 /
+ 2008 R2 (RHBZ#1624878).
+
+Thanks: Yan Vugenfirer.
+(cherry picked from commit 741ef228cd8d17bd1a8a60a2cfa83c3937120ede)
+---
+ v2v/virt-v2v.pod | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/v2v/virt-v2v.pod b/v2v/virt-v2v.pod
+index 91f575617..457effa50 100644
+--- a/v2v/virt-v2v.pod
++++ b/v2v/virt-v2v.pod
+@@ -946,6 +946,20 @@ This can also prevent booting with a 7B error [see previous section]
+ if the guest has group policy containing
+ C<Device Installation Restrictions>.
+ 
++=head2 Support for SHA-2 certificates in Windows 7 and Windows Server 2008 R2
++
++Later versions of the Windows virtio drivers are signed using SHA-2
++certificates (instead of SHA-1).  The original shipping Windows 7 and
++Windows Server 2008 R2 did not understand SHA-2 certificates and so
++the Windows virtio drivers will not install properly.
++
++To fix this you must apply SHA-2 Code Signing Support from:
++L<https://docs.microsoft.com/en-us/security-updates/SecurityAdvisories/2015/3033929>
++before converting the guest.
++
++For further information see:
++L<https://bugzilla.redhat.com/show_bug.cgi?id=1624878>
++
+ =head1 UEFI
+ 
+ VMware allows you to present UEFI firmware to guests (instead of the
+-- 
+2.17.2
+

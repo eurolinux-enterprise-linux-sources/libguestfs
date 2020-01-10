@@ -1,0 +1,1269 @@
+From 390f01ad72c9846a71d721d68ddab4535c77bb4d Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Thu, 22 Mar 2018 10:29:23 +0000
+Subject: [PATCH] v2v: Add general mechanism for input and output options
+ (-io/-oo).
+
+Currently we have a bunch of ad hoc options like --vddk* and --vdsm*
+(and proposed to add --rhv*) to handle extra parameters for input and
+output modes/transports.  This complicates the command line parsing
+and also the clarity of the command line (becauseit's not very obvious
+which options apply to which side of the conversion).
+
+Replace these with a general mechanism for handling input and output
+options.
+
+Thus (for example):
+
+  --vddk-thumbprint=...   becomes   -io vddk-thumbprint=...
+  --vdsm-compat=0.10                -oo vdsm-compat=0.10
+
+The responsibility for parsing input and output options moves into the
+input and output drivers.
+
+This improves error checking so it's harder now for wrong flags to be
+included on the command line when they don't apply to the current mode.
+
+The old option names are preserved for compatibility.
+
+(cherry picked from commit 6327e716cdd2f161bc639733f216a3a29d26ad3c)
+---
+ v2v/Makefile.am                  |   4 +
+ v2v/cmdline.ml                   | 229 ++++++++++++++-------------
+ v2v/input_libvirt.ml             |   4 +-
+ v2v/input_libvirt.mli            |   4 +-
+ v2v/input_libvirt_vddk.ml        | 112 +++++++++-----
+ v2v/input_libvirt_vddk.mli       |  16 +-
+ v2v/output_vdsm.ml               |  79 +++++++++-
+ v2v/output_vdsm.mli              |  13 +-
+ v2v/test-v2v-docs.sh             |  32 +++-
+ v2v/test-v2v-it-vddk-io-query.sh |  38 +++++
+ v2v/test-v2v-o-vdsm-oo-query.sh  |  38 +++++
+ v2v/test-v2v-o-vdsm-options.sh   |  16 +-
+ v2v/virt-v2v.pod                 | 258 ++++++++++++++++---------------
+ 13 files changed, 531 insertions(+), 312 deletions(-)
+ create mode 100755 v2v/test-v2v-it-vddk-io-query.sh
+ create mode 100755 v2v/test-v2v-o-vdsm-oo-query.sh
+
+diff --git a/v2v/Makefile.am b/v2v/Makefile.am
+index 424530b1d..5fcfeadba 100644
+--- a/v2v/Makefile.am
++++ b/v2v/Makefile.am
+@@ -307,6 +307,8 @@ TESTS = \
+ 	test-v2v-i-ova-tar.sh \
+ 	test-v2v-i-ova-two-disks.sh \
+ 	test-v2v-i-vmx.sh \
++	test-v2v-it-vddk-io-query.sh \
++	test-v2v-o-vdsm-oo-query.sh \
+ 	test-v2v-bad-networks-and-bridges.sh
+ 
+ if HAVE_LIBVIRT
+@@ -468,6 +470,7 @@ EXTRA_DIST += \
+ 	test-v2v-i-vmx-3.vmx \
+ 	test-v2v-i-vmx-4.vmx \
+ 	test-v2v-i-vmx-5.vmx \
++	test-v2v-it-vddk-io-query.sh \
+ 	test-v2v-machine-readable.sh \
+ 	test-v2v-networks-and-bridges-expected.xml \
+ 	test-v2v-networks-and-bridges.sh \
+@@ -478,6 +481,7 @@ EXTRA_DIST += \
+ 	test-v2v-o-null.sh \
+ 	test-v2v-o-qemu.sh \
+ 	test-v2v-o-rhv.sh \
++	test-v2v-o-vdsm-oo-query.sh \
+ 	test-v2v-o-vdsm-options.sh \
+ 	test-v2v-oa-option.sh \
+ 	test-v2v-of-option.sh \
+diff --git a/v2v/cmdline.ml b/v2v/cmdline.ml
+index 9bd0e8afc..c9b859dd6 100644
+--- a/v2v/cmdline.ml
++++ b/v2v/cmdline.ml
+@@ -65,24 +65,6 @@ let parse_cmdline () =
+   let output_password = ref None in
+   let output_storage = ref None in
+   let password_file = ref None in
+-  let vddk_config = ref None in
+-  let vddk_cookie = ref None in
+-  let vddk_libdir = ref None in
+-  let vddk_nfchostport = ref None in
+-  let vddk_port = ref None in
+-  let vddk_snapshot = ref None in
+-  let vddk_thumbprint = ref None in
+-  let vddk_transports = ref None in
+-  let vddk_vimapiver = ref None in
+-  let vdsm_vm_uuid = ref None in
+-  let vdsm_ovf_output = ref None in (* default "." *)
+-
+-  let vdsm_compat = ref "0.10" in
+-  let set_vdsm_compat s = vdsm_compat := s in
+-
+-  let vdsm_ovf_flavour = ref Create_ovf.RHVExportStorageDomain in
+-  let set_vdsm_ovf_flavour arg =
+-    vdsm_ovf_flavour := Create_ovf.ovf_flavour_of_string arg in
+ 
+   let set_string_option_once optname optref arg =
+     match !optref with
+@@ -106,6 +88,15 @@ let parse_cmdline () =
+       error (f_"unknown -i option: %s") s
+   in
+ 
++  let input_options = ref [] in
++  let set_input_option_compat k v =
++    input_options := (k, v) :: !input_options
++  in
++  let set_input_option option =
++    let k, v = String.split "=" option in
++    set_input_option_compat k v
++  in
++
+   let network_map = ref NetworkMap.empty in
+   let add_network, add_bridge =
+     let add flag name t str =
+@@ -159,6 +150,15 @@ let parse_cmdline () =
+       error (f_"unknown -oa option: %s") s
+   in
+ 
++  let output_options = ref [] in
++  let set_output_option_compat k v =
++    output_options := (k, v) :: !output_options
++  in
++  let set_output_option option =
++    let k, v = String.split "=" option in
++    set_output_option_compat k v
++  in
++
+   let root_choice = ref AskRoot in
+   let set_root_choice = function
+     | "ask" -> root_choice := AskRoot
+@@ -169,12 +169,6 @@ let parse_cmdline () =
+       error (f_"unknown --root option: %s") s
+   in
+ 
+-  let vdsm_image_uuids = ref [] in
+-  let add_vdsm_image_uuid s = List.push_front s vdsm_image_uuids in
+-
+-  let vdsm_vol_uuids = ref [] in
+-  let add_vdsm_vol_uuid s = List.push_front s vdsm_vol_uuids in
+-
+   let vmtype_warning _ =
+     warning (f_"the --vmtype option has been removed and now does nothing")
+   in
+@@ -198,6 +192,8 @@ let parse_cmdline () =
+                                     s_"Libvirt URI";
+     [ M"if" ],       Getopt.String ("format", set_string_option_once "-if" input_format),
+                                     s_"Input format (for -i disk)";
++    [ M"io" ],       Getopt.String ("option[=value]", set_input_option),
++                                    s_"Set option for input mode";
+     [ M"it" ],       Getopt.String ("transport", set_string_option_once "-it" input_transport),
+                                     s_"Input transport";
+     [ L"in-place" ], Getopt.Set in_place, Getopt.hidden_option_description;
+@@ -219,6 +215,8 @@ let parse_cmdline () =
+                                     s_"Set output format";
+     [ M"on" ],       Getopt.String ("name", set_string_option_once "-on" output_name),
+                                     s_"Rename guest when converting";
++    [ M"oo" ],       Getopt.String ("option[=value]", set_output_option),
++                                    s_"Set option for output mode";
+     [ M"op" ],       Getopt.String ("filename", set_string_option_once "-op" output_password),
+                                     s_"Use password from file to connect to output hypervisor";
+     [ M"os" ],       Getopt.String ("storage", set_string_option_once "-os" output_storage),
+@@ -229,36 +227,36 @@ let parse_cmdline () =
+                                     s_"Print source and stop";
+     [ L"root" ],     Getopt.String ("ask|... ", set_root_choice),
+                                     s_"How to choose root filesystem";
+-    [ L"vddk-config" ], Getopt.String ("filename", set_string_option_once "--vddk-config" vddk_config),
+-                                    s_"Set VDDK config file";
+-    [ L"vddk-cookie" ], Getopt.String ("cookie", set_string_option_once "--vddk-cookie" vddk_cookie),
+-                                    s_"Set VDDK cookie";
+-    [ L"vddk-libdir" ], Getopt.String ("libdir", set_string_option_once "--vddk-libdir" vddk_libdir),
+-                                    s_"Set VDDK library parent directory";
+-    [ L"vddk-nfchostport" ], Getopt.String ("nfchostport", set_string_option_once "--vddk-nfchostport" vddk_nfchostport),
+-                                    s_"Set VDDK nfchostport";
+-    [ L"vddk-port" ], Getopt.String ("port", set_string_option_once "--vddk-port" vddk_port),
+-                                    s_"Set VDDK port";
+-    [ L"vddk-snapshot" ], Getopt.String ("snapshot-moref", set_string_option_once "--vddk-snapshot" vddk_snapshot),
+-                                    s_"Set VDDK snapshot";
+-    [ L"vddk-thumbprint" ], Getopt.String ("thumbprint", set_string_option_once "--vddk-thumbprint" vddk_thumbprint),
+-                                    s_"Set VDDK thumbprint";
+-    [ L"vddk-transports" ], Getopt.String ("transports", set_string_option_once "--vddk-transports" vddk_transports),
+-                                    s_"Set VDDK transports";
+-    [ L"vddk-vimapiver" ], Getopt.String ("apiver", set_string_option_once "--vddk-vimapiver" vddk_vimapiver),
+-                                    s_"Set VDDK vimapiver";
+-    [ L"vdsm-compat" ], Getopt.Symbol ("0.10|1.1", ["0.10"; "1.1"], set_vdsm_compat),
+-                                    s_"Write qcow2 with compat=0.10|1.1";
+-    [ L"vdsm-image-uuid" ], Getopt.String ("uuid", add_vdsm_image_uuid),
+-                                    s_"Output image UUID(s)";
+-    [ L"vdsm-vol-uuid" ], Getopt.String ("uuid", add_vdsm_vol_uuid),
+-                                    s_"Output vol UUID(s)";
+-    [ L"vdsm-vm-uuid" ], Getopt.String ("uuid", set_string_option_once "--vdsm-vm-uuid" vdsm_vm_uuid),
+-                                    s_"Output VM UUID";
+-    [ L"vdsm-ovf-output" ], Getopt.String ("-", set_string_option_once "--vdsm-ovf-output" vdsm_ovf_output),
+-                                    s_"Output OVF file";
+-    [ L"vdsm-ovf-flavour" ], Getopt.Symbol (ovf_flavours_str, Create_ovf.ovf_flavours, set_vdsm_ovf_flavour),
+-                                    s_"Set the type of generated OVF (default rhvexp)";
++    [ L"vddk-config" ], Getopt.String ("filename", set_input_option_compat "vddk-config"),
++                                    s_"Same as ‘-io vddk-config=filename’";
++    [ L"vddk-cookie" ], Getopt.String ("cookie", set_input_option_compat "vddk-cookie"),
++                                    s_"Same as ‘-io vddk-cookie=filename’";
++    [ L"vddk-libdir" ], Getopt.String ("libdir", set_input_option_compat "vddk-libdir"),
++                                    s_"Same as ‘-io vddk-libdir=libdir’";
++    [ L"vddk-nfchostport" ], Getopt.String ("nfchostport", set_input_option_compat "vddk-nfchostport"),
++                                    s_"Same as ‘-io vddk-nfchostport=nfchostport’";
++    [ L"vddk-port" ], Getopt.String ("port", set_input_option_compat "vddk-port"),
++                                    s_"Same as ‘-io vddk-port=port’";
++    [ L"vddk-snapshot" ], Getopt.String ("snapshot-moref", set_input_option_compat "vddk-snapshot"),
++                                    s_"Same as ‘-io vddk-snapshot=snapshot-moref’";
++    [ L"vddk-thumbprint" ], Getopt.String ("thumbprint", set_input_option_compat "vddk-thumbprint"),
++                                    s_"Same as ‘-io vddk-thumbprint=thumbprint’";
++    [ L"vddk-transports" ], Getopt.String ("transports", set_input_option_compat "vddk-transports"),
++                                    s_"Same as ‘-io vddk-transports=transports’";
++    [ L"vddk-vimapiver" ], Getopt.String ("apiver", set_input_option_compat "vddk-vimapiver"),
++                                    s_"Same as ‘-io vddk-vimapiver=apiver’";
++    [ L"vdsm-compat" ], Getopt.String ("0.10|1.1", set_output_option_compat "vdsm-compat"),
++                                    s_"Same as ‘-oo vdsm-compat=0.10|1.1’";
++    [ L"vdsm-image-uuid" ], Getopt.String ("uuid", set_output_option_compat "vdsm-image-uuid"),
++                                    s_"Same as ‘-oo vdsm-image-uuid=uuid’";
++    [ L"vdsm-vol-uuid" ], Getopt.String ("uuid", set_output_option_compat "vdsm-vol-uuid"),
++                                    s_"Same as ‘-oo vdsm-vol-uuid=uuid’";
++    [ L"vdsm-vm-uuid" ], Getopt.String ("uuid", set_output_option_compat "vdsm-vm-uuid"),
++                                    s_"Same as ‘-oo vdsm-vm-uuid=uuid’";
++    [ L"vdsm-ovf-output" ], Getopt.String ("dir", set_output_option_compat "vdsm-ovf-output"),
++                                    s_"Same as ‘-oo vdsm-ovf-output=dir’";
++    [ L"vdsm-ovf-flavour" ], Getopt.String (ovf_flavours_str, set_output_option_compat "vdsm-ovf-flavour"),
++                                    s_"Same as ‘-oo vdsm-ovf-flavour=flavour’";
+     [ L"vmtype" ],   Getopt.String ("-", vmtype_warning),
+                                     s_"Ignored for backwards compatibility";
+   ] in
+@@ -297,6 +295,7 @@ read the man page virt-v2v(1).
+   let input_conn = !input_conn in
+   let input_format = !input_format in
+   let input_mode = !input_mode in
++  let input_options = List.rev !input_options in
+   let input_transport =
+     match !input_transport with
+     | None -> None
+@@ -315,28 +314,13 @@ read the man page virt-v2v(1).
+   let output_format = !output_format in
+   let output_mode = !output_mode in
+   let output_name = !output_name in
++  let output_options = List.rev !output_options in
+   let output_password = !output_password in
+   let output_storage = !output_storage in
+   let password_file = !password_file in
+   let print_source = !print_source in
+   let qemu_boot = !qemu_boot in
+   let root_choice = !root_choice in
+-  let vddk_options =
+-      { Input_libvirt_vddk.vddk_config = !vddk_config;
+-        vddk_cookie = !vddk_cookie;
+-        vddk_libdir = !vddk_libdir;
+-        vddk_nfchostport = !vddk_nfchostport;
+-        vddk_port = !vddk_port;
+-        vddk_snapshot = !vddk_snapshot;
+-        vddk_thumbprint = !vddk_thumbprint;
+-        vddk_transports = !vddk_transports;
+-        vddk_vimapiver = !vddk_vimapiver } in
+-  let vdsm_compat = !vdsm_compat in
+-  let vdsm_image_uuids = List.rev !vdsm_image_uuids in
+-  let vdsm_vol_uuids = List.rev !vdsm_vol_uuids in
+-  let vdsm_vm_uuid = !vdsm_vm_uuid in
+-  let vdsm_ovf_output = Option.default "." !vdsm_ovf_output in
+-  let vdsm_ovf_flavour = !vdsm_ovf_flavour in
+ 
+   (* No arguments and machine-readable mode?  Print out some facts
+    * about what this binary supports.
+@@ -349,6 +333,7 @@ read the man page virt-v2v(1).
+     printf "vddk\n";
+     printf "colours-option\n";
+     printf "vdsm-compat-option\n";
++    printf "io/oo\n";
+     List.iter (printf "input:%s\n") (Modules_list.input_modules ());
+     List.iter (printf "output:%s\n") (Modules_list.output_modules ());
+     List.iter (printf "convert:%s\n") (Modules_list.convert_modules ());
+@@ -356,6 +341,65 @@ read the man page virt-v2v(1).
+     exit 0
+   );
+ 
++  (* Input transport affects whether some input options should or
++   * should not be used.
++   *)
++  let input_transport =
++    let is_query = input_options = ["?", ""] in
++    let no_options () =
++      if is_query then (
++        printf (f_"No -io (input options) are supported with this input transport.\n");
++        exit 0
++      )
++      else if input_options <> [] then
++        error (f_"no -io (input options) are allowed here");
++    in
++    match input_transport with
++    | None -> no_options (); None
++    | Some `SSH -> no_options (); Some `SSH
++    | Some `VDDK ->
++       if is_query then (
++         Input_libvirt_vddk.print_input_options ();
++         exit 0
++       )
++       else (
++         let vddk_options =
++           Input_libvirt_vddk.parse_input_options input_options in
++         Some (`VDDK vddk_options)
++       ) in
++
++  (* Output mode affects whether some output options should or
++   * should not be used.
++   *)
++  let output_mode =
++    let is_query = output_options = ["?", ""] in
++    let no_options () =
++      if is_query then (
++        printf (f_"No -oo (output options) are supported in this output mode.\n");
++        exit 0
++      )
++      else if output_options <> [] then
++        error (f_"no -oo (output options) are allowed here");
++    in
++    match output_mode with
++    | `Not_set -> no_options (); `Not_set
++    | `Glance -> no_options (); `Glance
++    | `Libvirt -> no_options (); `Libvirt
++    | `Local -> no_options (); `Local
++    | `Null -> no_options (); `Null
++    | `RHV -> no_options (); `RHV
++    | `QEmu -> no_options (); `QEmu
++    | `VDSM ->
++       if is_query then (
++         Output_vdsm.print_output_options ();
++         exit 0
++       )
++       else (
++         let vdsm_options =
++           Output_vdsm.parse_output_options output_options in
++         `VDSM vdsm_options
++       ) in
++
+   (* Parse out the password from the password file. *)
+   let password =
+     match password_file with
+@@ -364,27 +408,6 @@ read the man page virt-v2v(1).
+       let password = read_first_line_from_file filename in
+       Some password in
+ 
+-  (* Input transport affects whether some parameters should or
+-   * should not be used.
+-   *)
+-  (match input_transport with
+-   | None
+-   | Some `SSH ->
+-      if !vddk_config <> None ||
+-         !vddk_cookie <> None ||
+-         !vddk_libdir <> None ||
+-         !vddk_nfchostport <> None ||
+-         !vddk_port <> None ||
+-         !vddk_snapshot <> None ||
+-         !vddk_thumbprint <> None ||
+-         !vddk_transports <> None ||
+-         !vddk_vimapiver <> None then
+-        error (f_"‘--vddk-*’ options should only be used when conversion via the nbdkit VDDK plugin has been enabled, ie. using ‘-it vddk’.")
+-   | Some `VDDK ->
+-      if !vddk_thumbprint = None then
+-        error (f_"‘--vddk-thumbprint’ is required when using ‘-it vddk’.")
+-  );
+-
+   (* Parsing of the argument(s) depends on the input mode. *)
+   let input =
+     match input_mode with
+@@ -410,11 +433,10 @@ read the man page virt-v2v(1).
+       let input_transport =
+         match input_transport with
+         | None -> None
+-        | Some `VDDK -> Some `VDDK
++        | (Some (`VDDK _) as vddk) -> vddk
+         | Some `SSH ->
+            error (f_"only ‘-it vddk’ can be used here") in
+-      Input_libvirt.input_libvirt vddk_options password
+-                                  input_conn input_transport guest
++      Input_libvirt.input_libvirt password input_conn input_transport guest
+ 
+     | `LibvirtXML ->
+       (* -i libvirtxml: Expecting a filename (XML file). *)
+@@ -445,7 +467,7 @@ read the man page virt-v2v(1).
+         match input_transport with
+         | None -> None
+         | Some `SSH -> Some `SSH
+-        | Some `VDDK ->
++        | Some (`VDDK _) ->
+            error (f_"only ‘-it ssh’ can be used here") in
+       Input_vmx.input_vmx input_transport arg in
+ 
+@@ -549,7 +571,7 @@ read the man page virt-v2v(1).
+       Output_rhv.output_rhv os output_alloc,
+       output_format, output_alloc
+ 
+-    | `VDSM ->
++    | `VDSM vdsm_options ->
+       if output_password <> None then
+         error_option_cannot_be_used_in_output_mode "vdsm" "-op";
+       let os =
+@@ -559,21 +581,6 @@ read the man page virt-v2v(1).
+         | Some d -> d in
+       if qemu_boot then
+         error_option_cannot_be_used_in_output_mode "vdsm" "--qemu-boot";
+-      let vdsm_vm_uuid =
+-        match vdsm_vm_uuid with
+-        | None ->
+-           error (f_"-o vdsm: --vdsm-image-uuid was not specified")
+-        | Some s -> s in
+-      if vdsm_image_uuids = [] || vdsm_vol_uuids = [] then
+-        error (f_"-o vdsm: either --vdsm-vol-uuid or --vdsm-vm-uuid was not specified");
+-      let vdsm_options = {
+-        Output_vdsm.image_uuids = vdsm_image_uuids;
+-        vol_uuids = vdsm_vol_uuids;
+-        vm_uuid = vdsm_vm_uuid;
+-        ovf_output = vdsm_ovf_output;
+-        compat = vdsm_compat;
+-        ovf_flavour = vdsm_ovf_flavour;
+-      } in
+       Output_vdsm.output_vdsm os vdsm_options output_alloc,
+       output_format, output_alloc in
+ 
+diff --git a/v2v/input_libvirt.ml b/v2v/input_libvirt.ml
+index 25c81b924..377257dc2 100644
+--- a/v2v/input_libvirt.ml
++++ b/v2v/input_libvirt.ml
+@@ -27,7 +27,7 @@ open Types
+ open Utils
+ 
+ (* Choose the right subclass based on the URI. *)
+-let input_libvirt vddk_options password libvirt_uri input_transport guest =
++let input_libvirt password libvirt_uri input_transport guest =
+   match libvirt_uri with
+   | None ->
+     Input_libvirt_other.input_libvirt_other password libvirt_uri guest
+@@ -53,7 +53,7 @@ let input_libvirt vddk_options password libvirt_uri input_transport guest =
+          password libvirt_uri parsed_uri server guest
+ 
+     (* vCenter or ESXi using nbdkit vddk plugin *)
+-    | Some server, Some ("esx"|"gsx"|"vpx"), Some `VDDK ->
++    | Some server, Some ("esx"|"gsx"|"vpx"), Some (`VDDK vddk_options) ->
+        Input_libvirt_vddk.input_libvirt_vddk vddk_options password
+                                              libvirt_uri parsed_uri guest
+ 
+diff --git a/v2v/input_libvirt.mli b/v2v/input_libvirt.mli
+index 6f9162482..08824bb67 100644
+--- a/v2v/input_libvirt.mli
++++ b/v2v/input_libvirt.mli
+@@ -18,7 +18,7 @@
+ 
+ (** [-i libvirt] source. *)
+ 
+-val input_libvirt : Input_libvirt_vddk.vddk_options -> string option -> string option -> [`VDDK] option -> string -> Types.input
+-(** [input_libvirt vddk_options password libvirt_uri input_transport guest]
++val input_libvirt : string option -> string option -> [`VDDK of Input_libvirt_vddk.vddk_options] option -> string -> Types.input
++(** [input_libvirt password libvirt_uri input_transport guest]
+     creates and returns a new {!Types.input} object specialized for reading
+     input from libvirt sources. *)
+diff --git a/v2v/input_libvirt_vddk.ml b/v2v/input_libvirt_vddk.ml
+index a53f3e71d..0b3ed7af9 100644
+--- a/v2v/input_libvirt_vddk.ml
++++ b/v2v/input_libvirt_vddk.ml
+@@ -33,22 +33,73 @@ open Xpath_helpers
+ 
+ open Printf
+ 
+-type vddk_options = {
+-    vddk_config : string option;
+-    vddk_cookie : string option;
+-    vddk_libdir : string option;
+-    vddk_nfchostport : string option;
+-    vddk_port : string option;
+-    vddk_snapshot : string option;
+-    vddk_thumbprint : string option;
+-    vddk_transports : string option;
+-    vddk_vimapiver : string option;
+-}
++type vddk_options = (string * string) list
++
++(* List of vddk-* input options. *)
++let vddk_option_keys =
++  [ "config";
++    "cookie";
++    "libdir";
++    "nfchostport";
++    "port";
++    "snapshot";
++    "thumbprint";
++    "transports";
++    "vimapiver" ]
++
++let print_input_options () =
++  printf (f_"Input options (-io) which can be used with -it vddk:
++
++  -io vddk-thumbprint=xx:xx:xx:...
++                               VDDK server thumbprint (required)
++
++All other settings are optional:
++
++  -io vddk-config=FILE         VDDK configuration file
++  -io vddk-cookie=COOKIE       VDDK cookie
++  -io vddk-libdir=LIBDIR       VDDK library parent directory
++  -io vddk-nfchostport=PORT    VDDK nfchostport
++  -io vddk-port=PORT           VDDK port
++  -io vddk-snapshot=SNAPSHOT-MOREF
++                               VDDK snapshot moref
++  -io vddk-transports=MODE:MODE:..
++                               VDDK transports
++  -io vddk-vimapiver=APIVER    VDDK vimapiver
++
++Refer to nbdkit-vddk-plugin(1) and the VDDK documentation for further
++information on these settings.
++")
++
++let parse_input_options options =
++  (* Check there are no options we don't understand.  Also removes
++   * the "vddk-" prefix from the internal list.
++   *)
++  let options =
++    List.map (
++      fun (key, value) ->
++        let error_invalid_key () =
++          error (f_"-it vddk: ‘-io %s’ is not a valid input option") key
++        in
++        if not (String.is_prefix key "vddk-") then error_invalid_key ();
++        let key = String.sub key 5 (String.length key-5) in
++        if not (List.mem key vddk_option_keys) then error_invalid_key ();
++
++        (key, value)
++    ) options in
++
++  (* Check no option appears twice. *)
++  let keys = List.map fst options in
++  if List.length keys <> List.length (List.sort_uniq keys) then
++    error (f_"-it vddk: duplicate -io options on the command line");
++
++  options
+ 
+ (* Subclass specialized for handling VMware via nbdkit vddk plugin. *)
+ class input_libvirt_vddk vddk_options password libvirt_uri parsed_uri guest =
+   (* The VDDK path. *)
+-  let libdir = vddk_options.vddk_libdir in
++  let libdir =
++    try Some (List.assoc "libdir" vddk_options)
++    with Not_found -> None in
+ 
+   (* VDDK libraries are located under lib32/ or lib64/ relative to the
+    * libdir.  Note this is unrelated to Linux multilib or multiarch.
+@@ -68,7 +119,7 @@ class input_libvirt_vddk vddk_options password libvirt_uri parsed_uri guest =
+      | None -> ()
+      | Some libdir ->
+         if not (is_directory libdir) then
+-          error (f_"‘--vddk-libdir %s’ does not point to a directory.  See \"INPUT FROM VDDK\" in the virt-v2v(1) manual.") libdir
++          error (f_"‘-io vddk-libdir=%s’ does not point to a directory.  See \"INPUT FROM VDDK\" in the virt-v2v(1) manual.") libdir
+     );
+ 
+     (match library_path with
+@@ -122,15 +173,15 @@ See also \"INPUT FROM VDDK\" in the virt-v2v(1) manual.")
+       else
+         error (f_"nbdkit VDDK plugin is not installed or not working.  It is required if you want to use VDDK.
+ 
+-It looks like you did not set the right path in the ‘--vddk-libdir’ option, or your copy of the VDDK directory is incomplete.  There should be a library called ’<libdir>/%s/libvixDiskLib.so.?’.
++It looks like you did not set the right path in the ‘-io vddk-libdir’ option, or your copy of the VDDK directory is incomplete.  There should be a library called ’<libdir>/%s/libvixDiskLib.so.?’.
+ 
+ See also \"INPUT FROM VDDK\" in the virt-v2v(1) manual.") libNN
+     )
+   in
+ 
+   let error_unless_thumbprint () =
+-    if vddk_options.vddk_thumbprint = None then
+-      error (f_"You must pass the ‘--vddk-thumbprint’ option with the SSL thumbprint of the VMware server.  To find the thumbprint, see the nbdkit-vddk-plugin(1) manual.  See also \"INPUT FROM VDDK\" in the virt-v2v(1) manual.")
++    if not (List.mem_assoc "thumbprint" vddk_options) then
++      error (f_"You must pass the ‘-io vddk-thumbprint’ option with the SSL thumbprint of the VMware server.  To find the thumbprint, see the nbdkit-vddk-plugin(1) manual.  See also \"INPUT FROM VDDK\" in the virt-v2v(1) manual.")
+   in
+ 
+   (* Check that nbdkit was compiled with SELinux support (for the
+@@ -147,18 +198,6 @@ See also \"INPUT FROM VDDK\" in the virt-v2v(1) manual.") libNN
+       error (f_"nbdkit was compiled without SELinux support.  You will have to recompile nbdkit with libselinux-devel installed, or else set SELinux to Permissive mode while doing the conversion.")
+   in
+ 
+-  (* List of passthrough parameters. *)
+-  let vddk_passthrus =
+-    [ "config",      (fun { vddk_config }      -> vddk_config);
+-      "cookie",      (fun { vddk_cookie }      -> vddk_cookie);
+-      "libdir",      (fun { vddk_libdir }      -> vddk_libdir);
+-      "nfchostport", (fun { vddk_nfchostport } -> vddk_nfchostport);
+-      "port",        (fun { vddk_port }        -> vddk_port);
+-      "snapshot",    (fun { vddk_snapshot }    -> vddk_snapshot);
+-      "thumbprint",  (fun { vddk_thumbprint }  -> vddk_thumbprint);
+-      "transports",  (fun { vddk_transports }  -> vddk_transports);
+-      "vimapiver",   (fun { vddk_vimapiver }   -> vddk_vimapiver) ] in
+-
+ object
+   inherit input_libvirt password libvirt_uri guest as super
+ 
+@@ -172,14 +211,9 @@ object
+ 
+   method as_options =
+     let pt_options =
+-      String.concat "" (
+-        List.map (
+-          fun (name, get_field) ->
+-            match get_field vddk_options with
+-            | None -> ""
+-            | Some field -> sprintf " --vddk-%s %s" name field
+-        ) vddk_passthrus
+-      ) in
++      String.concat ""
++                    (List.map (fun (k, v) ->
++                         sprintf " -io vddk-%s=%s" k v) vddk_options) in
+     sprintf "%s -it vddk %s"
+             super#as_options (* superclass prints "-i libvirt etc" *)
+             pt_options
+@@ -284,11 +318,7 @@ object
+       add_arg (sprintf "vm=moref=%s" moref);
+ 
+       (* The passthrough parameters. *)
+-      List.iter (
+-        fun (name, get_field) ->
+-          Option.may (fun field -> add_arg (sprintf "%s=%s" name field))
+-                     (get_field vddk_options)
+-      ) vddk_passthrus;
++      List.iter (fun (k, v) -> add_arg (sprintf "%s=%s" k v)) vddk_options;
+ 
+       get_args () in
+ 
+diff --git a/v2v/input_libvirt_vddk.mli b/v2v/input_libvirt_vddk.mli
+index c8606c72a..1cebba506 100644
+--- a/v2v/input_libvirt_vddk.mli
++++ b/v2v/input_libvirt_vddk.mli
+@@ -18,19 +18,13 @@
+ 
+ (** [-i libvirt] when the source is VMware via nbdkit vddk plugin *)
+ 
+-type vddk_options = {
+-    vddk_config : string option;
+-    vddk_cookie : string option;
+-    vddk_libdir : string option;
+-    vddk_nfchostport : string option;
+-    vddk_port : string option;
+-    vddk_snapshot : string option;
+-    vddk_thumbprint : string option;
+-    vddk_transports : string option;
+-    vddk_vimapiver : string option;
+-}
++type vddk_options
+ (** Various options passed through to the nbdkit vddk plugin unmodified. *)
+ 
++val print_input_options : unit -> unit
++val parse_input_options : (string * string) list -> vddk_options
++(** Print and parse vddk -io options. *)
++
+ val input_libvirt_vddk : vddk_options -> string option -> string option -> Xml.uri -> string -> Types.input
+ (** [input_libvirt_vddk vddk_options password libvirt_uri parsed_uri guest]
+     creates and returns a {!Types.input} object specialized for reading
+diff --git a/v2v/output_vdsm.ml b/v2v/output_vdsm.ml
+index b76a2e930..92b3fd122 100644
+--- a/v2v/output_vdsm.ml
++++ b/v2v/output_vdsm.ml
+@@ -35,23 +35,90 @@ type vdsm_options = {
+   ovf_flavour : Create_ovf.ovf_flavour;
+ }
+ 
++let ovf_flavours_str = String.concat "|" Create_ovf.ovf_flavours
++
++let print_output_options () =
++  printf (f_"Output options (-oo) which can be used with -o vdsm:
++
++  -oo vdsm-compat=0.10|1.1     Write qcow2 with compat=0.10|1.1
++                                   (default: 0.10)
++  -oo vdsm-vm-uuid=UUID        VM UUID (required)
++  -oo vdsm-ovf-output=DIR      OVF metadata directory (required)
++  -oo vdsm-ovf-flavour=%s
++                               Set the type of generated OVF (default: rhvexp)
++
++For each disk you must supply one of each of these options:
++
++  -oo vdsm-image-uuid=UUID     Image directory UUID
++  -oo vdsm-vol-uuid=UUID       Disk volume UUID
++") ovf_flavours_str
++
++let parse_output_options options =
++  let vm_uuid = ref None in
++  let ovf_output = ref None in (* default "." *)
++  let compat = ref "0.10" in
++  let ovf_flavour = ref Create_ovf.RHVExportStorageDomain in
++  let image_uuids = ref [] in
++  let vol_uuids = ref [] in
++
++  List.iter (
++    function
++    | "vdsm-compat", "0.10" -> compat := "0.10"
++    | "vdsm-compat", "1.1" -> compat := "1.1"
++    | "vdsm-compat", v ->
++       error (f_"-o vdsm: unknown vdsm-compat level ‘%s’") v
++    | "vdsm-vm-uuid", v ->
++       if !vm_uuid <> None then
++         error (f_"-o vdsm: -oo vdsm-vm-uuid set twice");
++       vm_uuid := Some v;
++    | "vdsm-ovf-output", v ->
++       if !ovf_output <> None then
++         error (f_"-o vdsm: -oo vdsm-ovf-output set twice");
++       ovf_output := Some v;
++    | "vdsm-ovf-flavour", v ->
++       ovf_flavour := Create_ovf.ovf_flavour_of_string v
++    | "vdsm-image-uuid", v ->
++       List.push_front v image_uuids
++    | "vdsm-vol-uuid", v ->
++       List.push_front v vol_uuids
++    | k, _ ->
++       error (f_"-o vdsm: unknown output option ‘-oo %s’") k
++  ) options;
++
++  let compat = !compat in
++  let image_uuids = List.rev !image_uuids in
++  let vol_uuids = List.rev !vol_uuids in
++  if image_uuids = [] || vol_uuids = [] then
++    error (f_"-o vdsm: either -oo vdsm-vol-uuid or -oo vdsm-vm-uuid was not specified");
++  let vm_uuid =
++    match !vm_uuid with
++    | None ->
++       error (f_"-o vdsm: -oo vdsm-image-uuid was not specified")
++    | Some uuid -> uuid in
++  let ovf_output = Option.default "." !ovf_output in
++  let ovf_flavour = !ovf_flavour in
++
++  { image_uuids; vol_uuids; vm_uuid; ovf_output; compat; ovf_flavour }
++
+ class output_vdsm os vdsm_options output_alloc =
+ object
+   inherit output
+ 
+   method as_options =
+-    sprintf "-o vdsm -os %s%s%s --vdsm-vm-uuid %s --vdsm-ovf-output %s%s%s" os
++    sprintf "-o vdsm -os %s%s%s -oo vdsm-vm-uuid=%s -oo vdsm-ovf-output=%s%s%s" os
+       (String.concat ""
+-         (List.map (sprintf " --vdsm-image-uuid %s") vdsm_options.image_uuids))
++         (List.map (sprintf " -oo vdsm-image-uuid=%s")
++                   vdsm_options.image_uuids))
+       (String.concat ""
+-         (List.map (sprintf " --vdsm-vol-uuid %s") vdsm_options.vol_uuids))
++         (List.map (sprintf " -oo vdsm-vol-uuid=%s")
++                   vdsm_options.vol_uuids))
+       vdsm_options.vm_uuid
+       vdsm_options.ovf_output
+       (match vdsm_options.compat with
+        | "0.10" -> "" (* currently this is the default, so don't print it *)
+-       | s -> sprintf " --vdsm-compat=%s" s)
++       | s -> sprintf " -oo vdsm-compat=%s" s)
+       (match vdsm_options.ovf_flavour with
+-       | Create_ovf.OVirt -> "--vdsm-ovf-flavour=ovf"
++       | Create_ovf.OVirt -> "-oo vdsm-ovf-flavour=ovf"
+        (* currently this is the default, so don't print it *)
+        | Create_ovf.RHVExportStorageDomain -> "")
+ 
+@@ -84,7 +151,7 @@ object
+   method prepare_targets _ targets =
+     if List.length vdsm_options.image_uuids <> List.length targets ||
+       List.length vdsm_options.vol_uuids <> List.length targets then
+-      error (f_"the number of ‘--vdsm-image-uuid’ and ‘--vdsm-vol-uuid’ parameters passed on the command line has to match the number of guest disk images (for this guest: %d)")
++      error (f_"the number of ‘-oo vdsm-image-uuid’ and ‘-oo vdsm-vol-uuid’ parameters passed on the command line has to match the number of guest disk images (for this guest: %d)")
+         (List.length targets);
+ 
+     let mp, uuid =
+diff --git a/v2v/output_vdsm.mli b/v2v/output_vdsm.mli
+index 6ed684638..36f327900 100644
+--- a/v2v/output_vdsm.mli
++++ b/v2v/output_vdsm.mli
+@@ -18,16 +18,13 @@
+ 
+ (** [-o vdsm] target. *)
+ 
+-type vdsm_options = {
+-  image_uuids : string list;          (* --vdsm-image-uuid (multiple) *)
+-  vol_uuids : string list;            (* --vdsm-vol-uuid (multiple) *)
+-  vm_uuid : string;                   (* --vdsm-vm-uuid *)
+-  ovf_output : string;                (* --vdsm-ovf-output *)
+-  compat : string;                    (* --vdsm-compat=0.10|1.1 *)
+-  ovf_flavour : Create_ovf.ovf_flavour;
+-}
++type vdsm_options
+ (** Miscellaneous extra command line parameters used by VDSM. *)
+ 
++val print_output_options : unit -> unit
++val parse_output_options : (string * string) list -> vdsm_options
++(** Print and parse vdsm -oo options. *)
++
+ val output_vdsm : string -> vdsm_options -> Types.output_allocation -> Types.output
+ (** [output_vdsm os vdsm_options output_alloc] creates and
+     returns a new {!Types.output} object specialized for writing
+diff --git a/v2v/test-v2v-docs.sh b/v2v/test-v2v-docs.sh
+index bb1ddefd7..da98050ee 100755
+--- a/v2v/test-v2v-docs.sh
++++ b/v2v/test-v2v-docs.sh
+@@ -22,4 +22,34 @@ $TEST_FUNCTIONS
+ skip_if_skipped
+ 
+ $top_srcdir/podcheck.pl virt-v2v.pod virt-v2v \
+-  --ignore=--debug-overlay,--ic,--if,--in-place,--it,--no-trim,--oa,--oc,--of,--on,--op,--os,--vmtype
++  --ignore=\
++--debug-overlay,\
++--ic,\
++--if,\
++--in-place,\
++--io,\
++--it,\
++--no-trim,\
++--oa,\
++--oc,\
++--of,\
++--on,\
++--oo,\
++--op,\
++--os,\
++--vddk-config,\
++--vddk-cookie,\
++--vddk-libdir,\
++--vddk-nfchostport,\
++--vddk-port,\
++--vddk-snapshot,\
++--vddk-thumbprint,\
++--vddk-transports,\
++--vddk-vimapiver,\
++--vdsm-compat,\
++--vdsm-image-uuid,\
++--vdsm-ovf-flavour,\
++--vdsm-ovf-output,\
++--vdsm-vm-uuid,\
++--vdsm-vol-uuid,\
++--vmtype
+diff --git a/v2v/test-v2v-it-vddk-io-query.sh b/v2v/test-v2v-it-vddk-io-query.sh
+new file mode 100755
+index 000000000..014e30207
+--- /dev/null
++++ b/v2v/test-v2v-it-vddk-io-query.sh
+@@ -0,0 +1,38 @@
++#!/bin/bash -
++# libguestfs virt-v2v test script
++# Copyright (C) 2018 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++
++# Test -io "?" option.
++
++set -e
++
++$TEST_FUNCTIONS
++skip_if_skipped
++
++export VIRT_TOOLS_DATA_DIR="$top_srcdir/test-data/fake-virt-tools"
++export VIRTIO_WIN="$top_srcdir/test-data/fake-virtio-win"
++
++f=test-v2v-it-vddk-io-query.actual
++rm -f $f
++
++$VG virt-v2v --debug-gc \
++    -it vddk -io "?" > $f
++
++grep -- "-io vddk-config" $f
++grep -- "-io vddk-thumbprint" $f
++
++rm $f
+diff --git a/v2v/test-v2v-o-vdsm-oo-query.sh b/v2v/test-v2v-o-vdsm-oo-query.sh
+new file mode 100755
+index 000000000..5691446ea
+--- /dev/null
++++ b/v2v/test-v2v-o-vdsm-oo-query.sh
+@@ -0,0 +1,38 @@
++#!/bin/bash -
++# libguestfs virt-v2v test script
++# Copyright (C) 2018 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++
++# Test -oo "?" option.
++
++set -e
++
++$TEST_FUNCTIONS
++skip_if_skipped
++
++export VIRT_TOOLS_DATA_DIR="$top_srcdir/test-data/fake-virt-tools"
++export VIRTIO_WIN="$top_srcdir/test-data/fake-virtio-win"
++
++f=test-v2v-o-vdsm-oo-query.actual
++rm -f $f
++
++$VG virt-v2v --debug-gc \
++    -o vdsm -oo "?" > $f
++
++grep -- "-oo vdsm-compat" $f
++grep -- "-oo vdsm-image-uuid" $f
++
++rm $f
+diff --git a/v2v/test-v2v-o-vdsm-options.sh b/v2v/test-v2v-o-vdsm-options.sh
+index 4ad5d4aad..65ce1234e 100755
+--- a/v2v/test-v2v-o-vdsm-options.sh
++++ b/v2v/test-v2v-o-vdsm-options.sh
+@@ -16,7 +16,7 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+-# Test -o vdsm options --vdsm-*-uuid
++# Test -o vdsm options -oo vdsm-*-uuid
+ 
+ set -e
+ set -x
+@@ -44,19 +44,19 @@ mkdir $d/12345678-1234-1234-1234-123456789abc/master
+ mkdir $d/12345678-1234-1234-1234-123456789abc/master/vms
+ mkdir $d/12345678-1234-1234-1234-123456789abc/master/vms/VM
+ 
+-# The --vdsm-*-uuid options don't actually check that the
++# The -oo vdsm-*-uuid options don't actually check that the
+ # parameter is a UUID, which is useful here.
+ 
+ $VG virt-v2v --debug-gc \
+     -i libvirt -ic "$libvirt_uri" windows \
+     -o vdsm -os $d/12345678-1234-1234-1234-123456789abc \
+     -of qcow2 \
+-    --vdsm-image-uuid IMAGE \
+-    --vdsm-vol-uuid VOL \
+-    --vdsm-vm-uuid VM \
+-    --vdsm-ovf-output $d/12345678-1234-1234-1234-123456789abc/master/vms/VM \
+-    --vdsm-compat=1.1 \
+-    --vdsm-ovf-flavour=ovirt
++    -oo vdsm-image-uuid=IMAGE \
++    -oo vdsm-vol-uuid=VOL \
++    -oo vdsm-vm-uuid=VM \
++    -oo vdsm-ovf-output=$d/12345678-1234-1234-1234-123456789abc/master/vms/VM \
++    -oo vdsm-compat=1.1 \
++    -oo vdsm-ovf-flavour=ovirt
+ 
+ # Test the OVF metadata was created.
+ test -f $d/12345678-1234-1234-1234-123456789abc/master/vms/VM/VM.ovf
+diff --git a/v2v/virt-v2v.pod b/v2v/virt-v2v.pod
+index 4df3791a9..5dd888e77 100644
+--- a/v2v/virt-v2v.pod
++++ b/v2v/virt-v2v.pod
+@@ -273,6 +273,47 @@ For I<-i disk> only, this specifies the format of the input disk
+ image.  For other input methods you should specify the input
+ format in the metadata.
+ 
++=item B<-io> OPTION=VALUE
++
++Set input option(s) related to the current input mode or transport.
++To display short help on what options are available you can use:
++
++ virt-v2v -it vddk -io "?"
++
++=item B<-io vddk-libdir=>LIBDIR
++
++Set the VDDK library directory.  This directory should I<contain>
++subdirectories called F<include>, F<lib64> etc., but do not include
++F<lib64> actually in the parameter.
++
++In most cases this parameter is required when using the I<-it vddk>
++(VDDK) transport.  See L</INPUT FROM VDDK> below for details.
++
++=item B<-io vddk-thumbprint=>xx:xx:xx:...
++
++Set the thumbprint of the remote VMware server.
++
++This parameter is required when using the I<-it vddk> (VDDK) transport.
++See L</INPUT FROM VDDK> below for details.
++
++=item B<-io vddk-config=>FILENAME
++
++=item B<-io vddk-cookie=>COOKIE
++
++=item B<-io vddk-nfchostport=>PORT
++
++=item B<-io vddk-port=>PORT
++
++=item B<-io vddk-snapshot=>SNAPSHOT-MOREF
++
++=item B<-io vddk-transports=>MODE:MODE:...
++
++=item B<-io vddk-vimapiver=>APIVER
++
++When using VDDK mode, these options are passed unmodified to the
++L<nbdkit(1)> VDDK plugin.  Please refer to L<nbdkit-vddk-plugin(1)>.
++These are all optional.
++
+ =item B<-it> B<ssh>
+ 
+ When using I<-i vmx>, this enables the ssh transport.
+@@ -282,7 +323,7 @@ See L</INPUT FROM VMWARE VMX> below.
+ 
+ Use VMware VDDK as a transport to copy the input disks.  See
+ L</INPUT FROM VDDK> below.  If you use this parameter then you may
+-need to use other I<--vddk*> options to specify how to connect through
++need to use other I<-io vddk*> options to specify how to connect through
+ VDDK.
+ 
+ =item B<--keys-from-stdin>
+@@ -442,6 +483,95 @@ If not specified, then the input format is used.
+ Rename the guest when converting it.  If this option is not used then
+ the output name is the same as the input name.
+ 
++=item B<-oo> OPTION=VALUE
++
++Set output option(s) related to the current output mode.
++To display short help on what options are available you can use:
++
++ virt-v2v -o vdsm -oo "?"
++
++=item B<-oo vdsm-compat=0.10>
++
++=item B<-oo vdsm-compat=1.1>
++
++If I<-o vdsm> and the output format is qcow2, then we add the qcow2
++I<compat=0.10> option to the output file for compatibility with RHEL 6
++(see L<https://bugzilla.redhat.com/1145582>).
++
++If I<-oo vdsm-compat=1.1> is used then modern qcow2 (I<compat=1.1>)
++files are generated instead.
++
++Currently I<-oo vdsm-compat=0.10> is the default, but this will change
++to I<-oo vdsm-compat=1.1> in a future version of virt-v2v (when we can
++assume that everyone is using a modern version of qemu).
++
++B<Note this option only affects I<-o vdsm> output>.  All other output
++modes (including I<-o rhv>) generate modern qcow2 I<compat=1.1>
++files, always.
++
++If this option is available, then C<vdsm-compat-option> will appear in
++the I<--machine-readable> output.
++
++=item B<-oo vdsm-image-uuid=>UUID
++
++=item B<-oo vdsm-vol-uuid=>UUID
++
++=item B<-oo vdsm-vm-uuid=>UUID
++
++=item B<-oo vdsm-ovf-output=>DIR
++
++Normally the RHV output mode chooses random UUIDs for the target
++guest.  However VDSM needs to control the UUIDs and passes these
++parameters when virt-v2v runs under VDSM control.  The parameters
++control:
++
++=over 4
++
++=item *
++
++the image directory of each guest disk (I<-oo vdsm-image-uuid>) (this
++option is passed once for each guest disk)
++
++=item *
++
++UUIDs for each guest disk (I<-oo vdsm-vol-uuid>) (this option
++is passed once for each guest disk)
++
++=item *
++
++the OVF file name (I<-oo vdsm-vm-uuid>).
++
++=item *
++
++the OVF output directory (default current directory) (I<-oo vdsm-ovf-output>).
++
++=back
++
++The format of UUIDs is: C<12345678-1234-1234-1234-123456789abc> (each
++hex digit can be C<0-9> or C<a-f>), conforming to S<OSF DCE 1.1>.
++
++These options can only be used with I<-o vdsm>.
++
++=item B<-oo vdsm-ovf-flavour=>flavour
++
++This option controls the format of the OVF generated at the end of conversion.
++Currently there are two possible flavours:
++
++=over 4
++
++=item rhevexp
++
++The OVF format used in RHV export storage domain.
++
++=item ovirt
++
++The OVF format understood by oVirt REST API.
++
++=back
++
++For backward compatibility the default is I<rhevexp>, but this may change in
++the future.
++
+ =item B<-op> file
+ 
+ Supply a file containing a password to be used when connecting to the
+@@ -538,122 +668,6 @@ boot an operating system from the first virtio disk.  Specifically,
+ F</boot> must be on the first virtio disk, and it cannot chainload an
+ OS which is not in the first virtio disk.
+ 
+-=item B<--vddk-libdir> LIBDIR
+-
+-Set the VDDK library directory.  This directory should I<contain>
+-subdirectories called F<include>, F<lib64> etc., but do not include
+-F<lib64> actually in the parameter.
+-
+-In most cases this parameter is required when using the I<-it vddk>
+-(VDDK) transport.  See L</INPUT FROM VDDK> below for details.
+-
+-=item B<--vddk-thumbprint> xx:xx:xx:...
+-
+-Set the thumbprint of the remote VMware server.
+-
+-This parameter is required when using the I<-it vddk> (VDDK) transport.
+-See L</INPUT FROM VDDK> below for details.
+-
+-=item B<--vddk-config> FILENAME
+-
+-=item B<--vddk-cookie> COOKIE
+-
+-=item B<--vddk-nfchostport> PORT
+-
+-=item B<--vddk-port> PORT
+-
+-=item B<--vddk-snapshot> SNAPSHOT-MOREF
+-
+-=item B<--vddk-transports> MODE:MODE:...
+-
+-=item B<--vddk-vimapiver> APIVER
+-
+-When using VDDK mode, these options are passed unmodified to the
+-L<nbdkit(1)> VDDK plugin.  Please refer to L<nbdkit-vddk-plugin(1)>.
+-These are all optional.
+-
+-=item B<--vdsm-compat=0.10>
+-
+-=item B<--vdsm-compat=1.1>
+-
+-If I<-o vdsm> and the output format is qcow2, then we add the qcow2
+-I<compat=0.10> option to the output file for compatibility with RHEL 6
+-(see L<https://bugzilla.redhat.com/1145582>).
+-
+-If I<--vdsm-compat=1.1> is used then modern qcow2 (I<compat=1.1>)
+-files are generated instead.
+-
+-Currently I<--vdsm-compat=0.10> is the default, but this will change
+-to I<--vdsm-compat=1.1> in a future version of virt-v2v (when we can
+-assume that everyone is using a modern version of qemu).
+-
+-B<Note this option only affects I<-o vdsm> output>.  All other output
+-modes (including I<-o rhv>) generate modern qcow2 I<compat=1.1>
+-files, always.
+-
+-If this option is available, then C<vdsm-compat-option> will appear in
+-the I<--machine-readable> output.
+-
+-=item B<--vdsm-image-uuid> UUID
+-
+-=item B<--vdsm-vol-uuid> UUID
+-
+-=item B<--vdsm-vm-uuid> UUID
+-
+-=item B<--vdsm-ovf-output>
+-
+-Normally the RHV output mode chooses random UUIDs for the target
+-guest.  However VDSM needs to control the UUIDs and passes these
+-parameters when virt-v2v runs under VDSM control.  The parameters
+-control:
+-
+-=over 4
+-
+-=item *
+-
+-the image directory of each guest disk (I<--vdsm-image-uuid>) (this
+-option is passed once for each guest disk)
+-
+-=item *
+-
+-UUIDs for each guest disk (I<--vdsm-vol-uuid>) (this option
+-is passed once for each guest disk)
+-
+-=item *
+-
+-the OVF file name (I<--vdsm-vm-uuid>).
+-
+-=item *
+-
+-the OVF output directory (default current directory) (I<--vdsm-ovf-output>).
+-
+-=back
+-
+-The format of UUIDs is: C<12345678-1234-1234-1234-123456789abc> (each
+-hex digit can be C<0-9> or C<a-f>), conforming to S<OSF DCE 1.1>.
+-
+-These options can only be used with I<-o vdsm>.
+-
+-=item B<--vdsm-ovf-flavour> flavour
+-
+-This option controls the format of the OVF generated at the end of conversion.
+-Currently there are two possible flavours:
+-
+-=over 4
+-
+-=item rhevexp
+-
+-The OVF format used in RHV export storage domain.
+-
+-=item ovirt
+-
+-The OVF format understood by oVirt REST API.
+-
+-=back
+-
+-For backward compatibility the default is I<rhevexp>, but this may change in
+-the future.
+-
+ =item B<-v>
+ 
+ =item B<--verbose>
+@@ -1528,15 +1542,15 @@ SSL thumbprint:
+  $ virt-v2v \
+      -ic 'vpx://root@vcenter.example.com/Datacenter/esxi?no_verify=1' \
+      -it vddk \
+-     --vddk-libdir /path/to/vmware-vix-disklib-distrib \
+-     --vddk-thumbprint xx:xx:xx:... \
++     -io vddk-libdir=/path/to/vmware-vix-disklib-distrib \
++     -io vddk-thumbprint=xx:xx:xx:... \
+      "Windows 2003" \
+      -o local -os /var/tmp
+ 
+ Other options that you might need to add in rare circumstances include
+-I<--vddk-config>, I<--vddk-cookie>, I<--vddk-nfchostport>,
+-I<--vddk-port>, I<--vddk-snapshot>, I<--vddk-transports> and
+-I<--vddk-vimapiver>, which are all explained in the
++I<-io vddk-config>, I<-io vddk-cookie>, I<-io vddk-nfchostport>,
++I<-io vddk-port>, I<-io vddk-snapshot>, I<-io vddk-transports> and
++I<-io vddk-vimapiver>, which are all explained in the
+ L<nbdkit-vddk-plugin(1)> documentation.
+ 
+ =head2 VDDK: DEBUGGING VDDK FAILURES
+-- 
+2.17.2
+

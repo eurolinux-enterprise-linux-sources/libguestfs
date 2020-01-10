@@ -1,0 +1,127 @@
+From 4b5304704a5fa4cad1e5869ce97f27ff64ac492f Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 20 Feb 2018 15:21:48 +0000
+Subject: [PATCH] v2v: DOM: Add doc_to_string function.
+
+Convert a document to an in-memory string.
+
+(cherry picked from commit 802c8635cc2537a7d4b7af8981c670e2fdbb2675)
+---
+ v2v/DOM.ml  | 61 +++++++++++++++++++++++++++++++++--------------------
+ v2v/DOM.mli |  3 +++
+ 2 files changed, 41 insertions(+), 23 deletions(-)
+
+diff --git a/v2v/DOM.ml b/v2v/DOM.ml
+index 7f66e0920..8b106224b 100644
+--- a/v2v/DOM.ml
++++ b/v2v/DOM.ml
+@@ -46,43 +46,48 @@ let e name attrs children =
+  * we will be writing, ie. libvirt XML and OVF metadata, where
+  * whitespace is generally not significant, but readability is useful.
+  *)
+-let rec node_to_chan ?(indent = 0) chan = function
+-  | PCData str -> output_string chan (xml_quote_pcdata str)
++let rec node_to_buf ?(indent = 0) buf = function
++  | PCData str ->
++     Buffer.add_string buf (xml_quote_pcdata str)
+   | Comment str ->
+-    output_spaces chan indent;
+-    fprintf chan "<!-- %s -->" (xml_quote_pcdata str)
+-  | Element e -> element_to_chan ~indent chan e
+-and element_to_chan ?(indent = 0) chan
++     buffer_add_spaces buf indent;
++     bprintf buf "<!-- %s -->" (xml_quote_pcdata str)
++  | Element e ->
++     element_to_buf ~indent buf e
++and element_to_buf ?(indent = 0) buf
+     { e_name = name; e_attrs = attrs; e_children = children } =
+-  output_spaces chan indent;
+-  fprintf chan "<%s" name;
+-  List.iter (fun (n, v) -> fprintf chan " %s='%s'" n (xml_quote_attr v)) attrs;
++  buffer_add_spaces buf indent;
++  bprintf buf "<%s" name;
++  List.iter (fun (n, v) -> bprintf buf " %s='%s'" n (xml_quote_attr v)) attrs;
+   if children <> [] then (
+-    output_string chan ">";
++    Buffer.add_string buf ">";
+     let last_child_was_element = ref false in
+     List.iter (
+       function
+       | Element _ as child ->
+         last_child_was_element := true;
+-        output_char chan '\n';
+-        node_to_chan ~indent:(indent+2) chan child;
++        Buffer.add_char buf '\n';
++        node_to_buf ~indent:(indent+2) buf child;
+       | PCData _ as child ->
+         last_child_was_element := false;
+-        node_to_chan ~indent:(indent+2) chan child;
++        node_to_buf ~indent:(indent+2) buf child;
+       | Comment _ as child ->
+         last_child_was_element := true;
+-        output_char chan '\n';
+-        node_to_chan ~indent:(indent+2) chan child;
++        Buffer.add_char buf '\n';
++        node_to_buf ~indent:(indent+2) buf child;
+     ) children;
+     if !last_child_was_element then (
+-      output_char chan '\n';
+-      output_spaces chan indent
++      Buffer.add_char buf '\n';
++      buffer_add_spaces buf indent
+     );
+-    fprintf chan "</%s>" name
++    bprintf buf "</%s>" name
+   ) else (
+-    output_string chan "/>"
++    Buffer.add_string buf "/>"
+   )
+ 
++and buffer_add_spaces buf n =
++  Buffer.add_string buf (String.spaces n)
++
+ (* Quote XML <element attr='...'> content.  Note you must use single
+  * quotes around the attribute.
+  *)
+@@ -99,10 +104,20 @@ and xml_quote_pcdata str =
+   let str = String.replace str ">" "&gt;" in
+   str
+ 
+-let doc_to_chan chan (Doc doc) =
+-  fprintf chan "<?xml version='1.0' encoding='utf-8'?>\n";
+-  element_to_chan chan doc;
+-  fprintf chan "\n"
++let doc_to_buf buf (Doc doc) =
++  bprintf buf "<?xml version='1.0' encoding='utf-8'?>\n";
++  element_to_buf buf doc;
++  bprintf buf "\n"
++
++let doc_to_string doc =
++  let buf = Buffer.create 4096 in
++  doc_to_buf buf doc;
++  Buffer.contents buf
++
++let doc_to_chan chan doc =
++  let buf = Buffer.create 4096 in
++  doc_to_buf buf doc;
++  Buffer.output_buffer chan buf
+ 
+ let path_to_nodes (Doc doc) path =
+   match path with
+diff --git a/v2v/DOM.mli b/v2v/DOM.mli
+index 1aa89b7e7..99223c389 100644
+--- a/v2v/DOM.mli
++++ b/v2v/DOM.mli
+@@ -60,6 +60,9 @@ v}
+ v}
+ *)
+ 
++val doc_to_string : doc -> string
++(** Convert a document to a string representation. *)
++
+ val doc_to_chan : out_channel -> doc -> unit
+ (** Write the XML document to an output channel. *)
+ 
+-- 
+2.17.2
+

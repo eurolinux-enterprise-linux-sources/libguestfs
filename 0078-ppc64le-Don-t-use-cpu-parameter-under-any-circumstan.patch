@@ -1,0 +1,27 @@
+From 815c29f1f90dcd96e91ecf80954db5ff409ddb1f Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 28 Aug 2018 12:59:06 +0100
+Subject: [PATCH] ppc64le: Don't use -cpu parameter under any circumstances
+ (RHBZ#1605071).
+
+---
+ lib/appliance-cpu.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/appliance-cpu.c b/lib/appliance-cpu.c
+index a6c1b0faf..fa1bae3f9 100644
+--- a/lib/appliance-cpu.c
++++ b/lib/appliance-cpu.c
+@@ -76,6 +76,9 @@ guestfs_int_get_cpu_model (int kvm)
+     return "host";
+   else
+     return "cortex-a57";
++#elif defined(__powerpc64__)
++  /* See discussion in https://bugzilla.redhat.com/show_bug.cgi?id=1605071 */
++  return NULL;
+ #else
+   /* On most architectures, it is faster to pass the CPU host model to
+    * the appliance, allowing maximum speed for things like checksums
+-- 
+2.17.2
+

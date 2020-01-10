@@ -1,0 +1,75 @@
+From 61ae7a5e6deaac5cb9d9776829ea92ac0ebcc5f8 Mon Sep 17 00:00:00 2001
+From: Nir Soffer <nirsof@gmail.com>
+Date: Fri, 15 Jun 2018 22:57:32 +0300
+Subject: [PATCH] RHEL 7: v2v: rhv-upload: Disable Nagle algorithm
+
+When sending a PUT request, the http header may be sent in the first
+packet when calling con.endheaders(). When we send the first chunk, the
+kernel may delay the send because the header packet was not acked yet.
+
+We have seen PUT requests delayed by 40 milliseconds on the server side
+during virt-v2v upload to ovirt. Here is example log from current RHEL
+virt-v2v version, uploading to RHV 4.2.3:
+
+2018-06-12 17:04:01,750 INFO    (Thread-2) [images] Writing 52736 bytes
+at offset 0 flush False to /path/to/image for ticket
+374bec27-930d-4097-8e41-e4bc23324eb0
+
+2018-06-12 17:04:01,790 INFO    (Thread-2) [directio] Operation stats:
+<Clock(total=0.04, read=0.04, write=0.00)>
+
+The server spent 40 milliseconds reading 52736 bytes form
+rhv_upload_plugin running on the same host.
+
+This issue was fixed in python 3.5 by using the TCP_NO_DELAY option
+after connecting[1]. I backported this change from python 3.5.
+
+I tested the same change using imageio example upload script. With this
+change and with optimized PATCH requests, upload time of 4G sparse image
+was reduced from 7 minutes to 1 minute.
+
+See this ovirt patch for more details:
+https://gerrit.ovirt.org/#/c/92276/
+
+This change is needed only for python 2.
+
+[1] https://bugs.python.org/issue23302
+---
+ v2v/rhv-upload-plugin.py | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
+index 3d4ed1270..b262fb3d6 100644
+--- a/v2v/rhv-upload-plugin.py
++++ b/v2v/rhv-upload-plugin.py
+@@ -25,7 +25,7 @@ import ssl
+ import sys
+ import time
+ 
+-from httplib import HTTPSConnection, HTTPConnection
++from httplib import HTTPSConnection as _HTTPSConnection, HTTPConnection
+ from urlparse import urlparse
+ 
+ import ovirtsdk4 as sdk
+@@ -51,6 +51,18 @@ def byteify(input):
+         return input
+ params = None
+ 
++class HTTPSConnection(_HTTPSConnection):
++    def connect(self):
++        """
++        Using TCP_NO_DELAY avoids delays when sending small payload, such as
++        ovirt PATCH requests.
++
++        This issue was fixed in python 3.5, see:
++        https://bugs.python.org/issue23302
++        """
++        _HTTPSConnection.connect(self)
++        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
++
+ def config(key, value):
+     global params
+ 
+-- 
+2.17.2
+

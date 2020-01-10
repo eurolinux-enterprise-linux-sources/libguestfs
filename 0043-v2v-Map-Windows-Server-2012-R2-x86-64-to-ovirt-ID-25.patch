@@ -1,0 +1,30 @@
+From c7de26ba87427294bae1d5e597f2c6cb80bd5dd3 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 1 May 2018 11:30:11 +0100
+Subject: [PATCH] v2v: Map Windows Server 2012 R2 x86-64 to ovirt ID 25.
+
+Thanks: Michal Skrivanek
+
+Fixes commit 593a19cc86cfa8f24c66518c8ba21222550b066a.
+
+(cherry picked from commit c6e89299299f1f620437ac3d05a1f0f12de0f208)
+---
+ v2v/create_ovf.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/v2v/create_ovf.ml b/v2v/create_ovf.ml
+index c29b8421c..190cf8bed 100644
+--- a/v2v/create_ovf.ml
++++ b/v2v/create_ovf.ml
+@@ -418,7 +418,7 @@ and get_ovirt_osid = function
+ 
+   | { i_type = "windows"; i_major_version = 6; i_minor_version = 3;
+       i_arch = "x86_64" } ->
+-    23
++    25
+ 
+   | { i_type = "windows"; i_major_version = 10; i_minor_version = 0;
+       i_arch = "i386" } ->
+-- 
+2.17.2
+

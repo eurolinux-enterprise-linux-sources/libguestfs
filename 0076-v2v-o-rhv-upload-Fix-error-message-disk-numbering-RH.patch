@@ -1,0 +1,42 @@
+From 21a58c8f5f0d4386b5a3c444883d87ccf92b15b5 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 14 Aug 2018 12:50:07 +0100
+Subject: [PATCH] v2v: -o rhv-upload: Fix error message disk numbering
+ (RHBZ#1615885).
+
+The output method used the s_disk_id field assuming it was a unique,
+monotonically increasing number counting from 0.  However this is not
+the case, the input method simply has to set s_disk_id to be unique
+for each disk.
+
+Fixes commit cc04573927cca97de60d544d37467e67c25867a7.
+
+Thanks: Xiaodai Wang
+---
+ v2v/output_rhv_upload.ml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/v2v/output_rhv_upload.ml b/v2v/output_rhv_upload.ml
+index 63fa2411a..7dbd98a0d 100644
+--- a/v2v/output_rhv_upload.ml
++++ b/v2v/output_rhv_upload.ml
+@@ -383,13 +383,13 @@ If the messages above are not sufficient to diagnose the problem then add the 
+      *)
+     let nr_disks = List.length targets in
+     let image_uuids =
+-      List.map (
+-        fun t ->
++      List.mapi (
++        fun i t ->
+           let id = t.target_overlay.ov_source.s_disk_id in
+           let diskid_file = diskid_file_of_id id in
+           if not (wait_for_file diskid_file finalization_timeout) then
+             error (f_"transfer of disk %d/%d failed, see earlier error messages")
+-                  (id+1) nr_disks;
++                  (i+1) nr_disks;
+           let diskid = read_whole_file diskid_file in
+           diskid
+       ) targets in
+-- 
+2.17.2
+

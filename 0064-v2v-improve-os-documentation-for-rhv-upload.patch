@@ -1,0 +1,29 @@
+From 6c8bf7005f36665c018d9fa9b17aeea4c09397c0 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 29 Jun 2018 12:58:33 +0200
+Subject: [PATCH] v2v: improve -os documentation for rhv-upload
+
+Thanks to: Ming Xie
+
+(cherry picked from commit 8d33ff8ba415180dee8f1f91f3b4d16d72ec094e)
+---
+ v2v/virt-v2v.pod | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/v2v/virt-v2v.pod b/v2v/virt-v2v.pod
+index 806225be0..90443373f 100644
+--- a/v2v/virt-v2v.pod
++++ b/v2v/virt-v2v.pod
+@@ -631,6 +631,9 @@ For I<-o libvirt>, this is a libvirt directory pool
+ For I<-o local> and I<-o qemu>, this is a directory name.  The
+ directory must exist.
+ 
++For I<-o rhv-upload>, this is the name of the destination Storage
++Domain.
++
+ For I<-o rhv>, this can be an NFS path of the Export Storage Domain
+ of the form C<E<lt>hostE<gt>:E<lt>pathE<gt>>, eg:
+ 
+-- 
+2.17.2
+

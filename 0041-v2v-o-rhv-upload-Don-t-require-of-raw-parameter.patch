@@ -1,0 +1,84 @@
+From 1b7f750e9244c6d0cd184ffa8a64461db70be263 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 20 Apr 2018 11:48:47 +0100
+Subject: [PATCH] =?UTF-8?q?v2v:=20-o=20rhv-upload:=20Don't=20require=20?=
+ =?UTF-8?q?=E2=80=98-of=20raw=E2=80=99=20parameter.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Because we checked the limitation of raw+sparse during command line
+processing, it had the effect of forcing you to use ‘-of raw’ even if
+the input was already in raw format.  Move the checking to the output
+mode to avoid this.
+
+Fixes commit cc04573927cca97de60d544d37467e67c25867a7.
+
+(cherry picked from commit b3769afaece360b8a2095e3d8a7a934d351c3ade)
+---
+ v2v/cmdline.ml           |  5 -----
+ v2v/output_rhv_upload.ml | 18 +++++++++++++++++-
+ 2 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/v2v/cmdline.ml b/v2v/cmdline.ml
+index 6321eb656..d0be1deb6 100644
+--- a/v2v/cmdline.ml
++++ b/v2v/cmdline.ml
+@@ -589,11 +589,6 @@ read the man page virt-v2v(1).
+         | None ->
+            error (f_"-o rhv-upload: use ‘-oc’ to point to the oVirt or RHV server REST API URL, which is usually https://servername/ovirt-engine/api")
+         | Some oc -> oc in
+-      (* Output format / sparse must currently be raw+sparse.  We can
+-       * change this in future.  See TODO file for details. XXX
+-       *)
+-      if output_alloc <> Sparse || output_format <> Some "raw" then
+-        error (f_"-o rhv-upload: currently you must use ‘-of raw’ and you cannot use ‘-oa preallocated’ with this output mode.  These restrictions will be loosened in a future version.");
+       (* In theory we could make the password optional in future. *)
+       let output_password =
+         match output_password with
+diff --git a/v2v/output_rhv_upload.ml b/v2v/output_rhv_upload.ml
+index 129461242..dc0d96d53 100644
+--- a/v2v/output_rhv_upload.ml
++++ b/v2v/output_rhv_upload.ml
+@@ -169,6 +169,19 @@ See also \"OUTPUT TO RHV\" in the virt-v2v(1) manual.")
+       error (f_"nbdkit was compiled without SELinux support.  You will have to recompile nbdkit with libselinux-devel installed, or else set SELinux to Permissive mode while doing the conversion.")
+   in
+ 
++  (* Output format/sparse must be raw/sparse.  We may be able to
++   * lift this limitation in future, but it requires changes on the
++   * RHV side.  See TODO file for details.  XXX
++   *)
++  let error_current_limitation required_param =
++    error (f_"rhv-upload: currently you must use ‘%s’.  This restriction will be loosened in a future version.") required_param
++  in
++
++  let error_unless_output_alloc_sparse () =
++    if output_alloc <> Sparse then
++      error_current_limitation "-oa sparse"
++  in
++
+   (* JSON parameters which are invariant between disks. *)
+   let json_params = [
+     "verbose", JSON.Bool (verbose ());
+@@ -220,6 +233,7 @@ object
+     error_unless_python_binary_on_path ();
+     error_unless_nbdkit_working ();
+     error_unless_nbdkit_python3_working ();
++    error_unless_output_alloc_sparse ();
+     if have_selinux then
+       error_unless_nbdkit_compiled_with_selinux ()
+ 
+@@ -260,7 +274,9 @@ object
+ 
+         let disk_format =
+           match t.target_format with
+-          | ("raw" | "qcow2") as fmt -> fmt
++          | "raw" as fmt -> fmt
++          | "qcow2" ->
++             error_current_limitation "-of raw"
+           | _ ->
+              error (f_"rhv-upload: -of %s: Only output format ‘raw’ or ‘qcow2’ is supported.  If the input is in a different format then force one of these output formats by adding either ‘-of raw’ or ‘-of qcow2’ on the command line.")
+                    t.target_format in
+-- 
+2.17.2
+

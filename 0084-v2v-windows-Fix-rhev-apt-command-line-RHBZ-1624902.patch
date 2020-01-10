@@ -1,0 +1,37 @@
+From 7c19232808d8c86835ec1b37276c4ae62739c9ac Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 3 Sep 2018 15:24:05 +0100
+Subject: [PATCH] v2v: windows: Fix rhev-apt command line (RHBZ#1624902).
+
+See:
+https://bugzilla.redhat.com/show_bug.cgi?id=1584678#c15
+
+Fixes commit bcdbe6405c10ecb7374ae47eee6385be17dbd49e.  However this
+bug was copied directly from old virt-v2v which did the same thing
+(from lib/Sys/VirtConvert/Converter/Windows.pm):
+
+  echo installing rhev-apt >>log.txt
+  "rhev-apt.exe" /S /v /qn >>log.txt
+
+Thanks: Lev Veyde
+(cherry picked from commit e12c56176abcc2d970a35f83bffc95f7ad1b2aab)
+---
+ v2v/convert_windows.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/v2v/convert_windows.ml b/v2v/convert_windows.ml
+index 163319545..4f0a08248 100644
+--- a/v2v/convert_windows.ml
++++ b/v2v/convert_windows.ml
+@@ -340,7 +340,7 @@ echo Wait for PnP to complete
+ @echo off
+ 
+ echo installing rhev-apt
+-\"\\rhev-apt.exe\" /S /v /qn
++\"\\rhev-apt.exe\" /S /v/qn
+ 
+ echo starting rhev-apt
+ net start rhev-apt
+-- 
+2.17.2
+
