@@ -1,0 +1,55 @@
+From 6bb859d7992908aa09619b8afd487464724c72a5 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 12 Apr 2019 16:19:43 +0200
+Subject: [PATCH] v2v: update documentation on nbdkit (RHBZ#1605242)
+
+nbdkit >= 1.6 ships a VDDK plugin always built, so recommend that
+version instead of recommending to build nbdkit from sources.
+
+(cherry picked from commit 0704d8eb0bcc8139886eb4291f75a3ca49a91e58)
+---
+ v2v/virt-v2v-input-vmware.pod | 28 ++--------------------------
+ 1 file changed, 2 insertions(+), 26 deletions(-)
+
+diff --git a/v2v/virt-v2v-input-vmware.pod b/v2v/virt-v2v-input-vmware.pod
+index 2b6dbaeec..b3ebda182 100644
+--- a/v2v/virt-v2v-input-vmware.pod
++++ b/v2v/virt-v2v-input-vmware.pod
+@@ -197,32 +197,8 @@ library is permitted by the license.
+ 
+ =item 2.
+ 
+-You must also compile nbdkit, enabling the VDDK plugin.  nbdkit E<ge>
+-1.1.25 is recommended, but it is usually best to compile from the git
+-tree.
+-
+-=over 4
+-
+-=item *
+-
+-L<https://github.com/libguestfs/nbdkit>
+-
+-=item *
+-
+-L<https://github.com/libguestfs/nbdkit/tree/master/plugins/vddk>
+-
+-=back
+-
+-Compile nbdkit as described in the sources (see link above).
+-
+-You do B<not> need to run C<make install> because you can run nbdkit
+-from its source directory.  The source directory has a shell script
+-called F<nbdkit> which runs the locally built copy of nbdkit and its
+-plugins.  So set C<$PATH> to point to the nbdkit top build directory
+-(that is, the directory containing the shell script called F<nbdkit>),
+-eg:
+-
+- export PATH=/path/to/nbdkit-1.1.x:$PATH
++nbdkit E<ge> 1.6 is recommended, as it ships with the VDDK plugin
++enabled unconditionally.
+ 
+ =item 3.
+ 
+-- 
+2.21.0
+

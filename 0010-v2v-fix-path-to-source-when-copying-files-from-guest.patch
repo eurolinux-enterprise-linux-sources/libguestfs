@@ -1,0 +1,41 @@
+From 1fc6b5a843dce740fd766c3a65ae378730fc9126 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Date: Fri, 8 Feb 2019 11:44:41 +0100
+Subject: [PATCH] v2v: fix path to source when copying files from guest tools
+ directory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The debug message was slightly changed too to better match the similar
+message for ISO case. It refers to the root directory instead of the
+specific subdirectory inside guest tools.
+
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+(cherry picked from commit f4bda5571a36da42bdc800c10f2c85cf20bf5c85)
+---
+ v2v/windows_virtio.ml | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/v2v/windows_virtio.ml b/v2v/windows_virtio.ml
+index f3302aed6..59b0bf493 100644
+--- a/v2v/windows_virtio.ml
++++ b/v2v/windows_virtio.ml
+@@ -315,10 +315,11 @@ and copy_drivers g inspect driverdir =
+ and copy_from_virtio_win g inspect srcdir destdir filter missing =
+   let ret = ref [] in
+   if is_directory virtio_win then (
++    debug "windows: copy_from_virtio_win: guest tools source directory %s"
++      virtio_win;
++
+     let dir = virtio_win // srcdir in
+-    debug "windows: copy_from_virtio_win: guest tools source directory %s" dir;
+-
+-    if not (is_directory srcdir) then missing ()
++    if not (is_directory dir) then missing ()
+     else (
+       let cmd = sprintf "cd %s && find -L -type f" (quote dir) in
+       let paths = external_command cmd in
+-- 
+2.21.0
+

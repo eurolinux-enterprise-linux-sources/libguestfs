@@ -1,0 +1,57 @@
+From dc4ea25b46861b5cd18dc432b3f39692a25ce441 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Wed, 27 Feb 2019 17:51:59 +0100
+Subject: [PATCH] v2v: linux: do not uninstall open-vm-tools w/ ubuntu-server
+
+ubuntu-server depends on open-vm-tools on Ubuntu, so if v2v tries to
+uninstall open-vm-tools then dpkg will (rightfully) fail with a
+dependency issue.
+
+Since open-vm-tools is harmless after the conversion anyway (it will
+not even run), then do not attempt to uninstall it if ubuntu-server is
+installed too.
+
+Followup of commit 2bebacf8bf611f0f80a66915f78653ce30b38129.
+
+Thanks to: Ming Xie.
+
+(cherry picked from commit 1a4fd822ef057764f809cddce642b3223756629e)
+---
+ v2v/convert_linux.ml | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/v2v/convert_linux.ml b/v2v/convert_linux.ml
+index 3d61400b5..b4b2f24c4 100644
+--- a/v2v/convert_linux.ml
++++ b/v2v/convert_linux.ml
+@@ -289,6 +289,18 @@ let convert (g : G.guestfs) inspect source output rcaps =
+ 
+     (* Uninstall VMware Tools. *)
+     let remove = ref [] and libraries = ref [] in
++    (* On Ubuntu, the ubuntu-server metapackage depends on
++     * open-vm-tools, and thus any attempt to remove it will cause
++     * dependency issues.  Hence, special case this situation, and
++     * leave open-vm-tools installed in this case.
++     *)
++    let has_ubuntu_server =
++      if family = `Debian_family then
++        List.exists (
++          fun { G.app2_name = name } ->
++            name = "ubuntu-server"
++        ) inspect.i_apps
++      else false in
+     List.iter (
+       fun { G.app2_name = name } ->
+         if String.is_prefix name "vmware-tools-libraries-" then
+@@ -301,7 +313,7 @@ let convert (g : G.guestfs) inspect source output rcaps =
+           List.push_front name remove
+         else if String.is_prefix name "open-vm-tools-" then
+           List.push_front name remove
+-        else if name = "open-vm-tools" then
++        else if name = "open-vm-tools" && not has_ubuntu_server then
+           List.push_front name remove
+     ) inspect.i_apps;
+     let libraries = !libraries in
+-- 
+2.21.0
+

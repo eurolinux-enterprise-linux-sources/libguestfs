@@ -1,5 +1,5 @@
 /* libguestfs - the guestfsd daemon
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,26 +115,8 @@ main_loop (int _sock)
       exit (EXIT_FAILURE);
 
 #ifdef ENABLE_PACKET_DUMP
-    if (verbose) {
-      size_t i, j;
-
-      for (i = 0; i < len; i += 16) {
-        printf ("%04zx: ", i);
-        for (j = i; j < MIN (i+16, len); ++j)
-          printf ("%02x ", (unsigned char) buf[j]);
-        for (; j < i+16; ++j)
-          printf ("   ");
-        printf ("|");
-        for (j = i; j < MIN (i+16, len); ++j)
-          if (c_isprint (buf[j]))
-            printf ("%c", buf[j]);
-          else
-            printf (".");
-        for (; j < i+16; ++j)
-          printf (" ");
-        printf ("|\n");
-      }
-    }
+    if (verbose)
+      guestfs_int_hexdump (buf, len, stdout);
 #endif
 
     gettimeofday (&start_t, NULL);

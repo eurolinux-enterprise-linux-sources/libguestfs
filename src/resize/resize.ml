@@ -1,5 +1,5 @@
 (* virt-resize
- * Copyright (C) 2010-2018 Red Hat Inc.
+ * Copyright (C) 2010-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ let debug_logvol lv =
 
 type expand_content_method =
   | PVResize | Resize2fs | NTFSResize | BtrfsFilesystemResize | XFSGrowFS
-  | Mkswap
+  | Mkswap | ResizeF2fs
 
 let string_of_expand_content_method = function
   | PVResize -> s_"pvresize"
@@ -145,6 +145,7 @@ let string_of_expand_content_method = function
   | BtrfsFilesystemResize -> s_"btrfs-filesystem-resize"
   | XFSGrowFS -> s_"xfs_growfs"
   | Mkswap -> s_"mkswap"
+  | ResizeF2fs -> s_"resize.f2fs"
 
 type unknown_filesystems_mode =
   | UnknownFsIgnore
@@ -156,7 +157,7 @@ let main () =
   let infile, outfile, align_first, alignment, copy_boot_loader,
     deletes,
     dryrun, expand, expand_content, extra_partition, format, ignores,
-    lv_expands, machine_readable, ntfsresize_force, output_format,
+    lv_expands, ntfsresize_force, output_format,
     resizes, resizes_force, shrink, sparse, unknown_fs_mode =
 
     let add xs s = List.push_front s xs in
@@ -169,7 +170,7 @@ let main () =
     let expand = ref "" in
     let set_expand s =
       if s = "" then error (f_"empty --expand option")
-      else if !expand <> "" then error (f_"--expand option given twice")
+      else if !expand <> "" then error (f_"--expand option given more than once")
       else expand := s
     in
     let expand_content = ref true in
@@ -177,7 +178,6 @@ let main () =
     let format = ref "" in
     let ignores = ref [] in
     let lv_expands = ref [] in
-    let machine_readable = ref false in
     let ntfsresize_force = ref false in
     let output_format = ref "" in
     let resizes = ref [] in
@@ -185,7 +185,7 @@ let main () =
     let shrink = ref "" in
     let set_shrink s =
       if s = "" then error (f_"empty --shrink option")
-      else if !shrink <> "" then error (f_"--shrink option given twice")
+      else if !shrink <> "" then error (f_"--shrink option given more than once")
       else shrink := s
     in
     let sparse = ref true in
@@ -203,7 +203,6 @@ let main () =
       [ L"format" ],  Getopt.Set_string (s_"format", format),     s_"Format of input disk";
       [ L"ignore" ],  Getopt.String (s_"part", add ignores),  s_"Ignore partition";
       [ L"lv-expand"; L"LV-expand"; L"lvexpand"; L"LVexpand" ], Getopt.String (s_"lv", add lv_expands), s_"Expand logical volume";
-      [ L"machine-readable" ], Getopt.Set machine_readable, s_"Make output machine readable";
       [ S 'n'; L"dry-run"; L"dryrun" ],        Getopt.Set dryrun,            s_"Don’t perform changes";
       [ L"ntfsresize-force" ], Getopt.Set ntfsresize_force, s_"Force ntfsresize";
       [ L"output-format" ], Getopt.Set_string (s_"format", output_format), s_"Format of output disk";
@@ -224,8 +223,8 @@ A short summary of the options is given below.  For detailed help please
 read the man page virt-resize(1).
 ")
         prog in
-    let opthandle = create_standard_options argspec ~anon_fun usage_msg in
-    Getopt.parse opthandle;
+    let opthandle = create_standard_options argspec ~anon_fun ~machine_readable:true usage_msg in
+    Getopt.parse opthandle.getopt;
 
     if verbose () then (
       printf "command line:";
@@ -244,7 +243,6 @@ read the man page virt-resize(1).
     let format = match !format with "" -> None | str -> Some str in
     let ignores = List.rev !ignores in
     let lv_expands = List.rev !lv_expands in
-    let machine_readable = !machine_readable in
     let ntfsresize_force = !ntfsresize_force in
     let output_format = match !output_format with "" -> None | str -> Some str in
     let resizes = List.rev !resizes in
@@ -278,24 +276,28 @@ read the man page virt-resize(1).
      * things added since this option, or things which depend on features
      * of the appliance.
      *)
-    if !disks = [] && machine_readable then (
-      printf "virt-resize\n";
-      printf "ntfsresize-force\n";
-      printf "32bitok\n";
-      printf "128-sector-alignment\n";
-      printf "alignment\n";
-      printf "align-first\n";
-      printf "infile-uri\n";
+    (match !disks, machine_readable () with
+    | [], Some { pr } ->
+      pr "virt-resize\n";
+      pr "ntfsresize-force\n";
+      pr "32bitok\n";
+      pr "128-sector-alignment\n";
+      pr "alignment\n";
+      pr "align-first\n";
+      pr "infile-uri\n";
       let g = open_guestfs () in
       g#add_drive "/dev/null";
       g#launch ();
       if g#feature_available [| "ntfsprogs"; "ntfs3g" |] then
-        printf "ntfs\n";
+        pr "ntfs\n";
       if g#feature_available [| "btrfs" |] then
-        printf "btrfs\n";
+        pr "btrfs\n";
       if g#feature_available [| "xfs" |] then
-        printf "xfs\n";
+        pr "xfs\n";
+      if g#feature_available [| "f2fs" |] then
+        pr "f2fs\n";
       exit 0
+    | _, _ -> ()
     );
 
     (* Verify we got exactly 2 disks. *)
@@ -328,13 +330,14 @@ read the man page virt-resize(1).
     infile, outfile, align_first, alignment, copy_boot_loader,
     deletes,
     dryrun, expand, expand_content, extra_partition, format, ignores,
-    lv_expands, machine_readable, ntfsresize_force, output_format,
+    lv_expands, ntfsresize_force, output_format,
     resizes, resizes_force, shrink, sparse, unknown_fs_mode in
 
-  (* Default to true, since NTFS/btrfs/XFS support are usually available. *)
+  (* Default to true, since NTFS/btrfs/XFS/f2fs support are usually available. *)
   let ntfs_available = ref true in
   let btrfs_available = ref true in
   let xfs_available = ref true in
+  let f2fs_available = ref true in
 
   (* Add a drive to an handle using the elements of the URI,
    * and few additional parameters.
@@ -352,7 +355,10 @@ read the man page virt-resize(1).
     (* The output disk is being created, so use cache=unsafe here. *)
     add_drive_uri g ?format:output_format ~readonly:false ~cachemode:"unsafe"
       (snd outfile);
-    if not (quiet ()) then Progress.set_up_progress_bar ~machine_readable g;
+    if not (quiet ()) then (
+      let machine_readable = machine_readable () <> None in
+      Progress.set_up_progress_bar ~machine_readable g
+    );
     g#launch ();
 
     (* Set the filter to /dev/sda, in case there are any rogue
@@ -364,6 +370,7 @@ read the man page virt-resize(1).
     ntfs_available := g#feature_available [|"ntfsprogs"; "ntfs3g"|];
     btrfs_available := g#feature_available [|"btrfs"|];
     xfs_available := g#feature_available [|"xfs"|];
+    f2fs_available := g#feature_available [|"f2fs"|];
 
     g
   in
@@ -585,6 +592,7 @@ read the man page virt-resize(1).
       | ContentFS (("ntfs"), _) when !ntfs_available -> true
       | ContentFS (("btrfs"), _) when !btrfs_available -> true
       | ContentFS (("xfs"), _) when !xfs_available -> true
+      | ContentFS (("f2fs"), _) when !f2fs_available -> true
       | ContentFS _ -> false
       | ContentExtendedPartition -> false
       | ContentSwap -> true
@@ -600,6 +608,7 @@ read the man page virt-resize(1).
       | ContentFS (("ntfs"), _) when !ntfs_available -> NTFSResize
       | ContentFS (("btrfs"), _) when !btrfs_available -> BtrfsFilesystemResize
       | ContentFS (("xfs"), _) when !xfs_available -> XFSGrowFS
+      | ContentFS (("f2fs"), _) when !f2fs_available -> ResizeF2fs
       | ContentFS _ -> assert false
       | ContentExtendedPartition -> assert false
       | ContentSwap -> Mkswap
@@ -1327,7 +1336,10 @@ read the man page virt-resize(1).
       (* The output disk is being created, so use cache=unsafe here. *)
       add_drive_uri g ?format:output_format ~readonly:false ~cachemode:"unsafe"
         (snd outfile);
-      if not (quiet ()) then Progress.set_up_progress_bar ~machine_readable g;
+      if not (quiet ()) then (
+        let machine_readable = machine_readable () <> None in
+        Progress.set_up_progress_bar ~machine_readable g
+      );
       g#launch ();
 
       g (* Return new handle. *)
@@ -1368,6 +1380,7 @@ read the man page virt-resize(1).
         if new_uuid <> orig_uuid then
           warning (f_"UUID in swap partition %s changed from ‘%s’ to ‘%s’")
             target orig_uuid new_uuid;
+      | ResizeF2fs -> g#f2fs_expand target
     in
 
     (* Expand partition content as required. *)

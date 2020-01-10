@@ -1,6 +1,6 @@
 #!/usr/bin/env ocaml
 (* libguestfs
- * Copyright (C) 2016-2018 Red Hat Inc.
+ * Copyright (C) 2016-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,17 @@
 
 open Printf
 
+let windows_installers = "/mnt/media/installers/Windows"
+
 let prog = "make-template"
+
+(* Ensure that a file is deleted on exit. *)
+let unlink_on_exit =
+  let files = ref [] in
+  at_exit (
+    fun () -> List.iter (fun f -> try Unix.unlink f with _ -> ()) !files
+  );
+  fun file -> files := file :: !files
 
 let () =
   (* Check we are being run from the correct directory. *)
@@ -72,6 +82,8 @@ type os =
   | Ubuntu of string * string
   | Fedora of int               (* version number *)
   | FreeBSD of int * int        (* major, minor *)
+  | Windows of int * int * windows_variant (* major, minor, variant *)
+and windows_variant = Client | Server
 type arch = X86_64 | Aarch64 | Armv7 | I686 | PPC64 | PPC64le | S390X
 
 type boot_media =
@@ -94,9 +106,10 @@ let rec main () =
   (* For OSes which require a kickstart, this generates one.
    * For OSes which require a preseed file, this returns one (we
    * don't generate preseed files at the moment).
+   * For Windows this returns an unattend file in an ISO.
    * For OSes which cannot be automated (FreeBSD), this returns None.
    *)
-  let ks = make_kickstart_or_preseed os arch in
+  let ks = make_kickstart os arch in
 
   (* Find the boot media.  Normally ‘virt-install --location’ but
    * for FreeBSD it downloads the boot ISO.
@@ -108,6 +121,7 @@ let rec main () =
 
   (* Choose a random temporary disk name. *)
   let tmpout = sprintf "%s.img" tmpname in
+  unlink_on_exit tmpout;
 
   (* Create the final output name (actually not quite final because
    * we will xz-compress it).
@@ -116,27 +130,28 @@ let rec main () =
 
   (* Some architectures need EFI boot. *)
   let tmpefivars =
-    match os, arch with
-    | (Fedora _|RHEL _), Aarch64 ->
-       let vars = Sys.getcwd () // sprintf "%s.vars" tmpname in
-       let cmd =
-         sprintf "cp /usr/share/edk2/aarch64/vars-template-pflash.raw %s"
-                 (quote vars) in
-       if Sys.command cmd <> 0 then exit 1;
-       Some ("/usr/share/edk2/aarch64/QEMU_EFI-pflash.raw", vars)
-    | _ -> None in
+    if needs_uefi os arch then (
+      let code, vars =
+        match arch with
+        | X86_64 ->
+           "/usr/share/edk2/ovmf/OVMF_CODE.fd",
+           "/usr/share/edk2/ovmf/OVMF_VARS.fd"
+        | Aarch64 ->
+           "/usr/share/edk2/aarch64/QEMU_EFI-pflash.raw",
+           "/usr/share/edk2/aarch64/vars-template-pflash.raw"
+        | _ -> assert false in
+
+      let vars_out = Sys.getcwd () // sprintf "%s.vars" tmpname in
+      unlink_on_exit vars_out;
+      let cmd = sprintf "cp %s %s" (quote vars) (quote vars_out) in
+      if Sys.command cmd <> 0 then exit 1;
+      Some (code, vars_out)
+    )
+    else None in
 
   (* Now construct the virt-install command. *)
   let vi = make_virt_install_command os arch ks tmpname tmpout tmpefivars
                                      boot_media virtual_size_gb in
-  (* Make sure that temporary files are removed if we exit for any reason. *)
-  at_exit (
-    fun () ->
-      (try Unix.unlink tmpout with _ -> ());
-      (match tmpefivars with
-       | Some (_, vars) -> (try Unix.unlink vars with _ -> ())
-       | None -> ());
-  );
 
   (* Print the virt-install command just before we run it, because
    * this is expected to be long-running.
@@ -232,24 +247,26 @@ let rec main () =
    | _ -> ()
   );
 
-  (match os with
-   | FreeBSD _ -> () (* virt-sysprep doesn't work on FreeBSD. *)
-   | _ ->
-      (* Sysprep.  Relabel SELinux-using guests. *)
-      printf "Sysprepping ...\n%!";
-      let cmd =
-        sprintf "virt-sysprep --quiet -a %s%s"
-                (quote tmpout)
-                (if is_selinux_os os then " --selinux-relabel" else "") in
-      if Sys.command cmd <> 0 then exit 1
+  if can_sysprep_os os then (
+    (* Sysprep.  Relabel SELinux-using guests. *)
+    printf "Sysprepping ...\n%!";
+    let cmd =
+      sprintf "virt-sysprep --quiet -a %s%s"
+              (quote tmpout)
+              (if is_selinux_os os then " --selinux-relabel" else "") in
+    if Sys.command cmd <> 0 then exit 1
   );
 
   (* Sparsify and copy to output name. *)
   printf "Sparsifying ...\n%!";
   let cmd =
-    sprintf "virt-sparsify --quiet %s %s" (quote tmpout) (quote output) in
+    sprintf "virt-sparsify --inplace --quiet %s" (quote tmpout) in
   if Sys.command cmd <> 0 then exit 1;
-  Unix.unlink tmpout;
+
+  (* Move file to final name before compressing. *)
+  let cmd =
+    sprintf "mv %s %s" (quote tmpout) (quote output) in
+  if Sys.command cmd <> 0 then exit 1;
 
   (* Compress the output. *)
   printf "Compressing ...\n%!";
@@ -257,6 +274,10 @@ let rec main () =
     sprintf "xz -f --best --block-size=16777216 %s" (quote output) in
   if Sys.command cmd <> 0 then exit 1;
   let output = output ^ ".xz" in
+
+  (* Set public readable permissions on the final file. *)
+  let cmd = sprintf "chmod 0644 %s" (quote output) in
+  if Sys.command cmd <> 0 then exit 1;
 
   printf "Template completed: %s\n%!" output;
 
@@ -335,8 +356,10 @@ and os_of_string os ver =
   | "ubuntu", "12.04" -> Ubuntu (ver, "precise")
   | "ubuntu", "14.04" -> Ubuntu (ver, "trusty")
   | "ubuntu", "16.04" -> Ubuntu (ver, "xenial")
+  | "ubuntu", "18.04" -> Ubuntu (ver, "bionic")
   | "fedora", ver -> Fedora (int_of_string ver)
   | "freebsd", ver -> let maj, min = parse_major_minor ver in FreeBSD (maj, min)
+  | "windows", ver -> parse_windows_version ver
   | _ ->
      eprintf "%s: unknown or unsupported OS (%s, %s)\n" prog os ver; exit 1
 
@@ -350,6 +373,18 @@ and parse_major_minor ver =
     eprintf "%s: cannot parse major.minor (%s)\n" prog ver;
     exit 1
   )
+
+(* https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions *)
+and parse_windows_version = function
+  | "7" -> Windows (6, 1, Client)
+  | "2k8r2" -> Windows (6, 1, Server)
+  | "2k12" -> Windows (6, 2, Server)
+  | "2k12r2" -> Windows (6, 3, Server)
+  | "2k16" -> Windows (10, 0, Server)
+  | _ ->
+     eprintf "%s: cannot parse Windows version, see ‘parse_windows_version’\n"
+             prog;
+     exit 1
 
 and arch_of_string = function
   | "x86_64" -> X86_64
@@ -388,6 +423,9 @@ and filename_of_os os arch ext =
   | CentOS (major, minor) ->
      if arch = X86_64 then sprintf "centos-%d.%d%s" major minor ext
      else sprintf "centos-%d.%d-%s%s" major minor (string_of_arch arch) ext
+  | RHEL (8, 0) -> (* RHEL 8 Alpha temporarily *)
+     if arch = X86_64 then sprintf "rhel-8.0-alpha%s" ext
+     else sprintf "rhel-8.0-alpha-%s%s" (string_of_arch arch) ext
   | RHEL (major, minor) ->
      if arch = X86_64 then sprintf "rhel-%d.%d%s" major minor ext
      else sprintf "rhel-%d.%d-%s%s" major minor (string_of_arch arch) ext
@@ -400,6 +438,14 @@ and filename_of_os os arch ext =
   | FreeBSD (major, minor) ->
      if arch = X86_64 then sprintf "freebsd-%d.%d%s" major minor ext
      else sprintf "freebsd-%d.%d-%s%s" major minor (string_of_arch arch) ext
+  | Windows (major, minor, Client) ->
+     if arch = X86_64 then sprintf "windows-%d.%d-client%s" major minor ext
+     else sprintf "windows-%d.%d-client-%s%s"
+                  major minor (string_of_arch arch) ext
+  | Windows (major, minor, Server) ->
+     if arch = X86_64 then sprintf "windows-%d.%d-server%s" major minor ext
+     else sprintf "windows-%d.%d-server-%s%s"
+                  major minor (string_of_arch arch) ext
 
 and string_of_os os arch = filename_of_os os arch ""
 
@@ -407,19 +453,43 @@ and string_of_os os arch = filename_of_os os arch ""
 and string_of_os_noarch = function
   | Fedora ver -> sprintf "fedora-%d" ver
   | CentOS (major, minor) -> sprintf "centos-%d.%d" major minor
+  | RHEL (8, 0) -> sprintf "rhel-8.0-alpha" (* RHEL 8 Alpha temporarily. *)
   | RHEL (major, minor) -> sprintf "rhel-%d.%d" major minor
   | Debian (ver, _) -> sprintf "debian-%d" ver
   | Ubuntu (ver, _) -> sprintf "ubuntu-%s" ver
   | FreeBSD (major, minor) -> sprintf "freebsd-%d.%d" major minor
+  | Windows (major, minor, Client) -> sprintf "windows-%d.%d-client" major minor
+  | Windows (major, minor, Server) -> sprintf "windows-%d.%d-server" major minor
+
+(* Does virt-sysprep know how to sysprep this OS? *)
+and can_sysprep_os = function
+  | RHEL _ | CentOS _ | Fedora _ | Debian _ | Ubuntu _ -> true
+  | FreeBSD _ | Windows _ -> false
 
 and is_selinux_os = function
   | RHEL _ | CentOS _ | Fedora _ -> true
   | Debian _ | Ubuntu _
-  | FreeBSD _ -> false
+  | FreeBSD _ | Windows _ -> false
 
-and get_virtual_size_gb os arch = 6
+and needs_uefi os arch =
+  match os, arch with
+  | Fedora _, Aarch64
+  | RHEL _, Aarch64 -> true
+  | RHEL _, _ | CentOS _, _ | Fedora _, _
+  | Debian _, _ | Ubuntu _, _
+  | FreeBSD _, _ | Windows _, _ -> false
 
-and make_kickstart_or_preseed os arch =
+and get_virtual_size_gb os arch =
+  match os with
+  | RHEL _ | CentOS _ | Fedora _
+  | Debian _ | Ubuntu _
+  | FreeBSD _ -> 6
+  | Windows (10, _, _) -> 40    (* Windows 10 *)
+  | Windows (6, _, _) -> 10     (* Windows from 2008 - 2012 *)
+  | Windows (5, _, _) -> 6      (* Windows <= 2003 *)
+  | Windows _ -> assert false
+
+and make_kickstart os arch =
   match os with
   (* Kickstart. *)
   | Fedora _ | CentOS _ | RHEL _ ->
@@ -432,6 +502,9 @@ and make_kickstart_or_preseed os arch =
 
   (* Not automated. *)
   | FreeBSD _ -> None
+
+  (* Windows unattend.xml wrapped in an ISO. *)
+  | Windows _ -> Some (make_unattend_iso os arch)
 
 and make_kickstart_common ks_filename os arch =
   let buf = Buffer.create 4096 in
@@ -610,6 +683,138 @@ and copy_preseed_to_temporary source =
   if Sys.command cmd <> 0 then exit 1;
   f
 
+(* For Windows:
+ * https://serverfault.com/questions/644437/unattended-installation-of-windows-server-2012-on-kvm
+ *)
+and make_unattend_iso os arch =
+  printf "enter Windows product key: ";
+  let product_key = read_line () in
+
+  let output_iso =
+    Sys.getcwd () // filename_of_os os arch "-unattend.iso" in
+  unlink_on_exit output_iso;
+
+  let d = Filename.get_temp_dir_name () // random8 () in
+  Unix.mkdir d 0o700;
+  let config_dir = d // "config" in
+  Unix.mkdir config_dir 0o700;
+  let f = config_dir // "autounattend.xml" in
+
+  let chan = open_out f in
+  let arch =
+    match arch with
+    | X86_64 -> "amd64"
+    | I686 -> "x86"
+    | _ ->
+       eprintf "%s: Windows architecture %s not supported\n"
+               prog (string_of_arch arch);
+       exit 1 in
+  (* Tip: If the install fails with a useless error "The answer file is
+   * invalid", type Shift + F10 into the setup screen and look for a
+   * file called \Windows\Panther\Setupact.log (NB:
+   * not \Windows\Setupact.log)
+   *)
+  fprintf chan "
+<unattend xmlns=\"urn:schemas-microsoft-com:unattend\"
+          xmlns:ms=\"urn:schemas-microsoft-com:asm.v3\"
+          xmlns:wcm=\"http://schemas.microsoft.com/WMIConfig/2002/State\">
+  <settings pass=\"windowsPE\">
+    <component name=\"Microsoft-Windows-Setup\"
+               publicKeyToken=\"31bf3856ad364e35\"
+               language=\"neutral\"
+               versionScope=\"nonSxS\"
+               processorArchitecture=\"%s\">
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <ProductKey>
+          <Key>%s</Key>
+          <WillShowUI>OnError</WillShowUI>
+        </ProductKey>
+      </UserData>
+
+      <DiskConfiguration>
+        <Disk wcm:action=\"add\">
+          <DiskID>0</DiskID>
+          <WillWipeDisk>true</WillWipeDisk>
+          <CreatePartitions>
+            <!-- System partition -->
+            <CreatePartition wcm:action=\"add\">
+              <Order>1</Order>
+              <Type>Primary</Type>
+              <Size>300</Size>
+            </CreatePartition>
+            <!-- Windows partition -->
+            <CreatePartition wcm:action=\"add\">
+              <Order>2</Order>
+              <Type>Primary</Type>
+              <Extend>true</Extend>
+            </CreatePartition>
+          </CreatePartitions>
+          <ModifyPartitions>
+            <!-- System partition -->
+            <ModifyPartition wcm:action=\"add\">
+              <Order>1</Order>
+              <PartitionID>1</PartitionID>
+              <Label>System</Label>
+              <Format>NTFS</Format>
+              <Active>true</Active>
+            </ModifyPartition>
+            <!-- Windows partition -->
+            <ModifyPartition wcm:action=\"add\">
+              <Order>2</Order>
+              <PartitionID>2</PartitionID>
+              <Label>Windows</Label>
+              <Letter>C</Letter>
+              <Format>NTFS</Format>
+            </ModifyPartition>
+          </ModifyPartitions>
+        </Disk>
+        <WillShowUI>OnError</WillShowUI>
+      </DiskConfiguration>
+
+      <ImageInstall>
+        <OSImage>
+          <WillShowUI>Never</WillShowUI>
+          <InstallFrom>
+            <MetaData>
+              <Key>/IMAGE/INDEX</Key>
+              <Value>1</Value>
+            </MetaData>
+          </InstallFrom>
+          <InstallTo>
+            <DiskID>0</DiskID>
+            <PartitionID>2</PartitionID>
+          </InstallTo>
+        </OSImage>
+      </ImageInstall>
+    </component>
+
+    <component name=\"Microsoft-Windows-International-Core-WinPE\"
+               publicKeyToken=\"31bf3856ad364e35\"
+               language=\"neutral\"
+               versionScope=\"nonSxS\"
+               processorArchitecture=\"%s\">
+      <SetupUILanguage>
+        <UILanguage>en-US</UILanguage>
+      </SetupUILanguage>
+      <SystemLocale>en-US</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UserLocale>en-US</UserLocale>
+    </component>
+  </settings>
+</unattend>"
+          arch product_key arch;
+  close_out chan;
+
+  let cmd = sprintf "cd %s && mkisofs -o %s -J -r config"
+                    (quote d) (quote output_iso) in
+  if Sys.command cmd <> 0 then exit 1;
+  let cmd = sprintf "rm -rf %s" (quote d) in
+  if Sys.command cmd <> 0 then exit 1;
+
+  (* Return the name of the unattend ISO. *)
+  output_iso
+
 and make_boot_media os arch =
   match os, arch with
   | CentOS (major, _), Aarch64 ->
@@ -682,14 +887,29 @@ and make_boot_media os arch =
   | RHEL (7, minor), X86_64 ->
      Location (sprintf "http://download.devel.redhat.com/released/RHEL-7/7.%d/Server/x86_64/os" minor)
 
-  | RHEL (7, minor), Aarch64 ->
-     Location (sprintf "http://download.eng.bos.redhat.com/released/RHEL-7/7.%d/Server/aarch64/os" minor)
-
   | RHEL (7, minor), PPC64 ->
      Location (sprintf "http://download.devel.redhat.com/released/RHEL-7/7.%d/Server/ppc64/os" minor)
 
   | RHEL (7, minor), PPC64le ->
      Location (sprintf "http://download.devel.redhat.com/released/RHEL-7/7.%d/Server/ppc64le/os" minor)
+
+  | RHEL (7, minor), S390X ->
+     Location (sprintf "http://download.devel.redhat.com/released/RHEL-7/7.%d/Server/s390x/os" minor)
+
+  | RHEL (7, minor), Aarch64 ->
+     Location (sprintf "http://download.eng.bos.redhat.com/released/RHEL-ALT-7/7.%d/Server/aarch64/os" minor)
+
+  | RHEL (8, 0), X86_64 ->
+     Location "http://download.eng.bos.redhat.com/released/RHEL-8/8.0-Alpha/BaseOS/x86_64/os"
+
+  | RHEL (8, 0), Aarch64 ->
+     Location "http://download.eng.bos.redhat.com/released/RHEL-8/8.0-Alpha/BaseOS/aarch64/os"
+
+  | RHEL (8, 0), PPC64le ->
+     Location "http://download.eng.bos.redhat.com/released/RHEL-8/8.0-Alpha/BaseOS/ppc64le/os"
+
+  | RHEL (8, 0), S390X ->
+     Location "http://download.eng.bos.redhat.com/released/RHEL-8/8.0-Alpha/BaseOS/s390x/os"
 
   | Ubuntu (_, dist), X86_64 ->
      Location (sprintf "http://archive.ubuntu.com/ubuntu/dists/%s/main/installer-amd64" dist)
@@ -707,6 +927,25 @@ and make_boot_media os arch =
      let cmd = sprintf "unxz -f --keep %s.xz" iso in
      if Sys.command cmd <> 0 then exit 1;
      CDRom iso
+
+  | Windows (major, minor, variant), arch ->
+     let iso_name =
+       match major, minor, variant, arch with
+       | 6, 1, Client, X86_64 -> (* Windows 7 *)
+          "en_windows_7_ultimate_with_sp1_x64_dvd_u_677332.iso"
+       | 6, 1, Server, X86_64 -> (* Windows 2008 R2 *)
+          "en_windows_server_2008_r2_with_sp1_x64_dvd_617601.iso"
+       | 6, 2, Server, X86_64 -> (* Windows Server 2012 *)
+          "en_windows_server_2012_x64_dvd_915478.iso"
+       | 6, 3, Server, X86_64 -> (* Windows Server 2012 R2 *)
+          "en_windows_server_2012_r2_with_update_x64_dvd_6052708.iso"
+       | 10, 0, Server, X86_64 -> (* Windows Server 2016 *)
+          "en_windows_server_2016_updated_feb_2018_x64_dvd_11636692.iso"
+       | _ ->
+          eprintf "%s: don't have an installer ISO for this version of Windows\n"
+                  prog;
+          exit 1 in
+     CDRom (windows_installers // iso_name)
 
   | _ ->
      eprintf "%s: don't know how to calculate the --location for this OS and architecture\n" prog;
@@ -731,7 +970,7 @@ The FreeBSD install is not automated.  Select all defaults, except:
 (* If the install is not automated and we need a graphical console. *)
 and needs_graphics = function
   | CentOS _ | RHEL _ | Debian _ | Ubuntu _ | Fedora _ -> false
-  | FreeBSD _ -> true
+  | FreeBSD _ | Windows _ -> true
 
 (* NB: Arguments do not need to be quoted, because we pass them
  * directly to exec(2).
@@ -744,9 +983,23 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
   add "virt-install";
 
   (* This ensures the libvirt domain will be automatically deleted
-   * when virt-install exits.
+   * when virt-install exits.  However it doesn't work for certain
+   * types of guest.
    *)
-  add "--transient";
+  (match os with
+   | Windows _ ->
+      printf "after Windows has installed, do:\n";
+      printf "  virsh shutdown %s\n  virsh undefine %s\n%!" tmpname tmpname;
+   | _ -> add "--transient"
+  );
+
+  (* Don't try relabelling everything.  This is particularly necessary
+   * for the Windows install ISOs which are located on NFS.
+   *)
+  (match os with
+   | Windows _ -> add "--security=type=none"
+   | _ -> ()
+  );
 
   add (sprintf "--name=%s" tmpname);
 
@@ -759,7 +1012,7 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
 
   (match arch with
    | X86_64 ->
-      (* XXX This assumes the host is always x86_64. *)
+      add "--arch=x86_64";
       add "--cpu=host";
       add "--vcpus=4"
    | PPC64 ->
@@ -787,9 +1040,12 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
    | _ -> ()
   );
 
-  (match ks with
-   | None -> ()
-   | Some ks ->
+  (* --initrd-inject and --extra-args flags for Linux only. *)
+  (match os with
+   | Debian _ | Ubuntu _
+   | Fedora _ | RHEL _ | CentOS _ ->
+      let ks =
+        match ks with None -> assert false | Some ks -> ks in
       add (sprintf "--initrd-inject=%s" ks);
 
       let os_extra =
@@ -797,7 +1053,7 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
         | Debian _ | Ubuntu _ -> "auto"
         | Fedora _ | RHEL _ | CentOS _ ->
            sprintf "ks=file:/%s" (Filename.basename ks)
-        | FreeBSD _ -> assert false in
+        | FreeBSD _ | Windows _ -> assert false in
       let proxy =
         let p = try Some (Sys.getenv "http_proxy") with Not_found -> None in
         match p with
@@ -805,16 +1061,19 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
            (match os with
             | Fedora _ | RHEL _ | CentOS _ | Ubuntu _ -> ""
             | Debian _ -> "mirror/http/proxy="
-            | FreeBSD _ -> assert false
+            | FreeBSD _ | Windows _ -> assert false
            )
         | Some p ->
            match os with
            | Fedora _ | RHEL _ | CentOS _ -> "proxy=" ^ p
            | Debian _ | Ubuntu _ -> "mirror/http/proxy=" ^ p
-           | FreeBSD _ -> assert false in
+           | FreeBSD _ | Windows _ -> assert false in
 
       add (sprintf "--extra-args=%s %s %s" (* sic: does NOT need to be quoted *)
                    os_extra proxy (kernel_cmdline_of_os os arch));
+
+   (* doesn't need --initrd-inject *)
+   | FreeBSD _ | Windows _ -> ()
   );
 
   add (sprintf "--disk=%s,size=%d,format=raw"
@@ -822,7 +1081,19 @@ and make_virt_install_command os arch ks tmpname tmpout tmpefivars
 
   (match boot_media with
    | Location location -> add (sprintf "--location=%s" location)
-   | CDRom iso -> add (sprintf "--cdrom=%s" iso)
+   | CDRom iso -> add (sprintf "--disk=%s,device=cdrom,boot_order=1" iso)
+  );
+
+  (* Windows requires one or two extra CDs!
+   * See: https://serverfault.com/questions/644437/unattended-installation-of-windows-server-2012-on-kvm
+   *)
+  (match os with
+   | Windows _ ->
+      let unattend_iso =
+        match ks with None -> assert false | Some ks -> ks in
+      (*add "--disk=/usr/share/virtio-win/virtio-win.iso,device=cdrom,boot_order=98";*)
+      add (sprintf "--disk=%s,device=cdrom,boot_order=99" unattend_iso)
+   | _ -> ()
   );
 
   add "--serial=pty";
@@ -856,6 +1127,13 @@ and os_variant_of_os ?(for_fedora = false) os arch =
     | Debian (ver, _) -> sprintf "debian%d" ver
     | Ubuntu (ver, _) -> sprintf "ubuntu%s" ver
     | FreeBSD (major, minor) -> sprintf "freebsd%d.%d" major minor
+
+    | Windows (6, 1, Client) -> "win7"
+    | Windows (6, 1, Server) -> "win2k8r2"
+    | Windows (6, 2, Server) -> "win2k12"
+    | Windows (6, 3, Server) -> "win2k12r2"
+    | Windows (10, 0, Server) -> "win2k16"
+    | Windows _ -> assert false
   )
   else (
     match os, arch with
@@ -872,16 +1150,30 @@ and os_variant_of_os ?(for_fedora = false) os arch =
        sprintf "centos%d.%d" major minor
     | CentOS _, _ -> "centos7.0" (* max version known in Fedora 24 *)
 
-    | RHEL (major, minor), _ when (major, minor) <= (7,2) ->
+    | RHEL (6, minor), _ when minor <= 8 ->
+       sprintf "rhel6.%d" minor
+    | RHEL (6, _), _ -> "rhel6.9" (* max version known in Fedora 29 *)
+    | RHEL (7, minor), _ when minor <= 4 ->
+       sprintf "rhel7.%d" minor
+    | RHEL (7, _), _ -> "rhel7.5" (* max version known in Fedora 29 *)
+    | RHEL (major, minor), _ ->
        sprintf "rhel%d.%d" major minor
-    | RHEL _, _ -> "rhel7.2" (* max version known in Fedora 24 *)
 
     | Debian (ver, _), _ when ver <= 8 -> sprintf "debian%d" ver
     | Debian _, _ -> "debian8" (* max version known in Fedora 26 *)
 
-    | Ubuntu (ver, _), _ -> sprintf "ubuntu%s" ver
+    | Ubuntu (ver, _), _ when ver < "18.04" -> sprintf "ubuntu%s" ver
+    | Ubuntu ("18.04", _), _ -> "ubuntu17.04"
+    | Ubuntu _, _ -> assert false
 
     | FreeBSD (major, minor), _ -> sprintf "freebsd%d.%d" major minor
+
+    | Windows (6, 1, Client), _ -> "win7"
+    | Windows (6, 1, Server), _ -> "win2k8r2"
+    | Windows (6, 2, Server), _ -> "win2k12"
+    | Windows (6, 3, Server), _ -> "win2k12r2"
+    | Windows (10, 0, Server), _ -> "win2k16"
+    | Windows _, _ -> assert false
   )
 
 and kernel_cmdline_of_os os arch =
@@ -899,11 +1191,12 @@ and kernel_cmdline_of_os os arch =
   | (RHEL _|CentOS _), PPC64
   | (RHEL _|CentOS _), PPC64le ->
      "console=tty0 console=ttyS0,115200 rd_NO_PLYMOUTH"
-  | FreeBSD _, (PPC64|PPC64le) -> assert false
+
+  | FreeBSD _, _ | Windows _, _ -> assert false
 
 and make_postinstall os arch =
   match os with
-  | Debian _ ->
+  | Debian _ | Ubuntu _ ->
      Some (
        fun g ->
          (* Remove apt proxy configuration (thanks: Daniel Miranda). *)
@@ -921,42 +1214,51 @@ and make_postinstall os arch =
          g#write "/etc/yum.repos.d/download.devel.redhat.com.repo" yum_conf
      )
 
-  | RHEL _ | Fedora _ | CentOS _ | Ubuntu _ | FreeBSD _ -> None
+  | RHEL _ | Fedora _ | CentOS _ | FreeBSD _ | Windows _ -> None
 
 and make_rhel_yum_conf major minor arch =
   let buf = Buffer.create 4096 in
   let bpf fs = bprintf buf fs in
 
-  let baseurl, srpms, optional =
-    match major, arch with
-    | 5, (I686|X86_64) ->
-       let arch = match arch with I686 -> "i386" | _ -> string_of_arch arch in
-       let topurl =
-         sprintf "http://download.devel.redhat.com/released/RHEL-5-Server/U%d"
-                 minor in
-       sprintf "%s/%s/os/Server" topurl arch,
-       sprintf "%s/source/SRPMS" topurl,
-       None
-    | 6, (I686|X86_64) ->
-       let arch = match arch with I686 -> "i386" | _ -> string_of_arch arch in
-       let topurl =
-         sprintf "http://download.devel.redhat.com/released/RHEL-%d/%d.%d"
-                 major major minor in
-       sprintf "%s/Server/%s/os" topurl arch,
-       sprintf "%s/source/SRPMS" topurl,
-       Some (sprintf "%s/Server/optional/%s/os" arch topurl,
-             sprintf "%s/Server/optional/source/SRPMS" topurl)
-    | 7, (X86_64|Aarch64|PPC64|PPC64le) ->
-       let topurl =
-         sprintf "http://download.devel.redhat.com/released/RHEL-%d/%d.%d"
-                 major major minor in
-       sprintf "%s/Server/%s/os" topurl (string_of_arch arch),
-       sprintf "%s/Server/source/tree" topurl,
-       Some (sprintf "%s/Server-optional/%s/os" topurl (string_of_arch arch),
-             sprintf "%s/Server-optional/source/tree" topurl)
-    | _ -> assert false in
+  if major <= 7 then (
+    let baseurl, srpms, optional =
+      match major, arch with
+      | 5, (I686|X86_64) ->
+         let arch = match arch with I686 -> "i386" | _ -> string_of_arch arch in
+         let topurl =
+           sprintf "http://download.devel.redhat.com/released/RHEL-5-Server/U%d"
+                   minor in
+         sprintf "%s/%s/os/Server" topurl arch,
+         sprintf "%s/source/SRPMS" topurl,
+         None
+      | 6, (I686|X86_64) ->
+         let arch = match arch with I686 -> "i386" | _ -> string_of_arch arch in
+         let topurl =
+           sprintf "http://download.devel.redhat.com/released/RHEL-%d/%d.%d"
+                   major major minor in
+         sprintf "%s/Server/%s/os" topurl arch,
+         sprintf "%s/source/SRPMS" topurl,
+         Some (sprintf "%s/Server/optional/%s/os" arch topurl,
+               sprintf "%s/Server/optional/source/SRPMS" topurl)
+      | 7, (X86_64|PPC64|PPC64le|S390X) ->
+         let topurl =
+           sprintf "http://download.devel.redhat.com/released/RHEL-%d/%d.%d"
+                   major major minor in
+         sprintf "%s/Server/%s/os" topurl (string_of_arch arch),
+         sprintf "%s/Server/source/tree" topurl,
+         Some (sprintf "%s/Server-optional/%s/os" topurl (string_of_arch arch),
+               sprintf "%s/Server-optional/source/tree" topurl)
+      | 7, Aarch64 ->
+         let topurl =
+           sprintf "http://download.devel.redhat.com/released/RHEL-ALT-%d/%d.%d"
+                   major major minor in
+         sprintf "%s/Server/%s/os" topurl (string_of_arch arch),
+         sprintf "%s/Server/source/tree" topurl,
+         Some (sprintf "%s/Server-optional/%s/os" topurl (string_of_arch arch),
+               sprintf "%s/Server-optional/source/tree" topurl)
+      | _ -> assert false in
 
-  bpf "\
+    bpf "\
 # Yum configuration pointing to Red Hat servers.
 
 [rhel%d]
@@ -974,10 +1276,10 @@ gpgcheck=0
 keepcache=0
 " major major baseurl major major srpms;
 
-  (match optional with
-   | None -> ()
-   | Some (optionalbaseurl, optionalsrpms) ->
-      bpf "\
+    (match optional with
+     | None -> ()
+     | Some (optionalbaseurl, optionalsrpms) ->
+        bpf "\
 
 [rhel%d-optional]
 name=RHEL %d Server Optional
@@ -993,6 +1295,31 @@ enabled=0
 gpgcheck=0
 keepcache=0
 " major major optionalbaseurl major major optionalsrpms
+    )
+  ) else if major = 8 then (
+    bpf "\
+# Temporary configuration for RHEL 8 Alpha.
+
+[rhel8-BaseOS-nightly]
+name=rhel8-BaseOS-nightly
+baseurl=http://download.devel.redhat.com/nightly/latest-RHEL-8/compose/BaseOS/$basearch/os/
+enabled=1
+gpgcheck=0
+
+[rhel8-AppStream-nightly]
+name=rhel8-AppStream-nightly
+baseurl=http://download.devel.redhat.com/nightly/latest-RHEL-8/compose/AppStream/$basearch/os/
+enabled=0
+gpgcheck=0
+
+[rhel8-Buildroot-nightly]
+name=rhel8-Buildroot-nightly
+baseurl=http://download.devel.redhat.com/nightly/latest-BUILDROOT-8-RHEL-8/compose/Buildroot/$basearch/os/
+enabled=1
+gpgcheck=0
+"
+  ) else (
+    assert false (* not implemented for RHEL major >= 9 *)
   );
 
   Buffer.contents buf
@@ -1069,6 +1396,18 @@ and long_name_of_os os arch =
   | FreeBSD (major, minor), arch ->
      sprintf "FreeBSD %d.%d (%s)" major minor (string_of_arch arch)
 
+  | Windows (6, 1, Client), arch ->
+     sprintf "Windows 7 (%s)" (string_of_arch arch)
+  | Windows (6, 1, Server), arch ->
+     sprintf "Windows Server 2008 R2 (%s)" (string_of_arch arch)
+  | Windows (6, 2, Server), arch ->
+     sprintf "Windows Server 2012 (%s)" (string_of_arch arch)
+  | Windows (6, 3, Server), arch ->
+     sprintf "Windows Server 2012 R2 (%s)" (string_of_arch arch)
+  | Windows (10, 0, Server), arch ->
+     sprintf "Windows Server 2016 (%s)" (string_of_arch arch)
+  | Windows _, _ -> assert false
+
 and notes_of_os os arch nvram =
   let args = ref [] in
   let add arg = args := arg :: !args in
@@ -1091,6 +1430,10 @@ and notes_of_os os arch nvram =
       add "This is a minimal Ubuntu install."
    | FreeBSD _ ->
       add "This is an all-default FreeBSD install."
+   | Windows _ ->
+      add "This is an unattended Windows install.";
+      add "";
+      add "You must have an MSDN subscription to use this image."
   );
   add "";
 

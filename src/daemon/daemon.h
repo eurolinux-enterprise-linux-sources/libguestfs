@@ -1,5 +1,5 @@
 /* libguestfs - the guestfsd daemon
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,10 +248,6 @@ extern char *get_blkid_tag (const char *device, const char *tag);
 
 /* lvm.c */
 extern int lv_canonical (const char *device, char **ret);
-
-/* lvm-filter.c */
-extern void clean_lvm_config (void);
-extern void start_lvmetad (void);
 
 /* zero.c */
 extern void wipe_device_before_mkfs (const char *device);

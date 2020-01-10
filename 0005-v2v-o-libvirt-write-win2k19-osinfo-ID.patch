@@ -1,0 +1,34 @@
+From 5686e157c90ccbe65d7c719f53d36028b6364b11 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Thu, 28 Feb 2019 11:00:27 +0100
+Subject: [PATCH] v2v: -o libvirt: write win2k19 osinfo ID
+
+When writing the libosinfo metadata in the libvirt XML, use the newly
+added (in osinfo-db) ID for Windows Server 2019; sadly, this version of
+Windows has the same version as Windows Server 2016, so distinguish it
+by looking at its product name.
+
+(cherry picked from commit bb11507fff8c65275afc0f29806d3b3de387c7f9)
+---
+ v2v/create_libvirt_xml.ml | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/v2v/create_libvirt_xml.ml b/v2v/create_libvirt_xml.ml
+index a8dc1f2f0..dbc24315f 100644
+--- a/v2v/create_libvirt_xml.ml
++++ b/v2v/create_libvirt_xml.ml
+@@ -124,6 +124,11 @@ let get_osinfo_id = function
+   | { i_type = "windows"; i_major_version = 6; i_minor_version = 3 } ->
+     Some "http://microsoft.com/win/8.1"
+ 
++  | { i_type = "windows"; i_major_version = 10; i_minor_version = 0;
++      i_product_variant = "Server"; i_product_name = product }
++      when String.find product "2019" >= 0 ->
++    Some "http://microsoft.com/win/2k19"
++
+   | { i_type = "windows"; i_major_version = 10; i_minor_version = 0;
+       i_product_variant = "Server" } ->
+     Some "http://microsoft.com/win/2k16"
+-- 
+2.21.0
+

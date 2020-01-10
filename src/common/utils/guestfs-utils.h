@@ -1,5 +1,5 @@
 /* libguestfs
- * Copyright (C) 2013-2018 Red Hat Inc.
+ * Copyright (C) 2013-2019 Red Hat Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -70,6 +70,7 @@ extern int guestfs_int_is_fifo (int64_t mode);
 extern int guestfs_int_is_lnk (int64_t mode);
 extern int guestfs_int_is_sock (int64_t mode);
 extern char *guestfs_int_full_path (const char *dir, const char *name);
+extern void guestfs_int_hexdump (const void *data, size_t len, FILE *fp);
 
 /* Not all language bindings know how to deal with Pointer arguments.
  * Those that don't will use this macro which complains noisily and

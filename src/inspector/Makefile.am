@@ -1,5 +1,5 @@
 # libguestfs virt-inspector
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,11 +27,13 @@ example_xml = \
 EXTRA_DIST = \
 	expected-debian.img.xml \
 	expected-fedora.img.xml \
+	expected-fedora-luks.img.xml \
 	expected-ubuntu.img.xml \
 	expected-archlinux.img.xml \
 	expected-coreos.img.xml \
 	expected-windows.img.xml \
 	test-virt-inspector.sh \
+	test-virt-inspector-luks.sh \
 	test-virt-inspector-docs.sh \
 	test-xmllint.sh.in \
 	virt-inspector.pod
@@ -92,14 +94,15 @@ TESTS = \
 
 if ENABLE_APPLIANCE
 TESTS += \
-	test-virt-inspector.sh
+	test-virt-inspector.sh \
+	test-virt-inspector-luks.sh
 endif ENABLE_APPLIANCE
 if HAVE_XMLLINT
 TESTS += test-xmllint.sh
 endif
 
 check-valgrind:
-	$(MAKE) TESTS="test-virt-inspector.sh" VG="@VG@" check
+	$(MAKE) TESTS="test-virt-inspector.sh test-virt-inspector-luks.sh" VG="@VG@" check
 
 check-valgrind-local-guests:
 	for g in $(GUESTS); do \

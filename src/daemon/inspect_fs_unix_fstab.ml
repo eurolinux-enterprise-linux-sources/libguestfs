@@ -1,5 +1,5 @@
 (* guestfs-inspection
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,14 +38,15 @@ let re_xdev = PCRE.compile "^/dev/(h|s|v|xv)d([a-z]+)(\\d*)$"
 
 let rec check_fstab ?(mdadm_conf = false) (root_mountable : Mountable.t)
                     os_type =
-  let configfiles =
-    "/etc/fstab" :: if mdadm_conf then ["/etc/mdadm.conf"] else [] in
+  let mdadmfiles =
+    if mdadm_conf then ["/etc/mdadm.conf"; "/etc/mdadm/mdadm.conf"] else [] in
+  let configfiles = "/etc/fstab" :: mdadmfiles in
 
   with_augeas ~name:"check_fstab_aug"
               configfiles (check_fstab_aug mdadm_conf root_mountable os_type)
 
 and check_fstab_aug mdadm_conf root_mountable os_type aug =
-  (* Generate a map of MD device paths listed in /etc/mdadm.conf
+  (* Generate a map of MD device paths listed in mdadm.conf
    * to MD device paths in the guestfs appliance.
    *)
   let md_map = if mdadm_conf then map_md_devices aug else StringMap.empty in
@@ -115,12 +116,20 @@ and check_fstab_entry md_map root_mountable os_type aug entry =
       if String.is_prefix spec "UUID=" then (
         let uuid = String.sub spec 5 (String.length spec - 5) in
         let uuid = shell_unquote uuid in
-        Mountable.of_device (Findfs.findfs_uuid uuid)
+        (* Just ignore the device if the UUID cannot be resolved. *)
+        try
+          Mountable.of_device (Findfs.findfs_uuid uuid)
+        with
+          Failure _ -> return None
       )
       else if String.is_prefix spec "LABEL=" then (
         let label = String.sub spec 6 (String.length spec - 6) in
         let label = shell_unquote label in
-        Mountable.of_device (Findfs.findfs_label label)
+        (* Just ignore the device if the label cannot be resolved. *)
+        try
+          Mountable.of_device (Findfs.findfs_label label)
+        with
+          Failure _ -> return None
       )
       (* Resolve /dev/root to the current device.
        * Do the same for the / partition of the *BSD
@@ -216,11 +225,13 @@ and map_md_devices aug =
   if StringMap.is_empty uuid_map then StringMap.empty
   else (
     (* Get all arrays listed in mdadm.conf. *)
-    let entries = aug_matches_noerrors aug "/files/etc/mdadm.conf/array" in
+    let entries1 = aug_matches_noerrors aug "/files/etc/mdadm.conf/array" in
+    let entries2 = aug_matches_noerrors aug "/files/etc/mdadm/mdadm.conf/array" in
+    let entries = List.append entries1 entries2 in
 
     (* Log a debug entry if we've got md devices but nothing in mdadm.conf. *)
     if verbose () && entries = [] then
-      eprintf "warning: appliance has MD devices, but augeas returned no array matches in /etc/mdadm.conf\n%!";
+      eprintf "warning: appliance has MD devices, but augeas returned no array matches in mdadm.conf\n%!";
 
     List.fold_left (
       fun md_map entry ->
@@ -339,7 +350,7 @@ and resolve_fstab_device spec md_map os_type =
     debug_matching "xdev";
     let typ = PCRE.sub 1
     and disk = PCRE.sub 2
-    and part = int_of_string (PCRE.sub 3) in
+    and part = PCRE.sub 3 in
     resolve_xdev typ disk part default
   )
 
@@ -456,7 +467,7 @@ and resolve_fstab_device spec md_map os_type =
     debug_matching "Hurd";
     let typ = PCRE.sub 1
     and disk = int_of_string (PCRE.sub 2)
-    and part = int_of_string (PCRE.sub 3) in
+    and part = PCRE.sub 3 in
 
     (* Hurd disk devices are like /dev/hdNsM, where hdN is the
      * N-th disk and M is the M-th partition on that disk.
@@ -493,7 +504,7 @@ and resolve_xdev typ disk part default =
   let i = drive_index disk in
   if i >= 0 && i < Array.length devices then (
     let dev = Array.get devices i in
-    let dev = dev ^ string_of_int part in
+    let dev = dev ^ part in
     if is_partition dev then
       Mountable.of_device dev
     else

@@ -1,5 +1,5 @@
 (* Common utilities for OCaml tools in libguestfs.
- * Copyright (C) 2010-2018 Red Hat Inc.
+ * Copyright (C) 2010-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,14 +64,39 @@ val parse_resize : int64 -> string -> int64
 val human_size : int64 -> string
 (** Converts a size in bytes to a human-readable string. *)
 
-val create_standard_options : Getopt.speclist -> ?anon_fun:Getopt.anon_fun -> ?key_opts:bool -> Getopt.usage_msg -> Getopt.t
+type machine_readable_fn = {
+  pr : 'a. ('a, unit, string, unit) format4 -> 'a;
+} (* [@@unboxed] *)
+(** Helper type for {!machine_readable}, used to workaround
+    limitations in returned values. *)
+val machine_readable : unit -> machine_readable_fn option
+(** Returns the printf-like function to use to write all the machine
+    readable output to, in case it was enabled via
+    [--machine-readable]. *)
+
+type key_store
+
+type cmdline_options = {
+  getopt : Getopt.t;              (** The actual {!Getopt} handle. *)
+  ks : key_store;                 (** Container for keys read via [--key]. *)
+}
+(** Structure representing all the data needed for handling command
+    line options. *)
+
+val create_standard_options : Getopt.speclist -> ?anon_fun:Getopt.anon_fun -> ?key_opts:bool -> ?machine_readable:bool -> Getopt.usage_msg -> cmdline_options
 (** Adds the standard libguestfs command line options to the specified ones,
     sorting them, and setting [long_options] to them.
 
     [key_opts] specifies whether add the standard options related to
-    keys management, i.e. [--echo-keys] and [--keys-from-stdin].
+    keys management, i.e. [--echo-keys], [--key], and [--keys-from-stdin].
+    In case [key_opts] is specified, {!recfield:cmdline_options.ks} will
+    contain the keys specified via [--key], so it ought to be passed around
+    where needed.
 
-    Returns a new [Getopt.t] handle. *)
+    [machine_readable] specifies whether add the [--machine-readable]
+    option.
+
+    Returns a new {!cmdline_options} structure. *)
 
 val external_command : ?echo_cmd:bool -> string -> string list
 (** Run an external command, slurp up the output as a list of lines.
@@ -98,8 +123,11 @@ val run_commands : ?echo_cmd:bool -> (string list * Unix.file_descr option * Uni
     [echo_cmd] specifies whether output the full command on verbose
     mode, and it's on by default. *)
 
-val run_command : ?echo_cmd:bool -> ?stdout_chan:Unix.file_descr -> ?stderr_chan:Unix.file_descr -> string list -> int
+val run_command : ?echo_cmd:bool -> ?stdout_fd:Unix.file_descr -> ?stderr_fd:Unix.file_descr -> string list -> int
 (** Run an external command without using a shell, and return its exit code.
+
+    If [stdout_fd] or [stderr_fd] is specified, the file descriptor
+    is automatically closed after executing the command.
 
     [echo_cmd] specifies whether output the full command on verbose
     mode, and it's on by default. *)
@@ -166,7 +194,21 @@ val inspect_mount_root_ro : Guestfs.guestfs -> string -> unit
 val is_btrfs_subvolume : Guestfs.guestfs -> string -> bool
 (** Checks if a filesystem is a btrfs subvolume. *)
 
-val inspect_decrypt : Guestfs.guestfs -> unit
+val inspect_decrypt : Guestfs.guestfs -> key_store -> unit
 (** Simple implementation of decryption: look for any [crypto_LUKS]
     partitions and decrypt them, then rescan for VGs.  This only works
     for Fedora whole-disk encryption. *)
+
+val with_timeout : string -> int -> ?sleep:int -> (unit -> 'a option) -> 'a
+(** [with_timeout op timeout ?sleep fn] implements a timeout loop.
+
+    [fn] is run repeatedly until the function returns [Some result],
+    whereupon [with_timeout] returns [result] to the caller.
+
+    If [fn] returns [None] then the we wait a few seconds (controlled
+    by [?sleep]) and repeat.
+
+    If the [timeout] (in seconds) is reached, then the function
+    calls {!error} and the program exits.  The error message will
+    contain the diagnostic string [op] to identify the operation
+    which timed out. *)

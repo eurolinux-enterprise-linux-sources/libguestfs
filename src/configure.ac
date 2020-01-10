@@ -1,5 +1,5 @@
 # libguestfs
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 # add extra information using --with-extra="..." which may be any
 # freeform string.
 m4_define([libguestfs_major],   [1])
-m4_define([libguestfs_minor],   [38])
+m4_define([libguestfs_minor],   [40])
 m4_define([libguestfs_release], [2])
 
 AC_INIT([libguestfs],libguestfs_major.libguestfs_minor.libguestfs_release)
@@ -32,6 +32,8 @@ m4_define([HEADING],
 AC_CONFIG_AUX_DIR([build-aux])
 AC_REQUIRE_AUX_FILE([guestfs-test-driver])
 
+AC_USE_SYSTEM_EXTENSIONS
+
 dnl Initialize automake.
 AM_INIT_AUTOMAKE(foreign subdir-objects tar-pax) dnl NB: Do not [quote] this parameter.
 
@@ -39,6 +41,9 @@ m4_ifndef([AM_SILENT_RULES], [m4_define([AM_SILENT_RULES],[])])
 AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
 
 AC_CONFIG_MACRO_DIR([m4])
+
+dnl Initialize libtool.
+LT_INIT
 
 dnl Stable or development version?
 BRANCH_NUMBER=libguestfs_major.libguestfs_minor
@@ -157,6 +162,10 @@ m4_include([m4/guestfs-golang.m4])
 HEADING([Checking for GObject Introspection])
 m4_include([m4/guestfs-gobject.m4])
 
+dnl virt-v2v, virt-p2v.
+HEADING([Checking the virt-v2v and virt-p2v dependencies])
+m4_include([m4/guestfs-v2v.m4])
+
 dnl Bash completion.
 HEADING([Checking for bash completion])
 m4_include([m4/guestfs-bash-completion.m4])
@@ -192,10 +201,14 @@ AC_CONFIG_FILES([inspector/test-xmllint.sh],
                 [chmod +x,-w inspector/test-xmllint.sh])
 AC_CONFIG_FILES([inspector/test-virt-inspector.sh],
                 [chmod +x,-w inspector/test-virt-inspector.sh])
+AC_CONFIG_FILES([inspector/test-virt-inspector-luks.sh],
+                [chmod +x,-w inspector/test-virt-inspector-luks.sh])
 AC_CONFIG_FILES([installcheck.sh],
                 [chmod +x,-w installcheck.sh])
 AC_CONFIG_FILES([ocaml-dep.sh],
                 [chmod +x,-w ocaml-dep.sh])
+AC_CONFIG_FILES([ocaml-link.sh],
+                [chmod +x,-w ocaml-link.sh])
 AC_CONFIG_FILES([p2v/virt-p2v-make-disk],
                 [chmod +x,-w p2v/virt-p2v-make-disk])
 AC_CONFIG_FILES([p2v/virt-p2v-make-kickstart],
@@ -352,9 +365,11 @@ AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  utils/boot-analysis/Makefile
                  utils/boot-benchmark/Makefile
+                 utils/max-disks/Makefile
                  utils/qemu-boot/Makefile
                  utils/qemu-speed-test/Makefile
                  v2v/Makefile
+                 v2v/config.ml
                  v2v/test-harness/Makefile
                  v2v/test-harness/META
                  website/index.html])

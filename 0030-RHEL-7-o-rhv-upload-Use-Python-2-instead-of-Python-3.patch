@@ -1,0 +1,257 @@
+From 6ac10b37563221ca9974439a80b3b02329b60e8d Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 9 Mar 2018 12:15:44 +0000
+Subject: [PATCH] RHEL 7: -o rhv-upload: Use Python 2 instead of Python 3.
+
+---
+ v2v/output_rhv_upload.ml      |  2 +-
+ v2v/python_script.ml          |  2 +-
+ v2v/rhv-upload-createvm.py    | 20 ++++++++++++++++----
+ v2v/rhv-upload-plugin.py      | 35 ++++++++++++++++++++++++-----------
+ v2v/rhv-upload-precheck.py    | 22 +++++++++++++++++-----
+ v2v/test-v2v-python-syntax.sh |  2 +-
+ 6 files changed, 60 insertions(+), 23 deletions(-)
+
+diff --git a/v2v/output_rhv_upload.ml b/v2v/output_rhv_upload.ml
+index 3d6d99008..051ce086f 100644
+--- a/v2v/output_rhv_upload.ml
++++ b/v2v/output_rhv_upload.ml
+@@ -135,7 +135,7 @@ class output_rhv_upload output_alloc output_conn
+       error (f_"nbdkit is not new enough, you need to upgrade to nbdkit ≥ 1.1.16")
+   in
+ 
+-  (* Check that the python3 plugin is installed and working
++  (* Check that the python plugin is installed and working
+    * and can load the plugin script.
+    *)
+   let error_unless_nbdkit_python_plugin_working () =
+diff --git a/v2v/python_script.ml b/v2v/python_script.ml
+index 3159373a1..fa052d697 100644
+--- a/v2v/python_script.ml
++++ b/v2v/python_script.ml
+@@ -24,7 +24,7 @@ open Unix_utils
+ 
+ open Common_gettext.Gettext
+ 
+-let python = "python3"          (* Defined by PEP 394 *)
++let python = "python"
+ 
+ type script = {
+   tmpdir : string;              (* Temporary directory. *)
+diff --git a/v2v/rhv-upload-createvm.py b/v2v/rhv-upload-createvm.py
+index 1d0e8c95d..3f2fae4c6 100644
+--- a/v2v/rhv-upload-createvm.py
++++ b/v2v/rhv-upload-createvm.py
+@@ -1,5 +1,6 @@
+ # -*- python -*-
+-# oVirt or RHV upload create VM used by ‘virt-v2v -o rhv-upload’
++# coding: utf-8
++# oVirt or RHV upload create VM used by 'virt-v2v -o rhv-upload'
+ # Copyright (C) 2018 Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+@@ -21,8 +22,8 @@ import logging
+ import sys
+ import time
+ 
+-from http.client import HTTPSConnection
+-from urllib.parse import urlparse
++from httplib import HTTPSConnection
++from urlparse import urlparse
+ 
+ import ovirtsdk4 as sdk
+ import ovirtsdk4.types as types
+@@ -37,8 +38,19 @@ if len(sys.argv) != 3:
+     raise RuntimeError("incorrect number of parameters")
+ 
+ # Parameters are passed in via a JSON document.
++# https://stackoverflow.com/a/13105359
++def byteify(input):
++    if isinstance(input, dict):
++        return {byteify(key): byteify(value)
++                for key, value in input.iteritems()}
++    elif isinstance(input, list):
++        return [byteify(element) for element in input]
++    elif isinstance(input, unicode):
++        return input.encode('utf-8')
++    else:
++        return input
+ with open(sys.argv[1], 'r') as fp:
+-    params = json.load(fp)
++    params = byteify(json.load(fp))
+ 
+ # What is passed in is a password file, read the actual password.
+ with open(params['output_password'], 'r') as fp:
+diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
+index b63d127f5..a7fb88dd3 100644
+--- a/v2v/rhv-upload-plugin.py
++++ b/v2v/rhv-upload-plugin.py
+@@ -1,5 +1,6 @@
+ # -*- python -*-
+-# oVirt or RHV upload nbdkit plugin used by ‘virt-v2v -o rhv-upload’
++# coding: utf-8
++# oVirt or RHV upload nbdkit plugin used by 'virt-v2v -o rhv-upload'
+ # Copyright (C) 2018 Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+@@ -16,7 +17,7 @@
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+-import builtins
++from __builtin__ import open as builtin_open
+ import json
+ import logging
+ import socket
+@@ -24,8 +25,8 @@ import ssl
+ import sys
+ import time
+ 
+-from http.client import HTTPSConnection, HTTPConnection
+-from urllib.parse import urlparse
++from httplib import HTTPSConnection, HTTPConnection
++from urlparse import urlparse
+ 
+ import ovirtsdk4 as sdk
+ import ovirtsdk4.types as types
+@@ -37,14 +38,25 @@ timeout = 5*60
+ # Parameters are passed in via a JSON doc from the OCaml code.
+ # Because this Python code ships embedded inside virt-v2v there
+ # is no formal API here.
++# https://stackoverflow.com/a/13105359
++def byteify(input):
++    if isinstance(input, dict):
++        return {byteify(key): byteify(value)
++                for key, value in input.iteritems()}
++    elif isinstance(input, list):
++        return [byteify(element) for element in input]
++    elif isinstance(input, unicode):
++        return input.encode('utf-8')
++    else:
++        return input
+ params = None
+ 
+ def config(key, value):
+     global params
+ 
+     if key == "params":
+-        with builtins.open(value, 'r') as fp:
+-            params = json.load(fp)
++        with builtin_open(value, 'r') as fp:
++            params = byteify(json.load(fp))
+     else:
+         raise RuntimeError("unknown configuration key '%s'" % key)
+ 
+@@ -54,13 +66,14 @@ def config_complete():
+ 
+ def debug(s):
+     if params['verbose']:
+-        print(s, file=sys.stderr)
++        sys.stderr.write(s)
++        sys.stderr.write("\n")
+         sys.stderr.flush()
+ 
+ def find_host(connection):
+     """Return the current host object or None."""
+     try:
+-        with builtins.open("/etc/vdsm/vdsm.id") as f:
++        with builtin_open("/etc/vdsm/vdsm.id") as f:
+             vdsm_id = f.readline().strip()
+     except Exception as e:
+         # This is most likely not an oVirt host.
+@@ -111,7 +124,7 @@ def open(readonly):
+     username = parsed.username or "admin@internal"
+ 
+     # Read the password from file.
+-    with builtins.open(params['output_password'], 'r') as fp:
++    with builtin_open(params['output_password'], 'r') as fp:
+         password = fp.read()
+     password = password.rstrip()
+ 
+@@ -244,7 +257,7 @@ def open(readonly):
+         # New imageio never needs authentication.
+         needs_auth = False
+ 
+-        j = json.loads(data)
++        j = byteify(json.loads(data))
+         can_flush = "flush" in j['features']
+         can_trim = "trim" in j['features']
+         can_zero = "zero" in j['features']
+@@ -533,7 +546,7 @@ def close(h):
+             pass
+ 
+         # Write the disk ID file.  Only do this on successful completion.
+-        with builtins.open(params['diskid_file'], 'w') as fp:
++        with builtin_open(params['diskid_file'], 'w') as fp:
+             fp.write(disk.id)
+ 
+     except:
+diff --git a/v2v/rhv-upload-precheck.py b/v2v/rhv-upload-precheck.py
+index 2798a29dd..5b650899f 100644
+--- a/v2v/rhv-upload-precheck.py
++++ b/v2v/rhv-upload-precheck.py
+@@ -1,5 +1,6 @@
+ # -*- python -*-
+-# oVirt or RHV pre-upload checks used by ‘virt-v2v -o rhv-upload’
++# coding: utf-8
++# oVirt or RHV pre-upload checks used by 'virt-v2v -o rhv-upload'
+ # Copyright (C) 2018 Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+@@ -21,8 +22,8 @@ import logging
+ import sys
+ import time
+ 
+-from http.client import HTTPSConnection
+-from urllib.parse import urlparse
++from httplib import HTTPSConnection
++from urlparse import urlparse
+ 
+ import ovirtsdk4 as sdk
+ import ovirtsdk4.types as types
+@@ -36,8 +37,19 @@ if len(sys.argv) != 2:
+     raise RuntimeError("incorrect number of parameters")
+ 
+ # Parameters are passed in via a JSON document.
++# https://stackoverflow.com/a/13105359
++def byteify(input):
++    if isinstance(input, dict):
++        return {byteify(key): byteify(value)
++                for key, value in input.iteritems()}
++    elif isinstance(input, list):
++        return [byteify(element) for element in input]
++    elif isinstance(input, unicode):
++        return input.encode('utf-8')
++    else:
++        return input
+ with open(sys.argv[1], 'r') as fp:
+-    params = json.load(fp)
++    params = byteify(json.load(fp))
+ 
+ # What is passed in is a password file, read the actual password.
+ with open(params['output_password'], 'r') as fp:
+@@ -67,7 +79,7 @@ vms = vms_service.list(
+ )
+ if len(vms) > 0:
+     vm = vms[0]
+-    raise RuntimeError("VM already exists with name ‘%s’, id ‘%s’" %
++    raise RuntimeError("VM already exists with name '%s', id '%s'" %
+                        (params['output_name'], vm.id))
+ 
+ # Otherwise everything is OK, exit with no error.
+diff --git a/v2v/test-v2v-python-syntax.sh b/v2v/test-v2v-python-syntax.sh
+index b167f4610..8d5924e3c 100755
+--- a/v2v/test-v2v-python-syntax.sh
++++ b/v2v/test-v2v-python-syntax.sh
+@@ -25,7 +25,7 @@ skip_if_skipped
+ files="rhv-upload-createvm.py rhv-upload-plugin.py rhv-upload-precheck.py"
+ 
+ # Base version of Python.
+-python=python3
++python=python
+ 
+ # Checks the files are syntactically correct, but not very much else.
+ for f in $files; do
+-- 
+2.21.0
+

@@ -1,5 +1,5 @@
 # libguestfs test images
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ disk_images = \
 	fedora-md1.img \
 	fedora-md2.img \
 	fedora-btrfs.img \
+	fedora-luks.img \
 	ubuntu.img \
 	archlinux.img \
 	coreos.img \
@@ -92,11 +93,20 @@ stamp-fedora-md.img: make-fedora-img.pl \
 	SRCDIR=$(srcdir) LAYOUT=partitions-md $(top_builddir)/run --test ./$<
 	touch $@
 
+# Make a (dummy) Fedora image using a single btrfs with two subvolumes
+# for root and home.
 fedora-btrfs.img: make-fedora-img.pl \
 		fedora-journal.tar.xz \
 		fedora-name.db \
 		fedora-packages.db
 	SRCDIR=$(srcdir) LAYOUT=btrfs $(top_builddir)/run --test ./$<
+
+# Make a (dummy) Fedora image with LVM encrypted with LUKS.
+fedora-luks.img: make-fedora-img.pl \
+		fedora-journal.tar.xz \
+		fedora-name.db \
+		fedora-packages.db
+	SRCDIR=$(srcdir) LAYOUT=lvm-luks $(top_builddir)/run --test ./$<
 
 # Make a (dummy) Debian image.
 debian.img: make-debian-img.sh

@@ -1,0 +1,63 @@
+From d161370dbc97786e05d476ccaed219fa14d7bf1b Mon Sep 17 00:00:00 2001
+From: Martin Kletzander <mkletzan@redhat.com>
+Date: Mon, 27 May 2019 13:30:05 +0200
+Subject: [PATCH] Use proper label for nbdkit sockets
+
+While svirt_t can be used for sockets it does not always guarantee that it will
+be accessible from a virtual machine.  The VM might be running under svirt_tcg_t
+context which will need a svirt_tcg_t label on the socket in order to access it.
+
+There is, however, another label, svirt_socket_t, which is accessible from
+virt_domain:
+
+  # sesearch -A -s svirt_t -c unix_stream_socket -p connectto
+  ...
+  allow virt_domain svirt_socket_t:unix_stream_socket { ... connectto ... };
+  ...
+
+And virt_domain is a type attribute of both svirt_t and svirt_tcg_t:
+
+  # seinfo -x -a virt_domain
+  Type Attributes: 1
+     attribute virt_domain;
+          svirt_t
+          svirt_tcg_t
+
+Resolves: https://bugzilla.redhat.com/1698437
+
+Signed-off-by: Martin Kletzander <mkletzan@redhat.com>
+(cherry picked from commit c2918b8b74506523a723b804d452816a059c5e50)
+---
+ v2v/input_libvirt_vddk.ml | 2 +-
+ v2v/output_rhv_upload.ml  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/v2v/input_libvirt_vddk.ml b/v2v/input_libvirt_vddk.ml
+index 97c7cb532..567233d58 100644
+--- a/v2v/input_libvirt_vddk.ml
++++ b/v2v/input_libvirt_vddk.ml
+@@ -290,7 +290,7 @@ object
+       add_arg "--newstyle";         (* use newstyle NBD protocol *)
+       add_arg "--exportname"; add_arg "/";
+       if have_selinux then (        (* label the socket so qemu can open it *)
+-        add_arg "--selinux-label"; add_arg "system_u:object_r:svirt_t:s0"
++        add_arg "--selinux-label"; add_arg "system_u:object_r:svirt_socket_t:s0"
+       );
+ 
+       (* Name of the plugin.  Everything following is a plugin parameter. *)
+diff --git a/v2v/output_rhv_upload.ml b/v2v/output_rhv_upload.ml
+index 77c39107e..c2a5c72c7 100644
+--- a/v2v/output_rhv_upload.ml
++++ b/v2v/output_rhv_upload.ml
+@@ -217,7 +217,7 @@ See also the virt-v2v-output-rhv(1) manual.")
+     let args =
+       (* label the socket so qemu can open it *)
+       if have_selinux then
+-        args @ ["--selinux-label"; "system_u:object_r:svirt_t:s0"]
++        args @ ["--selinux-label"; "system_u:object_r:svirt_socket_t:s0"]
+       else args in
+     args in
+ 
+-- 
+2.21.0
+

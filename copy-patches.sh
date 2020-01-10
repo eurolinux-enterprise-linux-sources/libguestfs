@@ -6,7 +6,7 @@ set -e
 # directory.  Use it like this:
 #   ./copy-patches.sh
 
-rhel_version=7.6
+rhel_version=7.7
 
 # Check we're in the right directory.
 if [ ! -f libguestfs.spec ]; then

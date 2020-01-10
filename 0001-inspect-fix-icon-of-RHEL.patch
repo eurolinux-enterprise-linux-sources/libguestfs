@@ -1,0 +1,32 @@
+From 880efbac3fced5f07f93b04d8a200d7f41ed3215 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Mon, 11 Feb 2019 19:28:00 +0100
+Subject: [PATCH] inspect: fix icon of RHEL
+
+Use a better icon for RHEL guests, still provided by redhat-logos (or
+equivalent in downstream distributions), and which fits a better
+definition of logo for the distribution.
+
+Thanks to Ray Strode for the hints.
+
+(cherry picked from commit c648052690a4a07a59c741308e0e8497d6f18057)
+---
+ lib/inspect-icon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/inspect-icon.c b/lib/inspect-icon.c
+index 623591aa6..19f3f87af 100644
+--- a/lib/inspect-icon.c
++++ b/lib/inspect-icon.c
+@@ -317,7 +317,7 @@ icon_rhel (guestfs_h *g, int major, size_t *size_r)
+   if (major < 7)
+     shadowman = "/usr/share/pixmaps/redhat/shadowman-transparent.png";
+   else
+-    shadowman = "/usr/share/pixmaps/fedora-logo-sprite.png";
++    shadowman = "/usr/share/icons/hicolor/96x96/apps/system-logo-icon.png";
+ 
+   return get_png (g, shadowman, size_r, 102400);
+ }
+-- 
+2.21.0
+

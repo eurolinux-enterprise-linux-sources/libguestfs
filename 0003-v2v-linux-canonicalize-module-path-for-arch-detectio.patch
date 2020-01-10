@@ -1,0 +1,36 @@
+From 0dc49c47060b35f6cffe73467823a07c4ca37e9e Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Wed, 20 Mar 2019 16:55:05 +0100
+Subject: [PATCH] v2v: linux: canonicalize module path for arch detection
+ (RHBZ#1690574)
+
+Kernel modules can be also symlinks to files available outside the
+"canonical" module directory; the "file" API, used by the
+"file-architecture" API, return the actual type of a file (so symlinks,
+block devices, etc), and thus "file-architecture" fails on symlinks.
+
+To prevent this situation, canonicalize the path of the module picked
+for architecture detection: this way, "file-architecture" will act on a
+real file.
+
+(cherry picked from commit 0a093035d485b3c2e66d56541ebe159f1b632ba6)
+---
+ v2v/linux_kernels.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/v2v/linux_kernels.ml b/v2v/linux_kernels.ml
+index 3313aabc7..889ec2f2a 100644
+--- a/v2v/linux_kernels.ml
++++ b/v2v/linux_kernels.ml
+@@ -189,7 +189,7 @@ let detect_kernels (g : G.guestfs) inspect family bootloader =
+               *)
+              let arch =
+                let any_module = modpath ^ List.hd modules in
+-               g#file_architecture any_module in
++               g#file_architecture (g#realpath any_module) in
+ 
+              (* Just return the module names, without path or extension. *)
+              let modules = List.filter_map (
+-- 
+2.21.0
+

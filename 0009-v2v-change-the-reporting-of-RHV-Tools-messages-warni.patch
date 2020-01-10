@@ -1,0 +1,56 @@
+From 4bb9affd19b7312af3c48cf141d695b4ec8f5656 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Tue, 26 Mar 2019 17:37:56 +0100
+Subject: [PATCH] v2v: change the reporting of RHV Tools
+ messages/warnings/error
+
+The RHV Tools ISO is provided as Red Hat only product, and thus not
+available for all the virt-v2v users.  Hence, change the way we report
+the status of the installation of the qemu guest agent from the RHV
+Tools ISO:
+- do not warn if virt-v2v does not know how to install the package for
+  the current guest
+- do not warn if the ISO does not contain packages for the current guest
+- on successful installations, show an info message
+
+Related: RHBZ#1691659
+(cherry picked from commit cbf887ed90e0ecb5c52fd2c663acb5b9b2e3e14a)
+---
+ v2v/windows_virtio.ml | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/v2v/windows_virtio.ml b/v2v/windows_virtio.ml
+index a499fcf8a..f3302aed6 100644
+--- a/v2v/windows_virtio.ml
++++ b/v2v/windows_virtio.ml
+@@ -197,9 +197,7 @@ and install_linux_tools g inspect =
+     | _ -> None in
+ 
+   match os with
+-  | None ->
+-      warning (f_"don't know how to install guest tools on %s-%d")
+-        inspect.i_distro inspect.i_major_version
++  | None -> ()
+   | Some os ->
+       let src_path = "linux" // os in
+       let dst_path = "/var/tmp" in
+@@ -216,13 +214,13 @@ and install_linux_tools g inspect =
+       let packages =
+         copy_from_virtio_win g inspect src_path dst_path
+                              package_filter
+-                             (fun () ->
+-                               warning (f_"guest tools directory ‘%s’ is missing from the virtio-win directory or ISO.\n\nGuest tools are only provided in the RHV Guest Tools ISO, so this can happen if you are using the version of virtio-win which contains just the virtio drivers.  In this case only virtio drivers can be installed in the guest, and installation of Guest Tools will be skipped.")
+-                                       src_path) in
++                             (fun () -> ()) in
+       debug "done copying %d files" (List.length packages);
+       let packages = List.map ((//) dst_path) packages in
+       try
+         Linux.install_local g inspect packages;
++        if packages <> [] then
++          info (f_"QEMU Guest Agent installed for this guest.");
+       with G.Error msg ->
+         warning (f_"failed to install QEMU Guest Agent: %s") msg
+ 
+-- 
+2.21.0
+

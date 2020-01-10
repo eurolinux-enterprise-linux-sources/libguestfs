@@ -1,5 +1,5 @@
 (* virt-v2v
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,8 +44,10 @@ let rec main () =
 
   (* Handle the command line. *)
   let argspec = [
-    [ L"ic" ],       Getopt.String ("uri", set_string_option_once "-ic" input_conn),
+    [ M"ic" ],       Getopt.String ("uri", set_string_option_once "-ic" input_conn),
                                             s_"Libvirt URI";
+    [ M"ip" ],       Getopt.String ("file", set_string_option_once "-ip" password_file),
+                                            s_"Use password from file";
     [ L"password-file" ], Getopt.String ("file", set_string_option_once "--password-file" password_file),
                                             s_"Use password from file";
   ] in
@@ -74,7 +76,7 @@ read the man page virt-v2v-copy-to-local(1).
 ")
       prog in
   let opthandle = create_standard_options argspec ~anon_fun usage_msg in
-  Getopt.parse opthandle;
+  Getopt.parse opthandle.getopt;
 
   let args = !args in
   let input_conn = !input_conn in
@@ -85,14 +87,6 @@ read the man page virt-v2v-copy-to-local(1).
     | None ->
        error (f_"the -ic parameter is required") (* at the moment *)
     | Some ic -> ic in
-
-  (* Parse out the password from the password file. *)
-  let password =
-    match password_file with
-    | None -> None
-    | Some filename ->
-      let password = read_first_line_from_file filename in
-      Some password in
 
   (* Check this is a libvirt URI we can understand. *)
   let parsed_uri =
@@ -131,7 +125,7 @@ read the man page virt-v2v-copy-to-local(1).
 
   (* Get the remote libvirt XML. *)
   message (f_"Fetching the remote libvirt XML metadata ...");
-  let xml = Libvirt_utils.dumpxml ?password ~conn:input_conn guest_name in
+  let xml = Libvirt_utils.dumpxml ?password_file ~conn:input_conn guest_name in
 
   debug "libvirt XML from remote server:\n%s" xml;
 

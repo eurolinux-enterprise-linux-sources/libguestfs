@@ -1,5 +1,5 @@
 # libguestfs virt-v2v test harness
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ OCAMLPACKAGES = \
 	-I $(top_builddir)/common/mltools \
 	-I $(top_builddir)/v2v
 
-OCAMLFLAGS = $(OCAML_FLAGS) $(OCAML_WARN_ERROR)
+OCAMLFLAGS = $(OCAML_FLAGS) $(OCAML_WARN_ERROR) -ccopt '$(CFLAGS)'
 
 BOBJECTS = \
 	$(SOURCES_ML:.ml=.cmo) \

@@ -1,5 +1,5 @@
 (* virt-sparsify
- * Copyright (C) 2011-2018 Red Hat Inc.
+ * Copyright (C) 2011-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ type cmdline = {
   indisk : string;
   format : string option;
   ignores : string list;
-  machine_readable : bool;
   zeroes : string list;
   mode : mode_t;
+  ks : Tools_utils.key_store;
 }
 
 and mode_t =

@@ -1,5 +1,5 @@
 (* virt-get-kernel
- * Copyright (C) 2013-2018 Red Hat Inc.
+ * Copyright (C) 2013-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ let parse_cmdline () =
   let libvirturi = ref "" in
   let format = ref "auto" in
   let output = ref "" in
-  let machine_readable = ref false in
   let unversioned = ref false in
   let prefix = ref None in
 
@@ -57,7 +56,6 @@ let parse_cmdline () =
     [ S 'c'; L"connect" ],        Getopt.Set_string (s_"uri", libvirturi), s_"Set libvirt URI";
     [ S 'd'; L"domain" ],        Getopt.String (s_"domain", set_domain),      s_"Set libvirt guest name";
     [ L"format" ],  Getopt.Set_string (s_"format", format),      s_"Format of input disk";
-    [ L"machine-readable" ], Getopt.Set machine_readable, s_"Make output machine readable";
     [ S 'o'; L"output" ],        Getopt.Set_string (s_"directory", output),  s_"Output directory";
     [ L"unversioned-names" ], Getopt.Set unversioned,
                                             s_"Use unversioned names for files";
@@ -71,15 +69,17 @@ A short summary of the options is given below.  For detailed help please
 read the man page virt-get-kernel(1).
 ")
       prog in
-  let opthandle = create_standard_options argspec ~key_opts:true usage_msg in
-  Getopt.parse opthandle;
+  let opthandle = create_standard_options argspec ~key_opts:true ~machine_readable:true usage_msg in
+  Getopt.parse opthandle.getopt;
 
   (* Machine-readable mode?  Print out some facts about what
    * this binary supports.
    *)
-  if !machine_readable then (
-    printf "virt-get-kernel\n";
+  (match machine_readable () with
+  | Some { pr } ->
+    pr "virt-get-kernel\n";
     exit 0
+  | None -> ()
   );
 
   (* Check -a and -d options. *)
@@ -112,7 +112,7 @@ read the man page virt-get-kernel(1).
   let unversioned = !unversioned in
   let prefix = !prefix in
 
-  add, output, unversioned, prefix
+  add, output, unversioned, prefix, opthandle.ks
 
 let rec do_fetch ~transform_fn ~outputdir g root =
   (* Mount up the disks. *)
@@ -166,7 +166,7 @@ and pick_kernel_files_linux (g : Guestfs.guestfs) root =
 
 (* Main program. *)
 let main () =
-  let add, output, unversioned, prefix = parse_cmdline () in
+  let add, output, unversioned, prefix, ks = parse_cmdline () in
 
   (* Connect to libguestfs. *)
   let g = open_guestfs () in
@@ -174,7 +174,7 @@ let main () =
   g#launch ();
 
   (* Decrypt the disks. *)
-  inspect_decrypt g;
+  inspect_decrypt g ks;
 
   let roots = g#inspect_os () in
   if Array.length roots = 0 then

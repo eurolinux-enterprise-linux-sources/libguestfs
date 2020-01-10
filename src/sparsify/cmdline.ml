@@ -1,5 +1,5 @@
 (* virt-sparsify
- * Copyright (C) 2011-2018 Red Hat Inc.
+ * Copyright (C) 2011-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@ type cmdline = {
   indisk : string;
   format : string option;
   ignores : string list;
-  machine_readable : bool;
   zeroes : string list;
   mode : mode_t;
+  ks : key_store;
 }
 
 and mode_t =
@@ -60,7 +60,6 @@ let parse_cmdline () =
   let format = ref "" in
   let ignores = ref [] in
   let in_place = ref false in
-  let machine_readable = ref false in
   let option = ref "" in
   let tmp = ref "" in
   let zeroes = ref [] in
@@ -72,7 +71,6 @@ let parse_cmdline () =
     [ L"format" ],  Getopt.Set_string (s_"format", format),     s_"Format of input disk";
     [ L"ignore" ],  Getopt.String (s_"fs", add ignores),  s_"Ignore filesystem";
     [ L"in-place"; L"inplace" ], Getopt.Set in_place,         s_"Modify the disk image in-place";
-    [ L"machine-readable" ], Getopt.Set machine_readable, s_"Make output machine readable";
     [ S 'o' ],        Getopt.Set_string (s_"option", option),     s_"Add qemu-img options";
     [ L"tmp" ],     Getopt.Set_string (s_"block|dir|prebuilt:file", tmp),        s_"Set temporary block device, directory or prebuilt file";
     [ L"zero" ],    Getopt.String (s_"fs", add zeroes),   s_"Zero filesystem";
@@ -91,8 +89,8 @@ A short summary of the options is given below.  For detailed help please
 read the man page virt-sparsify(1).
 ")
       prog in
-  let opthandle = create_standard_options argspec ~anon_fun ~key_opts:true usage_msg in
-  Getopt.parse opthandle;
+  let opthandle = create_standard_options argspec ~anon_fun ~key_opts:true ~machine_readable:true usage_msg in
+  Getopt.parse opthandle.getopt;
 
   (* Dereference the rest of the args. *)
   let check_tmpdir = !check_tmpdir in
@@ -102,7 +100,6 @@ read the man page virt-sparsify(1).
   let format = match !format with "" -> None | str -> Some str in
   let ignores = List.rev !ignores in
   let in_place = !in_place in
-  let machine_readable = !machine_readable in
   let option = match !option with "" -> None | str -> Some str in
   let tmp = match !tmp with "" -> None | str -> Some str in
   let zeroes = List.rev !zeroes in
@@ -110,21 +107,23 @@ read the man page virt-sparsify(1).
   (* No arguments and machine-readable mode?  Print out some facts
    * about what this binary supports.
    *)
-  if disks = [] && machine_readable then (
-    printf "virt-sparsify\n";
-    printf "linux-swap\n";
-    printf "zero\n";
-    printf "check-tmpdir\n";
-    printf "in-place\n";
-    printf "tmp-option\n";
+  (match disks, machine_readable () with
+  | [], Some { pr } ->
+    pr "virt-sparsify\n";
+    pr "linux-swap\n";
+    pr "zero\n";
+    pr "check-tmpdir\n";
+    pr "in-place\n";
+    pr "tmp-option\n";
     let g = open_guestfs () in
     g#add_drive "/dev/null";
     g#launch ();
     if g#feature_available [| "ntfsprogs"; "ntfs3g" |] then
-      printf "ntfs\n";
+      pr "ntfs\n";
     if g#feature_available [| "btrfs" |] then
-      printf "btrfs\n";
+      pr "btrfs\n";
     exit 0
+  | _, _ -> ()
   );
 
   let indisk, mode =
@@ -180,7 +179,7 @@ read the man page virt-sparsify(1).
   { indisk = indisk;
     format = format;
     ignores = ignores;
-    machine_readable = machine_readable;
     zeroes = zeroes;
     mode = mode;
+    ks = opthandle.ks;
   }

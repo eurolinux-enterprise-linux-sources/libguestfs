@@ -1,0 +1,48 @@
+From 6a89d52b408885a8151939798ab5dfb57fac3fda Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Fri, 12 Apr 2019 17:28:12 +0200
+Subject: [PATCH] v2v: warn when the guest has direct network interfaces
+ (RHBZ#1518539)
+
+virt-v2v obviously cannot convert this kind of devices, since they are
+specific to the host of the hypervisor.  Thus, emit a warning about the
+presence of direct network interfaces, so at least this can be noticed
+when converting a guest.
+
+(cherry picked from commit 1629ec6a5639cf5e226e80bcee749ae8851b1fae)
+---
+ v2v/parse_libvirt_xml.ml | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/v2v/parse_libvirt_xml.ml b/v2v/parse_libvirt_xml.ml
+index d5d78d367..b9970cee8 100644
+--- a/v2v/parse_libvirt_xml.ml
++++ b/v2v/parse_libvirt_xml.ml
+@@ -492,6 +492,24 @@ let parse_libvirt_xml ?conn xml =
+     )
+   in
+ 
++  (* Check for direct attachments to physical network interfaces.
++   * (RHBZ#1518539)
++   *)
++  let () =
++    let obj = Xml.xpath_eval_expression xpathctx "/domain/devices/interface[@type='direct']" in
++    let nr_nodes = Xml.xpathobj_nr_nodes obj in
++    if nr_nodes > 0 then (
++      (* Sadly fn_ in ocaml-gettext seems broken, and always returns the
++       * singular string no matter what.  Work around this by using a simple
++       * string with sn_ (which works), and outputting it as a whole.
++       *)
++      let msg = sn_ "this guest has a direct network interface which will be ignored"
++                    "this guest has direct network interfaces which will be ignored"
++                    nr_nodes in
++      warning "%s" msg
++    )
++  in
++
+   ({
+     s_hypervisor = hypervisor;
+     s_name = name; s_orig_name = name;
+-- 
+2.21.0
+

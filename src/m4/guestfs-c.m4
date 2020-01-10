@@ -1,5 +1,5 @@
 # libguestfs
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,12 +56,14 @@ nw="$nw -Wunsafe-loop-optimizations" # just a warning that an optimization
 nw="$nw -Wstack-protector"           # Useless warning when stack protector
                                      # cannot being used in a function.
 nw="$nw -Wcast-align"                # Useless warning on arm >= 7, intel
+nw="$nw -Wabi"                       # Broken in GCC 8.1.
 dnl things I might fix soon:
 nw="$nw -Wpacked"                    # Allow attribute((packed)) on structs
 nw="$nw -Wlong-long"                 # Allow long long since it's required
                                      # by Python, Ruby and xstrtoll.
 nw="$nw -Wsuggest-attribute=pure"    # Don't suggest pure functions.
 nw="$nw -Wsuggest-attribute=const"   # Don't suggest const functions.
+nw="$nw -Wsuggest-attribute=malloc"  # Don't suggest malloc functions.
 nw="$nw -Wunsuffixed-float-constants" # Don't care about these.
 nw="$nw -Wswitch-default"            # This warning is actively dangerous.
 nw="$nw -Woverlength-strings"        # Who cares about stupid ISO C99 limit.
@@ -102,6 +104,9 @@ gl_WARN_ADD([-Wimplicit-fallthrough=4])
 
 dnl GCC level 2 gives incorrect warnings, so use level 1.
 gl_WARN_ADD([-Wformat-truncation=1])
+
+dnl GCC 9 at level 2 gives apparently bogus errors when %.*s is used.
+gl_WARN_ADD([-Wformat-overflow=1])
 
 AC_SUBST([WARN_CFLAGS])
 

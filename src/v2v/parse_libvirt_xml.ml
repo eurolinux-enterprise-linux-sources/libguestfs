@@ -1,5 +1,5 @@
 (* virt-v2v
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,8 +63,8 @@ let create_curl_qemu_uri driver host port path =
   let json_params = [
     "file.driver", JSON.String driver;  (* "http" or "https" *)
     "file.url", JSON.String url;
-    "file.timeout", JSON.Int 2000;
-    "file.readahead", JSON.Int (1024 * 1024);
+    "file.timeout", JSON.Int 2000_L;
+    "file.readahead", JSON.Int (1024_L *^ 1024_L);
     (* "file.sslverify", JSON.String "off"; XXX *)
   ] in
 
@@ -90,6 +90,10 @@ let parse_libvirt_xml ?conn xml =
     | None | Some "" ->
        error (f_"in the libvirt XML metadata, <name> is missing or empty")
     | Some s -> s in
+  let genid =
+    match xpath_string "/domain/genid/text()" with
+    | None | Some "" -> None
+    | Some _ as s -> s in
   let memory =
     Option.default (1024L *^ 1024L) (xpath_int64 "/domain/memory/text()") in
   let memory = memory *^ 1024L in
@@ -123,14 +127,8 @@ let parse_libvirt_xml ?conn xml =
     | _, _, _ -> None in
 
   let features =
-    let features = ref [] in
-    let obj = Xml.xpath_eval_expression xpathctx "/domain/features/*" in
-    let nr_nodes = Xml.xpathobj_nr_nodes obj in
-    for i = 0 to nr_nodes-1 do
-      let node = Xml.xpathobj_node obj i in
-      List.push_front (Xml.node_name node) features
-    done;
-    !features in
+    let nodes = xpath_get_nodes xpathctx "/domain/features/*" in
+    List.map Xml.node_name nodes in
 
   let display =
     let obj = Xml.xpath_eval_expression xpathctx "/domain/devices/graphics" in
@@ -248,7 +246,7 @@ let parse_libvirt_xml ?conn xml =
   (* Non-removable disk devices. *)
   let disks =
     let get_disks, add_disk =
-      let disks = ref [] and i = ref 0 in
+      let disks = ref [] and i = ref (-1) in
       let get_disks () = List.rev !disks in
       let add_disk qemu_uri format controller p_source =
         incr i;
@@ -385,6 +383,16 @@ let parse_libvirt_xml ?conn xml =
         let target_dev = xpath_string "target/@dev" in
         match target_dev with
         | None -> None
+        | Some dev when String.is_prefix dev "sr" ->
+           (* "srN" devices are found mostly in the physical XML written by
+            * virt-p2v.
+            *)
+           let name = String.sub dev 2 (String.length dev - 2) in
+           (try Some (int_of_string name)
+            with Failure _ ->
+              warning (f_"could not parse device name ‘%s’ from the source libvirt XML") dev;
+              None
+           )
         | Some dev ->
            let rec loop = function
              | [] ->
@@ -451,8 +459,8 @@ let parse_libvirt_xml ?conn xml =
              s_mac = mac;
              s_nic_model = model;
              s_vnet = vnet;
-             s_vnet_orig = vnet;
-             s_vnet_type = vnet_type
+             s_vnet_type = vnet_type;
+             s_mapping_explanation = None
            } in
            List.push_front nic nics
          in
@@ -487,6 +495,7 @@ let parse_libvirt_xml ?conn xml =
   ({
     s_hypervisor = hypervisor;
     s_name = name; s_orig_name = name;
+    s_genid = genid;
     s_memory = memory;
     s_vcpu = vcpu;
     s_cpu_vendor = cpu_vendor;

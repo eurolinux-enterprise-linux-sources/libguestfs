@@ -1,5 +1,5 @@
 /* libguestfs
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,6 +76,9 @@ guestfs_int_get_cpu_model (int kvm)
     return "host";
   else
     return "cortex-a57";
+#elif defined(__powerpc64__)
+  /* See discussion in https://bugzilla.redhat.com/show_bug.cgi?id=1605071 */
+  return NULL;
 #else
   /* On most architectures, it is faster to pass the CPU host model to
    * the appliance, allowing maximum speed for things like checksums

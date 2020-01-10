@@ -1,5 +1,5 @@
 (* virt-builder
- * Copyright (C) 2016-2018 SUSE Inc.
+ * Copyright (C) 2016-2019 SUSE Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ open Tools_utils
 open Unix_utils
 open Getopt.OptionName
 open Utils
-open Yajl
+open JSON_parser
 open Xpath_helpers
 
 open Printf
@@ -47,7 +47,6 @@ let parse_cmdline () =
 
   let interactive = ref false in
   let compression = ref true in
-  let machine_readable = ref false in
 
   let argspec = [
     [ L"gpg" ], Getopt.Set_string ("gpg", gpg), s_"Set GPG binary/command";
@@ -55,7 +54,6 @@ let parse_cmdline () =
       s_"ID of the GPG key to sign the repo with";
     [ S 'i'; L"interactive" ], Getopt.Set interactive, s_"Ask the user about missing data";
     [ L"no-compression" ], Getopt.Clear compression, s_"Don’t compress the new images in the index";
-    [ L"machine-readable" ], Getopt.Set machine_readable, s_"Make output machine readable";
   ] in
 
   let args = ref [] in
@@ -70,15 +68,17 @@ A short summary of the options is given below.  For detailed help please
 read the man page virt-builder-repository(1).
 ")
       prog in
-  let opthandle = create_standard_options argspec ~anon_fun usage_msg in
-  Getopt.parse opthandle;
+  let opthandle = create_standard_options argspec ~anon_fun ~machine_readable:true usage_msg in
+  Getopt.parse opthandle.getopt;
 
   (* Machine-readable mode?  Print out some facts about what
    * this binary supports.
    *)
-  if !machine_readable then (
-    printf "virt-builder-repository\n";
+  (match machine_readable () with
+  | Some { pr } ->
+    pr "virt-builder-repository\n";
     exit 0
+  | None -> ()
   );
 
   (* Dereference options. *)
@@ -152,7 +152,7 @@ let compress_to file outdir =
   let cmd = [ "xz"; "-f"; "--best"; "--block-size=16777216"; "-c"; file ] in
   let file_flags = [ Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC; ] in
   let outfd = Unix.openfile outimg file_flags 0o666 in
-  let res = run_command cmd ~stdout_chan:outfd in
+  let res = run_command cmd ~stdout_fd:outfd in
   if res <> 0 then
     error (f_"‘xz’ command failed");
   outimg
@@ -169,23 +169,6 @@ let get_disk_image_info filepath =
     format = object_get_string "format" infos;
     size = object_get_number "virtual-size" infos
   }
-
-let compute_short_id distro major minor =
-  match distro with
-  | "centos" when major >= 7 ->
-    sprintf "%s%d.0" distro major
-  | "debian" when major >= 4 ->
-    sprintf "%s%d" distro major
-  | ("fedora"|"mageia") ->
-    sprintf "%s%d" distro major
-  | "sles" when minor = 0 ->
-    sprintf "%s%d" distro major
-  | "sles" ->
-    sprintf "%s%dsp%d" distro major minor
-  | "ubuntu" ->
-    sprintf "%s%d.%02d" distro major minor
-  | _ (* Any other combination. *) ->
-    sprintf "%s%d.%d" distro major minor
 
 let cmp a b =
   Index.string_of_arch a = Index.string_of_arch b
@@ -260,13 +243,9 @@ let process_image acc_entries filename repo tmprepo index interactive
     let root = Array.get roots 0 in
     let inspected_arch = g#inspect_get_arch root in
     let product = g#inspect_get_product_name root in
-    let distro = g#inspect_get_distro root in
-    let version_major = g#inspect_get_major_version root in
-    let version_minor = g#inspect_get_minor_version root in
+    let shortid = g#inspect_get_osinfo root in
     let lvs = g#lvs () in
     let filesystems = g#inspect_get_filesystems root in
-
-    let shortid = compute_short_id distro version_major version_minor in
 
     g#close ();
 

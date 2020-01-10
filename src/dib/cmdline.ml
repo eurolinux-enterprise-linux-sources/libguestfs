@@ -145,8 +145,6 @@ read the man page virt-dib(1).
   let mkfs_options = ref None in
   let set_mkfs_options arg = mkfs_options := Some arg in
 
-  let machine_readable = ref false in
-
   let extra_packages = ref [] in
   let append_extra_packages arg =
     List.push_front_list (List.rev (String.nsplit "," arg)) extra_packages in
@@ -191,15 +189,14 @@ read the man page virt-dib(1).
     [ L"smp" ],        Getopt.Int ("vcpus", set_smp),           s_"Set number of vCPUs";
     [ L"no-delete-on-failure" ], Getopt.Clear delete_on_failure,
                                                s_"Don’t delete output file on failure";
-    [ L"machine-readable" ], Getopt.Set machine_readable, s_"Make output machine readable";
 
     [ L"debug" ],      Getopt.Int ("level", set_debug),         s_"Set debug level";
     [ S 'B' ],           Getopt.Set_string ("path", basepath),   s_"Base path of diskimage-builder library";
   ] in
   let argspec = argspec @ Output_format.extra_args () in
 
-  let opthandle = create_standard_options argspec ~anon_fun:append_element usage_msg in
-  Getopt.parse opthandle;
+  let opthandle = create_standard_options argspec ~anon_fun:append_element ~machine_readable:true usage_msg in
+  Getopt.parse opthandle.getopt;
 
   let debug = !debug in
   let basepath = !basepath in
@@ -226,17 +223,18 @@ read the man page virt-dib(1).
   let is_ramdisk = !is_ramdisk in
   let ramdisk_element = !ramdisk_element in
   let mkfs_options = !mkfs_options in
-  let machine_readable = !machine_readable in
   let extra_packages = List.rev !extra_packages in
   let checksum = !checksum in
   let python = !python in
 
   (* No elements and machine-readable mode?  Print some facts. *)
-  if elements = [] && machine_readable then (
-    printf "virt-dib\n";
+  (match elements, machine_readable () with
+  | [], Some { pr } ->
+    pr "virt-dib\n";
     let formats_list = Output_format.list_formats () in
-    List.iter (printf "output:%s\n") formats_list;
+    List.iter (pr "output:%s\n") formats_list;
     exit 0
+  | _, _ -> ()
   );
 
   if basepath = "" then
@@ -253,17 +251,7 @@ read the man page virt-dib(1).
   if elements = [] then
     error (f_"at least one distribution root element must be specified");
 
-  let python =
-    match python with
-    | Some exe ->
-      let p =
-        if String.find exe Filename.dir_sep <> -1 then (
-          Unix.access exe [Unix.X_OK];
-          exe
-        ) else
-          get_required_tool exe in
-      Some p
-    | None -> None in
+  let python = Option.map get_required_tool python in
 
   { debug = debug; basepath = basepath; elements = elements;
     excluded_elements = excluded_elements; element_paths = element_paths;

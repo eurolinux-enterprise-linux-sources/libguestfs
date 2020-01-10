@@ -1,5 +1,5 @@
 (* Common utilities for OCaml tools in libguestfs.
- * Copyright (C) 2011-2018 Red Hat Inc.
+ * Copyright (C) 2011-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,14 +94,14 @@ let test_run_command ctx =
   assert_equal_int 0 (run_command ["true"]);
   begin
     let tmpfile, chan = bracket_tmpfile ctx in
-    let res = run_command ["echo"; "this is a test"] ~stdout_chan:(Unix.descr_of_out_channel chan) in
+    let res = run_command ["echo"; "this is a test"] ~stdout_fd:(Unix.descr_of_out_channel chan) in
     assert_equal_int 0 res;
     let content = read_whole_file tmpfile in
     assert_equal_string "this is a test\n" content
   end;
   begin
     let tmpfile, chan = bracket_tmpfile ctx in
-    let res = run_command ["ls"; "/this-directory-is-unlikely-to-exist"] ~stderr_chan:(Unix.descr_of_out_channel chan) in
+    let res = run_command ["ls"; "/this-directory-is-unlikely-to-exist"] ~stderr_fd:(Unix.descr_of_out_channel chan) in
     assert_equal_int 2 res;
     let content = read_whole_file tmpfile in
     assert_bool "test_run_commands/not-existing/content" (String.length content > 0)

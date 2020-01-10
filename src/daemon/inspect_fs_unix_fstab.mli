@@ -1,5 +1,5 @@
 (* guestfs-inspection
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ val check_fstab : ?mdadm_conf:bool -> Mountable.t -> Inspect_types.os_type ->
     this function also knows how to map (eg) BSD device names into
     Linux/libguestfs device names.
 
-    [mdadm_conf] is true if you want to check [/etc/mdadm.conf] as well.
+    [mdadm_conf] is true if you want to check [/etc/mdadm.conf] or
+    [/etc/mdadm/mdadm.conf] as well.
 
     [root_mountable] is the [Mountable.t] of the root filesystem.  (Note
     that the root filesystem must be mounted on sysroot before this

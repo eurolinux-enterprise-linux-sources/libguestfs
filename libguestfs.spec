@@ -20,111 +20,59 @@
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
-Version:       1.38.2
-Release:       12%{?dist}.2
+Version:       1.40.2
+Release:       5%{?dist}
 License:       LGPLv2+
 
 # Source and patches.
 URL:           http://libguestfs.org/
-Source0:       http://libguestfs.org/download/1.38-stable/%{name}-%{version}.tar.gz
+Source0:       http://libguestfs.org/download/1.40-stable/%{name}-%{version}.tar.gz
 
 %if 0%{verify_tarball_signature}
-Source1:       http://libguestfs.org/download/1.38-stable/%{name}-%{version}.tar.gz.sig
+Source1:       http://libguestfs.org/download/1.40-stable/%{name}-%{version}.tar.gz.sig
 %endif
 
 ExclusiveArch: x86_64 %{power64} aarch64 s390x
 
 # RHEL 7 git repository is:
-# https://github.com/libguestfs/libguestfs/tree/rhel-7.6
+# https://github.com/libguestfs/libguestfs/tree/rhel-7.7
 # Use 'copy-patches.sh' to copy the patches from the git repo
 # to the current directory.
 
 # Patches.
-Patch0001:     0001-RHEL-7-Remove-libguestfs-live-RHBZ-798980.patch
-Patch0002:     0002-RHEL-7-Remove-9p-APIs-from-RHEL-RHBZ-921710.patch
-Patch0003:     0003-RHEL-7-Disable-unsupported-remote-drive-protocols-RH.patch
-Patch0004:     0004-RHEL-7-Remove-User-Mode-Linux-RHBZ-1144197.patch
-Patch0005:     0005-RHEL-7-v2v-Select-correct-qemu-binary-for-o-qemu-mod.patch
-Patch0006:     0006-RHEL-7-v2v-Disable-the-qemu-boot-option-RHBZ-1147313.patch
-Patch0007:     0007-RHEL-7-move-VIRTIO_DEVICE_NAME-macro-to-guestfs-inte.patch
-Patch0008:     0008-RHEL-7-Revert-tests-rsync-Skip-this-test-when-the-ba.patch
-Patch0009:     0009-RHEL-7-Revert-appliance-Change-example-ping-lines-to.patch
-Patch0010:     0010-RHEL-7-Revert-launch-libvirt-Use-qemu-bridge-helper-.patch
-Patch0011:     0011-RHEL-7-Revert-launch-libvirt-Better-error-when-bridg.patch
-Patch0012:     0012-RHEL-7-Revert-appliance-add-dhcp-client-on-Mageia.patch
-Patch0013:     0013-RHEL-7-Revert-appliance-add-dhcpcd-and-gptfdisk-on-A.patch
-Patch0014:     0014-RHEL-7-Revert-appliance-Use-dhclient-or-dhcpcd-inste.patch
-Patch0015:     0015-RHEL-7-Disable-alternate-Augeas-lenses.patch
-Patch0016:     0016-RHEL-7-Fix-list-of-supported-sound-cards-to-match-RH.patch
-Patch0017:     0017-RHEL-7-v2v-efi-Remove-references-to-Fedora-kraxel-s-.patch
-Patch0018:     0018-RHEL-7-Reject-use-of-libguestfs-winsupport-features-.patch
-Patch0019:     0019-RHEL-7-daemon-umount-all-Hack-to-avoid-umount-sysroo.patch
-Patch0020:     0020-RHEL-7-Fix-tests-for-libguestfs-winsupport-7.2.patch
-Patch0021:     0021-RHEL-7-Revert-v2v-Add-a-support-matrix-to-the-manual.patch
-Patch0022:     0022-RHEL-7-All-qemu-kvm-in-RHEL-7-supports-discard-of-qc.patch
-Patch0023:     0023-RHEL-7-tests-Disable-daemon-tests-that-require-the-u.patch
-Patch0024:     0024-RHEL-7-v2v-Disable-the-virt-v2v-in-place-option.patch
-Patch0025:     0025-RHEL-7-v2v-i-disk-force-VNC-as-display-RHBZ-1372671.patch
-Patch0026:     0026-RHEL-7-v2v-do-not-mention-SUSE-Xen-hosts-RHBZ-143020.patch
-Patch0027:     0027-RHEL-7-v2v-disable-unconfig-of-manually-installed-VM.patch
-Patch0028:     0028-v2v-Use-Std_utils.qemu_input_filename-instead-of-pre.patch
-Patch0029:     0029-v2v-o-null-support-older-qemu-img-RHBZ-1580309.patch
-Patch0030:     0030-v2v-ovf-Create-OVF-more-aligned-with-the-standard.patch
-Patch0031:     0031-v2v-vdsm-add-vdsm-fixed-ovf-option.patch
-Patch0032:     0032-v2v-OVF-Code-formatting.patch
-Patch0033:     0033-v2v-DOM-Add-doc_to_string-function.patch
-Patch0034:     0034-v2v-Add-op-output-password-file-option.patch
-Patch0035:     0035-v2v-cmdline-Move-definition-to-before-its-only-use.patch
-Patch0036:     0036-v2v-Add-general-mechanism-for-input-and-output-optio.patch
-Patch0037:     0037-v2v-OVF-write-ovirt-id-attribute-for-the-OS-in-OVirt.patch
-Patch0038:     0038-v2v-OVF-fix-ovf-id-for-VirtualSystem-in-OVirt-flavou.patch
-Patch0039:     0039-v2v-Add-o-rhv-upload-output-mode-RHBZ-1557273.patch
-Patch0040:     0040-v2v-refer-to-the-right-embed-script-in-EXTRA_DIST.patch
-Patch0041:     0041-v2v-o-rhv-upload-Don-t-require-of-raw-parameter.patch
-Patch0042:     0042-v2v-o-rhv-upload-install-RHV-tools-RHBZ-1561828.patch
-Patch0043:     0043-v2v-Map-Windows-Server-2012-R2-x86-64-to-ovirt-ID-25.patch
-Patch0044:     0044-v2v-fix-build-rules-for-output_rhv_upload_-_source.m.patch
-Patch0045:     0045-v2v-fix-rhevexp-typo-in-documentation.patch
-Patch0046:     0046-v2v-add-and-use-Create_ovf.ovf_flavour_to_string.patch
-Patch0047:     0047-daemon-Move-lvmetad-to-early-in-the-appliance-boot-p.patch
-Patch0048:     0048-v2v-o-rhv-upload-Set-inactivity-timeout-RHBZ-1586198.patch
-Patch0049:     0049-v2v-linux-fix-kernel-detection-when-split-in-differe.patch
-Patch0050:     0050-New-API-inspect_get_osinfo.patch
-Patch0051:     0051-inspector-show-the-per-OS-osinfo-guess-RHBZ-1544842.patch
-Patch0052:     0052-lib-libvirt-Convert-all-socket-parameters-to-an-abso.patch
-Patch0053:     0053-v2v-o-rhv-upload-Optimize-http-request-sending.patch
-Patch0054:     0054-v2v-o-rhv-upload-Log-full-imageio-response-on-failur.patch
-Patch0055:     0055-v2v-Add-Disk-ovf-capacity-attribute-containing-disk-.patch
-Patch0056:     0056-v2v-File-ovf-size-changed-to-the-actual-size-if-know.patch
-Patch0057:     0057-p2v-Allow-virt-v2v-input-and-output-drivers-containi.patch
-Patch0058:     0058-v2v-o-libvirt-Don-t-write-only-vendor-without-model-.patch
-Patch0059:     0059-v2v-rvh-upload-plugin-Always-read-the-response.patch
-Patch0060:     0060-v2v-rhv-upload-plugin-Fix-name-error.patch
-Patch0061:     0061-v2v-rhv-upload-plugin-Remove-unused-variables.patch
-Patch0062:     0062-v2v-o-rhv-upload-Always-fetch-server-options-when-op.patch
-Patch0063:     0063-v2v-o-rhv-upload-Use-Unix-domain-socket-to-access-im.patch
-Patch0064:     0064-v2v-improve-os-documentation-for-rhv-upload.patch
-Patch0065:     0065-v2v-rhv-upload-plugin-Remove-unneeded-auth.patch
-Patch0066:     0066-v2v-rhv-upload-plugin-Improve-error-handling.patch
-Patch0067:     0067-v2v-rhv-upload-plugin-Optimize-only-direct-upload.patch
-Patch0068:     0068-v2v-rhv-plugin-find-suitable-host-RHBZ-1596810-RHBZ-.patch
-Patch0069:     0069-v2v-change-QXL-ResourceType-in-OVirt-flavour-RHBZ-15.patch
-Patch0070:     0070-v2v-o-rhv-upload-check-for-ovirtsdk4-RHBZ-1601943.patch
-Patch0071:     0071-v2v-rhv-plugin-fix-DC-search-string.patch
-Patch0072:     0072-v2v-rhv-plugin-case-sensitive-search-queries.patch
-Patch0073:     0073-Revert-lvm-do-not-pass-cache-to-vgscan.patch
-Patch0074:     0074-daemon-inspect-ignore-fstab-devs-that-cannot-be-reso.patch
-Patch0075:     0075-v2v-parse_libvirt_xml-handle-srN-CDROM-devices-RHBZ-.patch
-Patch0076:     0076-v2v-o-rhv-upload-Fix-error-message-disk-numbering-RH.patch
-Patch0077:     0077-v2v-o-rhv-upload-Properly-replace-SD_UUID-in-OVF-RHB.patch
-Patch0078:     0078-ppc64le-Don-t-use-cpu-parameter-under-any-circumstan.patch
-Patch0079:     0079-RHEL-7-v2v-rhv-upload-Remove-restriction-on-oa-spars.patch
-Patch0080:     0080-RHEL-7-o-rhv-upload-Use-Python-2-instead-of-Python-3.patch
-Patch0081:     0081-RHEL-7-v2v-rhv-upload-Disable-Nagle-algorithm.patch
-Patch0082:     0082-RHEL-7-p2v-ignore-rhv-upload-driver-RHBZ-1590220.patch
-Patch0083:     0083-v2v-docs-Describe-support-for-SHA-2-certs-for-Window.patch
-Patch0084:     0084-v2v-windows-Fix-rhev-apt-command-line-RHBZ-1624902.patch
-Patch0085:     0085-inspect-fix-inspection-of-partition-less-devices-RHB.patch
+Patch0001:     0001-inspect-fix-icon-of-RHEL.patch
+Patch0002:     0002-v2v-linux-do-not-uninstall-open-vm-tools-w-ubuntu-se.patch
+Patch0003:     0003-v2v-linux-canonicalize-module-path-for-arch-detectio.patch
+Patch0004:     0004-v2v-linux-improve-arch-detection-from-modules-RHBZ-1.patch
+Patch0005:     0005-v2v-o-libvirt-write-win2k19-osinfo-ID.patch
+Patch0006:     0006-v2v-update-documentation-on-nbdkit-RHBZ-1605242.patch
+Patch0007:     0007-v2v-linux-add-helper-functions-for-pkg-arch-and-exte.patch
+Patch0008:     0008-v2v-try-to-pick-the-right-arch-for-qemu-ga-pkgs.patch
+Patch0009:     0009-v2v-change-the-reporting-of-RHV-Tools-messages-warni.patch
+Patch0010:     0010-v2v-fix-path-to-source-when-copying-files-from-guest.patch
+Patch0011:     0011-v2v-warn-when-the-guest-has-direct-network-interface.patch
+Patch0012:     0012-Use-proper-label-for-nbdkit-sockets.patch
+Patch0013:     0013-RHEL-7-Remove-libguestfs-live-RHBZ-798980.patch
+Patch0014:     0014-RHEL-7-Remove-9p-APIs-from-RHEL-RHBZ-921710.patch
+Patch0015:     0015-RHEL-7-Disable-unsupported-remote-drive-protocols-RH.patch
+Patch0016:     0016-RHEL-7-Remove-User-Mode-Linux-RHBZ-1144197.patch
+Patch0017:     0017-RHEL-7-v2v-Select-correct-qemu-binary-for-o-qemu-mod.patch
+Patch0018:     0018-RHEL-7-v2v-Disable-the-qemu-boot-option-RHBZ-1147313.patch
+Patch0019:     0019-RHEL-7-Disable-alternate-Augeas-lenses.patch
+Patch0020:     0020-RHEL-7-Fix-list-of-supported-sound-cards-to-match-RH.patch
+Patch0021:     0021-RHEL-7-Reject-use-of-libguestfs-winsupport-features-.patch
+Patch0022:     0022-RHEL-7-daemon-umount-all-Hack-to-avoid-umount-sysroo.patch
+Patch0023:     0023-RHEL-7-Fix-tests-for-libguestfs-winsupport-7.2.patch
+Patch0024:     0024-RHEL-7-All-qemu-kvm-in-RHEL-7-supports-discard-of-qc.patch
+Patch0025:     0025-RHEL-7-tests-Disable-daemon-tests-that-require-the-u.patch
+Patch0026:     0026-RHEL-7-v2v-Disable-the-virt-v2v-in-place-option.patch
+Patch0027:     0027-RHEL-7-v2v-i-disk-force-VNC-as-display-RHBZ-1372671.patch
+Patch0028:     0028-RHEL-7-v2v-do-not-mention-SUSE-Xen-hosts-RHBZ-143020.patch
+Patch0029:     0029-RHEL-7-v2v-rhv-upload-Remove-restriction-on-oa-spars.patch
+Patch0030:     0030-RHEL-7-o-rhv-upload-Use-Python-2-instead-of-Python-3.patch
+Patch0031:     0031-RHEL-7-v2v-rhv-upload-Disable-Nagle-algorithm.patch
+Patch0032:     0032-RHEL-7-p2v-ignore-rhv-upload-driver-RHBZ-1590220.patch
+Patch0033:     0033-RHEL-7-point-to-KB-for-supported-v2v-hypervisors-gue.patch
 
 # Use git for patch management.
 BuildRequires: git
@@ -152,7 +100,7 @@ Source7:       libguestfs.keyring
 # RHEV-APT is taken from the RHEV Tools CD
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1186850
 Source96:      rhsrvany.exe
-Source97:      RHEV-Application-Provisioning-Tool.exe_4.42
+Source97:      RHEV-Application-Provisioning-Tool.exe_4.43-3
 
 Source98:      brew-overrides.sh
 Source99:      copy-patches.sh
@@ -198,7 +146,7 @@ BuildRequires: libvirt-daemon-kvm
 BuildRequires: libacl-devel
 BuildRequires: libcap-devel
 #BuildRequires: libldm-devel
-BuildRequires: yajl-devel
+BuildRequires: jansson-devel
 BuildRequires: systemd-devel
 BuildRequires: bash-completion
 BuildRequires: /usr/bin/ping
@@ -258,7 +206,7 @@ BuildRequires: gjs
 #   for f in `cat appliance/packagelist`; do echo $f; done | sort -u
 # However you have to edit the list down to packages which exist in
 # current RHEL, since supermin ignores non-existent packages.
-BuildRequires: acl attr augeas-libs bash binutils btrfs-progs bzip2 coreutils cpio cryptsetup curl diffutils dosfstools e2fsprogs file findutils gawk gdisk genisoimage grep gzip hivex iproute iputils kernel kmod kpartx less libcap libselinux libxml2 lsof lsscsi lvm2 lzop mdadm openssh-clients parted pciutils pcre policycoreutils procps psmisc qemu-img rsync scrub sed squashfs-tools strace systemd tar udev util-linux vim-minimal which xfsprogs xz yajl
+BuildRequires: acl attr augeas-libs bash binutils btrfs-progs bzip2 coreutils cpio cryptsetup curl dhclient diffutils dosfstools e2fsprogs file findutils gawk gdisk genisoimage grep gzip hivex iproute iputils jansson kernel kmod kpartx less libcap libselinux libxml2 lsof lsscsi lvm2 lzop mdadm openssh-clients parted pciutils pcre policycoreutils procps psmisc qemu-img rsync scrub sed squashfs-tools strace systemd tar udev util-linux vim-minimal which xfsprogs xz
 %ifarch x86_64
 BuildRequires: gfs2-utils
 %endif
@@ -1213,11 +1161,17 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 
 %ifarch %{v2v_arches}
 %files -n virt-v2v
-%doc COPYING README v2v/TODO
+%doc COPYING README
 %{_bindir}/virt-v2v
 %{_bindir}/virt-v2v-copy-to-local
 %{_mandir}/man1/virt-v2v.1*
 %{_mandir}/man1/virt-v2v-copy-to-local.1*
+%{_mandir}/man1/virt-v2v-input-vmware.1*
+%{_mandir}/man1/virt-v2v-input-xen.1*
+%{_mandir}/man1/virt-v2v-output-local.1*
+%{_mandir}/man1/virt-v2v-output-openstack.1*
+%{_mandir}/man1/virt-v2v-output-rhv.1*
+%{_mandir}/man1/virt-v2v-support.1*
 %{_datadir}/virt-tools
 
 
@@ -1238,6 +1192,7 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 %{_datadir}/bash-completion/completions/guestfish
 %{_datadir}/bash-completion/completions/guestmount
 %{_datadir}/bash-completion/completions/guestunmount
+%{_datadir}/bash-completion/completions/libguestfs-test-tool
 %{_datadir}/bash-completion/completions/virt-*
 
 
@@ -1334,9 +1289,43 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 
 
 %changelog
-* Thu Feb 07 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.38.2-12.el7_6.2
-- Fix inspection of partition-less devices
-  resolves: rhbz#1673280
+* Tue Jun 04 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.40.2-5
+- Rebase to libguestfs 1.40.2 in RHEL 7.7.
+  resolves: rhbz#1621895
+- v2v: uninstall the VMware Tools correctly
+  resolves: rhbz#1465849
+  resolves: rhbz#1481930
+- v2v: fix VMware vCenter roles needed for conversion
+  resolves: rhbz#1530967
+- v2v: preserve the VM Generation ID
+  resolves: rhbz#1598350
+- Query QEMU to known whether KVM is supported
+  resolves: rhbz#1605071
+- v2v: add --mac option
+  resolves: rhbz#1607274
+- v2v: install ovirt-guest-agent-common on Linux guests migrated to RHV
+  resolves: rhbz#1619665
+  resolves: rhbz#1691659
+- v2v: provide a way to query for the estimated size of the disks
+  resolves: rhbz#1622785
+- Correctly inspect the newer versions of openSUSE (15, Factory, Thumbleweed)
+  resolves: rhbz#1634248
+- p2v: add an option to Shutdown the machine after the conversion
+  resolves: rhbz#1642044
+- v2v: fix epoch when querying installed RPM packages
+  resolves: rhbz#1669395
+- Use a better icon for RHEL >= 7 guests
+  resolves: rhbz#1679482
+- v2v: improve the architecture detection of Linux kernel modules
+  resolves: rhbz#1690574
+- v2v: ship a newer version of rhev-apt.exe
+  resolves: rhbz#1688155
+- v2v: update nbdkit information in documentation
+  resolves: rhbz#1605242
+- v2v: warn when a guest has 'direct' network interfaces
+  resolves: rhbz#1151902
+- v2v: use proper SELinux label for nbdkit sockets
+  resolves: rhbz#1698437
 
 * Fri Oct 12 2018 Pino Toscano <ptoscano@redhat.com> - 1:1.38.2-12.el7_6.1
 - v2v: update documentation regarding SHA-2 certificates in Windows 7 and

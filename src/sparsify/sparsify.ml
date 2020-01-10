@@ -1,5 +1,5 @@
 (* virt-sparsify
- * Copyright (C) 2011-2018 Red Hat Inc.
+ * Copyright (C) 2011-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ let rec main () =
   (match cmdline.mode with
   | Mode_copying (outdisk, check_tmpdir, compress, convert, option, tmp) ->
     Copying.run cmdline.indisk outdisk check_tmpdir compress convert
-                cmdline.format cmdline.ignores cmdline.machine_readable
-                option tmp cmdline.zeroes
+                cmdline.format cmdline.ignores option tmp cmdline.zeroes
+                cmdline.ks
   | Mode_in_place ->
-    In_place.run cmdline.indisk cmdline.format cmdline.ignores
-                 cmdline.machine_readable cmdline.zeroes
+    In_place.run cmdline.indisk cmdline.format cmdline.ignores cmdline.zeroes
+                 cmdline.ks
   )
 
 let () = run_main_and_handle_errors main

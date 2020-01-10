@@ -1,5 +1,5 @@
 # libguestfs
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,24 @@ AM_CONDITIONAL([HAVE_OCAMLOPT],
                [test "x$OCAMLOPT" != "xno"])
 AM_CONDITIONAL([HAVE_OCAMLDOC],
                [test "x$OCAMLDOC" != "xno"])
+
+dnl Check if ocamlc/ocamlopt -runtime-variant _pic works.  It was
+dnl added in OCaml >= 4.03, but in theory might be disabled by
+dnl downstream distros.
+OCAML_RUNTIME_VARIANT_PIC_OPTION=""
+if test "x$OCAMLC" != "xno"; then
+    AC_MSG_CHECKING([if OCaml ‘-runtime-variant _pic’ works])
+    rm -f conftest.ml contest
+    echo 'print_endline "hello world"' > conftest.ml
+    if $OCAMLC conftest.ml -runtime-variant _pic -o conftest >&5 2>&5 ; then
+        AC_MSG_RESULT([yes])
+        OCAML_RUNTIME_VARIANT_PIC_OPTION="-runtime-variant _pic"
+    else
+        AC_MSG_RESULT([no])
+    fi
+    rm -f conftest.ml contest
+fi
+AC_SUBST([OCAML_RUNTIME_VARIANT_PIC_OPTION])
 
 dnl Check if ocamldep has options -all and -one-line (not present in RHEL 6).
 AC_MSG_CHECKING([if ocamldep has the ‘-all’ option])

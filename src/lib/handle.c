@@ -1,5 +1,5 @@
 /* libguestfs
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -100,6 +100,8 @@ guestfs_create_flags (unsigned flags, ...)
   g->autosync = 1;
 
   g->memsize = DEFAULT_MEMSIZE;
+
+  g->qemu_img_supports_U_option = -1; /* not tested, see lib/info.c */
 
   /* Start with large serial numbers so they are easy to spot
    * inside the protocol.
@@ -399,7 +401,9 @@ guestfs_close (guestfs_h *g)
   free (g->hv);
   free (g->backend);
   free (g->backend_data);
+#if HAVE_FUSE
   free (g->localmountpoint);
+#endif
   guestfs_int_free_string_list (g->backend_settings);
   free (g->append);
   guestfs_int_free_error_data_list (g);

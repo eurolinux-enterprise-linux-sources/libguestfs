@@ -1,5 +1,5 @@
 (* libguestfs
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -367,7 +367,7 @@ let generate_fish_run_cmds actions () =
         pr "    }\n";
         pr "\n";
         pr "    if (optargs_s.bitmask & this_mask) {\n";
-        pr "      fprintf (stderr, _(\"%%s: optional argument \\\"%%s\\\" given twice\\n\"),\n";
+        pr "      fprintf (stderr, _(\"%%s: optional argument \\\"%%s\\\" given more than once\\n\"),\n";
         pr "               cmd, this_arg);\n";
         pr "      goto out;\n";
         pr "    }\n";

@@ -1,6 +1,6 @@
 #!/bin/bash -
 # libguestfs
-# Copyright (C) 2014-2018 Red Hat Inc.
+# Copyright (C) 2014-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -194,6 +194,16 @@ skip_unless_feature_available ()
 {
     if ! guestfish -a /dev/null run : available "$1"; then
         echo "$(basename $0): test skipped because feature $1 is not available"
+        exit 77
+    fi
+}
+
+# Skip if a filesystem is unavailable in the daemon.
+skip_unless_filesystem_available ()
+{
+    r="$(guestfish -a /dev/null run : filesystem_available "$1")"
+    if [ "$r" != "true" ] ; then
+        echo "$(basename $0): test skipped because $1 filesystem is not available"
         exit 77
     fi
 }

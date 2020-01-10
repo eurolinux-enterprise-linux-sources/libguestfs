@@ -37,7 +37,7 @@ CLEANFILES += t/*.annot t/*.cmi t/*.cmo t/*.cmx t/*.o t/*.a t/*.so
 
 if HAVE_OCAML
 
-OCAMLFLAGS = $(OCAML_FLAGS) $(OCAML_WARN_ERROR)
+OCAMLFLAGS = $(OCAML_FLAGS) $(OCAML_WARN_ERROR) -ccopt '$(CFLAGS)'
 
 noinst_DATA = mlguestfs.cma META
 if HAVE_OCAMLOPT
@@ -64,14 +64,14 @@ endif
 
 stamp-mlguestfs: libguestfsocaml.a $(guestfs_cmm)
 	$(OCAMLMKLIB) -o mlguestfs \
+	  -ldopt '$(LDFLAGS)' \
 	  $(libguestfsocaml_a_OBJECTS) guestfs.cmo \
-	  $(LDFLAGS) \
 	  $(LTLIBINTL) \
 	  -L../lib/.libs -lguestfs
 if HAVE_OCAMLOPT
 	$(OCAMLMKLIB) -o mlguestfs \
+	  -ldopt '$(LDFLAGS)' \
 	  $(libguestfsocaml_a_OBJECTS) guestfs.cmx \
-	  $(LDFLAGS) \
 	  $(LTLIBINTL) \
 	  -L../lib/.libs -lguestfs
 endif

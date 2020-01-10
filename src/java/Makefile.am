@@ -1,5 +1,5 @@
 # libguestfs Java bindings
-# Copyright (C) 2009-2018 Red Hat Inc.
+# Copyright (C) 2009-2019 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -122,7 +122,8 @@ libguestfs_jni_la_CFLAGS = \
 libguestfs_jni_la_LIBADD = \
 	$(top_builddir)/common/structs/libstructs.la \
 	$(top_builddir)/common/utils/libutils.la \
-	$(top_builddir)/lib/libguestfs.la
+	$(top_builddir)/lib/libguestfs.la \
+	$(top_builddir)/gnulib/lib/libgnu.la
 
 libguestfs_jni_la_LDFLAGS = -version-info $(JNI_VERSION_INFO) -shared
 

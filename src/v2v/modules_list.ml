@@ -1,5 +1,5 @@
 (* virt-v2v
- * Copyright (C) 2009-2018 Red Hat Inc.
+ * Copyright (C) 2009-2019 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,15 @@ open Std_utils
 let input_modules = ref []
 and output_modules = ref []
 
-let register_input_module name = List.push_front name input_modules
-and register_output_module name = List.push_front name output_modules
+(* Must match the regular expressions in p2v/ssh.c *)
+let module_name_re = PCRE.compile ~anchored:true "[-\\w]+"
+
+let register_input_module name =
+  assert (PCRE.matches module_name_re name);
+  List.push_front name input_modules
+and register_output_module name =
+  assert (PCRE.matches module_name_re name);
+  List.push_front name output_modules
 
 let input_modules () = List.sort compare !input_modules
 and output_modules () = List.sort compare !output_modules

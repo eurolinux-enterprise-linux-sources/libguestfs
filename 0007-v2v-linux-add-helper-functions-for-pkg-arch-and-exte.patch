@@ -1,0 +1,62 @@
+From f3574733eeda9952aa13f36e4ae40a8c5c0a5479 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <ptoscano@redhat.com>
+Date: Tue, 26 Mar 2019 17:02:02 +0100
+Subject: [PATCH] v2v: linux: add helper functions for pkg arch and extension
+
+Add helper functions to get the typical extension of binary packages
+for a package manager, and the string for an architecture.
+
+(cherry picked from commit 13ef175a7b3a010175d57d60b2c4c51bc0efb171)
+---
+ v2v/linux.ml  | 21 +++++++++++++++++++++
+ v2v/linux.mli |  8 ++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/v2v/linux.ml b/v2v/linux.ml
+index 99b0e0e7b..4949c8e16 100644
+--- a/v2v/linux.ml
++++ b/v2v/linux.ml
+@@ -179,3 +179,24 @@ let is_package_manager_save_file filename =
+   (* Recognized suffixes of package managers. *)
+   let suffixes = [ ".dpkg-old"; ".dpkg-new"; ".rpmsave"; ".rpmnew"; ] in
+   List.exists (Filename.check_suffix filename) suffixes
++
++let binary_package_extension { i_package_format = package_format } =
++  match package_format with
++  | "deb" -> "deb"
++  | "rpm" -> "rpm"
++  | format ->
++    error (f_"don’t know what is the extension of binary packages using %s")
++      format
++
++let architecture_string { i_package_format = package_format; i_arch = arch;
++                          i_distro = distro } =
++  match package_format, distro, arch with
++  | "deb", _, "x86_64" -> "amd64"
++  | "deb", _, a -> a
++  | "rpm", ("sles"|"suse-based"|"opensuse"), "i386" -> "i586"
++  | "rpm", ("sles"|"suse-based"|"opensuse"), a -> a
++  | "rpm", _, "i386" -> "i686"
++  | "rpm", _, a -> a
++  | format, distro, arch ->
++    error (f_"don’t know what is the architecture string of %s using %s on %s")
++      arch format distro
+diff --git a/v2v/linux.mli b/v2v/linux.mli
+index 0a5991d12..30099745c 100644
+--- a/v2v/linux.mli
++++ b/v2v/linux.mli
+@@ -38,3 +38,11 @@ val is_file_owned : Guestfs.guestfs -> Types.inspect -> string -> bool
+ val is_package_manager_save_file : string -> bool
+ (** Return true if the filename is something like [*.rpmsave], ie.
+     a package manager save-file. *)
++
++val binary_package_extension : Types.inspect -> string
++(** Return the extension typically used for binary packages in the
++    specified package format. *)
++
++val architecture_string : Types.inspect -> string
++(** Return the architecture string typically used for binary packages
++    in the specified package format, and for the specified distro. *)
+-- 
+2.21.0
+
