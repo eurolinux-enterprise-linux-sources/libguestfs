@@ -24,5 +24,5 @@ index 6a61a8d6e..f530ad3d5 100755
      echo -n "uptime: "; cat /proc/uptime
  fi
 -- 
-2.17.2
+2.20.1
 

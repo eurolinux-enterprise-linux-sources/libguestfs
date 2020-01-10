@@ -149,5 +149,5 @@ index 9ad354b84..7c5084efd 100644
  def delete_disk_on_failure(h):
      disk_service = h['disk_service']
 -- 
-2.17.2
+2.20.1
 

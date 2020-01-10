@@ -68,5 +68,5 @@ index b8825cf56..1acf8db27 100644
  static int
  shutdown_uml (guestfs_h *g, void *datav, int check_for_errors)
 -- 
-2.17.2
+2.20.1
 

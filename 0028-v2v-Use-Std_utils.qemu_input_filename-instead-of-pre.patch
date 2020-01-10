@@ -29,5 +29,5 @@ index 90173b018..6b9bdadf6 100644
          [ "qemu-img"; "convert" ] @
          (if not (quiet ()) then [ "-p" ] else []) @
 -- 
-2.17.2
+2.20.1
 

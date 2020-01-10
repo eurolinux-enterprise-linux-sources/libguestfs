@@ -82,5 +82,5 @@ index f0f52fba0..c709c4fe2 100644
  ignore_errors (void *ignore, virErrorPtr ignore2)
  {
 -- 
-2.17.2
+2.20.1
 

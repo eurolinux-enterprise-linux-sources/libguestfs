@@ -37,5 +37,5 @@ index 9e0c772fd..5db239d66 100644
            e "rasd:VirtualQuantity" [] [PCData "1"];
            e "rasd:Device" [] [PCData "qxl"];
 -- 
-2.17.2
+2.20.1
 

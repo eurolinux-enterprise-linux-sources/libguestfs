@@ -80,5 +80,5 @@ index 129461242..dc0d96d53 100644
               error (f_"rhv-upload: -of %s: Only output format ‘raw’ or ‘qcow2’ is supported.  If the input is in a different format then force one of these output formats by adding either ‘-of raw’ or ‘-of qcow2’ on the command line.")
                     t.target_format in
 -- 
-2.17.2
+2.20.1
 

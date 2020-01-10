@@ -1760,5 +1760,5 @@ index 5dd888e77..62b726b8f 100644
  virt-v2v from the RHV-M user interface, then behind the scenes the
  import is managed by VDSM using the I<-o vdsm> output mode (which end
 -- 
-2.17.2
+2.20.1
 

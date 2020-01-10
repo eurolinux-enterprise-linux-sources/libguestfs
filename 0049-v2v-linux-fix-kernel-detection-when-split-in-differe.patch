@@ -106,5 +106,5 @@ index c047d6deb..24f61429d 100644
  
               let kernel_supports what kconf =
 -- 
-2.17.2
+2.20.1
 

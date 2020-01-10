@@ -33,5 +33,5 @@ index ac3c61b13..e0f81e0a2 100644
            "ovf:parentRef", "";
            "ovf:vm_snapshot_id", uuidgen ();
 -- 
-2.17.2
+2.20.1
 

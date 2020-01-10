@@ -30,5 +30,5 @@ index e880001eb..812d339e0 100644
  (* Find the UEFI firmware. *)
  let find_uefi_firmware guest_arch =
 -- 
-2.17.2
+2.20.1
 

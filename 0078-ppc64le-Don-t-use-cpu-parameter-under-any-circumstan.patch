@@ -23,5 +23,5 @@ index a6c1b0faf..fa1bae3f9 100644
    /* On most architectures, it is faster to pass the CPU host model to
     * the appliance, allowing maximum speed for things like checksums
 -- 
-2.17.2
+2.20.1
 

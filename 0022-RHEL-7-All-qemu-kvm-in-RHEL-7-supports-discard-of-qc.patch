@@ -42,5 +42,5 @@ index 6159b5a52..1e52cf75b 100644
      /* It's possible in future other formats will support discard, but
       * currently (qemu 1.7) none of them do.
 -- 
-2.17.2
+2.20.1
 

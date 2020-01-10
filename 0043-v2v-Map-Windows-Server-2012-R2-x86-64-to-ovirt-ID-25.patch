@@ -26,5 +26,5 @@ index c29b8421c..190cf8bed 100644
    | { i_type = "windows"; i_major_version = 10; i_minor_version = 0;
        i_arch = "i386" } ->
 -- 
-2.17.2
+2.20.1
 

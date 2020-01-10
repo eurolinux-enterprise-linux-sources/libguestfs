@@ -28,5 +28,5 @@ index ccde960df..c29b8421c 100644
          e "Content" ["ovf:id", "out"; "xsi:type", "ovf:VirtualSystem_Type"]
            !content_subnodes
 -- 
-2.17.2
+2.20.1
 

@@ -338,5 +338,5 @@ index c5e904ba1..ce286d327 100644
      (* Write it to the metadata file. *)
      let file = vdsm_options.ovf_output // vdsm_options.vm_uuid ^ ".ovf" in
 -- 
-2.17.2
+2.20.1
 

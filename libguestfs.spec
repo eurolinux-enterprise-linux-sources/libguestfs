@@ -21,7 +21,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.38.2
-Release:       12%{?dist}.1
+Release:       12%{?dist}.2
 License:       LGPLv2+
 
 # Source and patches.
@@ -124,6 +124,7 @@ Patch0081:     0081-RHEL-7-v2v-rhv-upload-Disable-Nagle-algorithm.patch
 Patch0082:     0082-RHEL-7-p2v-ignore-rhv-upload-driver-RHBZ-1590220.patch
 Patch0083:     0083-v2v-docs-Describe-support-for-SHA-2-certs-for-Window.patch
 Patch0084:     0084-v2v-windows-Fix-rhev-apt-command-line-RHBZ-1624902.patch
+Patch0085:     0085-inspect-fix-inspection-of-partition-less-devices-RHB.patch
 
 # Use git for patch management.
 BuildRequires: git
@@ -1333,6 +1334,10 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 
 
 %changelog
+* Thu Feb 07 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.38.2-12.el7_6.2
+- Fix inspection of partition-less devices
+  resolves: rhbz#1673280
+
 * Fri Oct 12 2018 Pino Toscano <ptoscano@redhat.com> - 1:1.38.2-12.el7_6.1
 - v2v: update documentation regarding SHA-2 certificates in Windows 7 and
   Windows Server 2008 R2
