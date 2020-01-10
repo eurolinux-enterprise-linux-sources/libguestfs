@@ -1,4 +1,4 @@
-From 8c73e56b0de14c53b056fb7b90f0070aff2b41cd Mon Sep 17 00:00:00 2001
+From 2a524032d65c7436b4d5158c4ae3076995ed24a6 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sun, 30 Aug 2015 03:21:57 -0400
 Subject: [PATCH] RHEL 7: Fix tests for libguestfs-winsupport 7.2.

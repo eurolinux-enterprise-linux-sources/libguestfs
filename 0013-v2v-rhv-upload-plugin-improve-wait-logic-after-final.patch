@@ -1,0 +1,55 @@
+From 82991dd35be56cf7173f55a7152a401a0eae71ce Mon Sep 17 00:00:00 2001
+From: Daniel Erez <derez@redhat.com>
+Date: Mon, 18 Mar 2019 18:51:26 +0200
+Subject: [PATCH] v2v: rhv-upload-plugin - improve wait logic after finalize
+ (RHBZ#1680361)
+
+After invoking transfer_service.finalize, check operation status by
+examining DiskStatus.  This is done instead of failing after a
+predefined timeout regardless the status.
+
+Bug-Url: https://bugzilla.redhat.com/show_bug.cgi?id=1680361
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Tested-by: Ilanit Stein <istein@redhat.com>
+(cherry picked from commit eeabb3fdc7756887b53106f455a7b54309130637)
+---
+ v2v/rhv-upload-plugin.py | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
+index 2a950c5ed..4d61a089b 100644
+--- a/v2v/rhv-upload-plugin.py
++++ b/v2v/rhv-upload-plugin.py
+@@ -523,16 +523,23 @@ def close(h):
+         # waiting for the transfer object to cease to exist, which
+         # falls through to the exception case and then we can
+         # continue.
+-        endt = time.time() + timeout
++        disk_id = disk.id
++        start = time.time()
+         try:
+             while True:
+                 time.sleep(1)
+-                tmp = transfer_service.get()
+-                if time.time() > endt:
+-                    raise RuntimeError("timed out waiting for transfer "
+-                                       "to finalize")
++                disk_service = h['disk_service']
++                disk = disk_service.get()
++                if disk.status == types.DiskStatus.LOCKED:
++                    if time.time() > start + timeout:
++                        raise RuntimeError("timed out waiting for transfer "
++                                           "to finalize")
++                    continue
++                if disk.status == types.DiskStatus.OK:
++                    debug("finalized after %s seconds" % (time.time() - start))
++                    break
+         except sdk.NotFoundError:
+-            pass
++            raise RuntimeError("transfer failed: disk %s not found" % disk_id)
+ 
+         # Write the disk ID file.  Only do this on successful completion.
+         with builtins.open(params['diskid_file'], 'w') as fp:
+-- 
+2.21.0
+

@@ -1,4 +1,4 @@
-From e7a123793726b1e56121f59fe39fe40c1154b5bf Mon Sep 17 00:00:00 2001
+From 8f32d2e47c424db7d862bcc207962fb7a1a8b80e Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Fri, 24 Oct 2014 16:33:50 +0100
 Subject: [PATCH] RHEL 7: Disable alternate Augeas lenses.

@@ -1,4 +1,4 @@
-From 625701598f958502623738a9a7b93d1807e98706 Mon Sep 17 00:00:00 2001
+From 9e12b50d1886d09ea91964c1bc5805afeec16744 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 30 Sep 2014 10:50:27 +0100
 Subject: [PATCH] RHEL 7: v2v: Disable the --qemu-boot option (RHBZ#1147313).

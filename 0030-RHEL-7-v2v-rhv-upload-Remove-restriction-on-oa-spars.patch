@@ -1,4 +1,4 @@
-From bcc63ea8b4a2d7851f5026d03f2cc41f5dcb98d7 Mon Sep 17 00:00:00 2001
+From aef93211935578c97aedef2c4581bb9b7a9bb4d4 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 14 May 2018 10:16:58 +0100
 Subject: [PATCH] RHEL 7: v2v: rhv-upload: Remove restriction on -oa sparse.
@@ -45,7 +45,7 @@ index c2a5c72c7..3d6d99008 100644
        error_unless_nbdkit_compiled_with_selinux ()
  
 diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
-index 2a950c5ed..b63d127f5 100644
+index 4d61a089b..a631d54d6 100644
 --- a/v2v/rhv-upload-plugin.py
 +++ b/v2v/rhv-upload-plugin.py
 @@ -140,10 +140,8 @@ def open(readonly):

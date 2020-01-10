@@ -1,4 +1,4 @@
-From 5cbc97ddb60a8767ff4bc19a968ef325d364a865 Mon Sep 17 00:00:00 2001
+From 339e77afaee9cc45ee0653afeae70706d911a27d Mon Sep 17 00:00:00 2001
 From: Pino Toscano <ptoscano@redhat.com>
 Date: Thu, 19 Jul 2018 13:30:17 +0200
 Subject: [PATCH] RHEL 7: p2v: ignore 'rhv-upload' driver (RHBZ#1590220)

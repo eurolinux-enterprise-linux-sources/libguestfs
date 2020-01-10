@@ -1,4 +1,4 @@
-From 374d1cb44e7a47a646b7e84d635489625189729c Mon Sep 17 00:00:00 2001
+From e40864cd07bf16919327de8e447d44d4764e79ac Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Fri, 19 Sep 2014 13:38:20 +0100
 Subject: [PATCH] RHEL 7: Remove User-Mode Linux (RHBZ#1144197).

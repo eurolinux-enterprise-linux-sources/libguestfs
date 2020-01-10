@@ -1,4 +1,4 @@
-From 1b36358ede519a700208b95951c2263bde699ad3 Mon Sep 17 00:00:00 2001
+From 513d9b44075f8b40d306b4821d6230c32895345a Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 14 Jan 2016 11:53:42 -0500
 Subject: [PATCH] RHEL 7: v2v: Disable the virt-v2v --in-place option.

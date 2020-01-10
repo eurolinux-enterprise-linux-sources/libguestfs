@@ -1,4 +1,4 @@
-From 8b147944f3df99a1836384aa4d10fb906e7c6991 Mon Sep 17 00:00:00 2001
+From 351ac14b2313d7987d17c217402b8fdc75cc3083 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 21 Sep 2015 13:12:43 -0400
 Subject: [PATCH] RHEL 7: tests: Disable daemon tests that require the 'unix'

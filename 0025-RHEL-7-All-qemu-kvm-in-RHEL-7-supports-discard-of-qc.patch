@@ -1,4 +1,4 @@
-From 94f599ab3f423af768c9b32a689450c64e8876bc Mon Sep 17 00:00:00 2001
+From 489a665a4715baa15fe77206030ab516f41ef961 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Wed, 27 May 2015 10:03:00 -0400
 Subject: [PATCH] RHEL 7: All qemu-kvm in RHEL 7 supports discard of qcow2

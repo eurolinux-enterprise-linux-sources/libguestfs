@@ -21,7 +21,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.40.2
-Release:       5%{?dist}.1
+Release:       5%{?dist}.2
 License:       LGPLv2+
 
 # Source and patches.
@@ -52,27 +52,28 @@ Patch0009:     0009-v2v-change-the-reporting-of-RHV-Tools-messages-warni.patch
 Patch0010:     0010-v2v-fix-path-to-source-when-copying-files-from-guest.patch
 Patch0011:     0011-v2v-warn-when-the-guest-has-direct-network-interface.patch
 Patch0012:     0012-Use-proper-label-for-nbdkit-sockets.patch
-Patch0013:     0013-RHEL-7-Remove-libguestfs-live-RHBZ-798980.patch
-Patch0014:     0014-RHEL-7-Remove-9p-APIs-from-RHEL-RHBZ-921710.patch
-Patch0015:     0015-RHEL-7-Disable-unsupported-remote-drive-protocols-RH.patch
-Patch0016:     0016-RHEL-7-Remove-User-Mode-Linux-RHBZ-1144197.patch
-Patch0017:     0017-RHEL-7-v2v-Select-correct-qemu-binary-for-o-qemu-mod.patch
-Patch0018:     0018-RHEL-7-v2v-Disable-the-qemu-boot-option-RHBZ-1147313.patch
-Patch0019:     0019-RHEL-7-Disable-alternate-Augeas-lenses.patch
-Patch0020:     0020-RHEL-7-Fix-list-of-supported-sound-cards-to-match-RH.patch
-Patch0021:     0021-RHEL-7-Reject-use-of-libguestfs-winsupport-features-.patch
-Patch0022:     0022-RHEL-7-daemon-umount-all-Hack-to-avoid-umount-sysroo.patch
-Patch0023:     0023-RHEL-7-Fix-tests-for-libguestfs-winsupport-7.2.patch
-Patch0024:     0024-RHEL-7-All-qemu-kvm-in-RHEL-7-supports-discard-of-qc.patch
-Patch0025:     0025-RHEL-7-tests-Disable-daemon-tests-that-require-the-u.patch
-Patch0026:     0026-RHEL-7-v2v-Disable-the-virt-v2v-in-place-option.patch
-Patch0027:     0027-RHEL-7-v2v-i-disk-force-VNC-as-display-RHBZ-1372671.patch
-Patch0028:     0028-RHEL-7-v2v-do-not-mention-SUSE-Xen-hosts-RHBZ-143020.patch
-Patch0029:     0029-RHEL-7-v2v-rhv-upload-Remove-restriction-on-oa-spars.patch
-Patch0030:     0030-RHEL-7-o-rhv-upload-Use-Python-2-instead-of-Python-3.patch
-Patch0031:     0031-RHEL-7-v2v-rhv-upload-Disable-Nagle-algorithm.patch
-Patch0032:     0032-RHEL-7-p2v-ignore-rhv-upload-driver-RHBZ-1590220.patch
-Patch0033:     0033-RHEL-7-point-to-KB-for-supported-v2v-hypervisors-gue.patch
+Patch0013:     0013-v2v-rhv-upload-plugin-improve-wait-logic-after-final.patch
+Patch0014:     0014-RHEL-7-Remove-libguestfs-live-RHBZ-798980.patch
+Patch0015:     0015-RHEL-7-Remove-9p-APIs-from-RHEL-RHBZ-921710.patch
+Patch0016:     0016-RHEL-7-Disable-unsupported-remote-drive-protocols-RH.patch
+Patch0017:     0017-RHEL-7-Remove-User-Mode-Linux-RHBZ-1144197.patch
+Patch0018:     0018-RHEL-7-v2v-Select-correct-qemu-binary-for-o-qemu-mod.patch
+Patch0019:     0019-RHEL-7-v2v-Disable-the-qemu-boot-option-RHBZ-1147313.patch
+Patch0020:     0020-RHEL-7-Disable-alternate-Augeas-lenses.patch
+Patch0021:     0021-RHEL-7-Fix-list-of-supported-sound-cards-to-match-RH.patch
+Patch0022:     0022-RHEL-7-Reject-use-of-libguestfs-winsupport-features-.patch
+Patch0023:     0023-RHEL-7-daemon-umount-all-Hack-to-avoid-umount-sysroo.patch
+Patch0024:     0024-RHEL-7-Fix-tests-for-libguestfs-winsupport-7.2.patch
+Patch0025:     0025-RHEL-7-All-qemu-kvm-in-RHEL-7-supports-discard-of-qc.patch
+Patch0026:     0026-RHEL-7-tests-Disable-daemon-tests-that-require-the-u.patch
+Patch0027:     0027-RHEL-7-v2v-Disable-the-virt-v2v-in-place-option.patch
+Patch0028:     0028-RHEL-7-v2v-i-disk-force-VNC-as-display-RHBZ-1372671.patch
+Patch0029:     0029-RHEL-7-v2v-do-not-mention-SUSE-Xen-hosts-RHBZ-143020.patch
+Patch0030:     0030-RHEL-7-v2v-rhv-upload-Remove-restriction-on-oa-spars.patch
+Patch0031:     0031-RHEL-7-o-rhv-upload-Use-Python-2-instead-of-Python-3.patch
+Patch0032:     0032-RHEL-7-v2v-rhv-upload-Disable-Nagle-algorithm.patch
+Patch0033:     0033-RHEL-7-p2v-ignore-rhv-upload-driver-RHBZ-1590220.patch
+Patch0034:     0034-RHEL-7-point-to-KB-for-supported-v2v-hypervisors-gue.patch
 
 # Use git for patch management.
 BuildRequires: git
@@ -1289,6 +1290,10 @@ install -m 0644 utils/boot-benchmark/boot-benchmark.1 $RPM_BUILD_ROOT%{_mandir}/
 
 
 %changelog
+* Wed Sep 18 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.40.2-5.el7_7.2
+- v2v: -o rhv-upload: improve wait logic after finalize
+  resolves: rhbz#1753121
+
 * Mon Jul 22 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.40.2-5.el7_7.1
 - v2v: fix a couple of Python 2 porting issues in the nbdkit Python script
   for 'rhv-upload'

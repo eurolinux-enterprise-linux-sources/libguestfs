@@ -1,4 +1,4 @@
-From 6e6a24eee5335a0909d1bdf488ed4ff28b876b7c Mon Sep 17 00:00:00 2001
+From 72150755cdf7273a38709dd36f57b4940b68e998 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Thu, 23 Jul 2015 18:15:36 -0400
 Subject: [PATCH] RHEL 7: daemon: umount-all: Hack to avoid umount: /sysroot:

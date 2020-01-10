@@ -1,4 +1,4 @@
-From 2c47e8f0329a210d26083c7ea7fd14a5553f70b1 Mon Sep 17 00:00:00 2001
+From 0b47ff224ee459113ea662084cc24b6243aebfc6 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Mon, 22 Jul 2019 13:32:54 +0200
 Subject: [PATCH] RHEL 7: -o rhv-upload: Use Python 2 instead of Python 3.
@@ -84,7 +84,7 @@ index 1d0e8c95d..3f2fae4c6 100644
  # What is passed in is a password file, read the actual password.
  with open(params['output_password'], 'r') as fp:
 diff --git a/v2v/rhv-upload-plugin.py b/v2v/rhv-upload-plugin.py
-index b63d127f5..2e8486848 100644
+index a631d54d6..adace732b 100644
 --- a/v2v/rhv-upload-plugin.py
 +++ b/v2v/rhv-upload-plugin.py
 @@ -1,5 +1,6 @@
@@ -203,8 +203,8 @@ index b63d127f5..2e8486848 100644
  
          r = http.getresponse()
          if r.status != 200:
-@@ -533,7 +549,7 @@ def close(h):
-             pass
+@@ -540,7 +556,7 @@ def close(h):
+             raise RuntimeError("transfer failed: disk %s not found" % disk_id)
  
          # Write the disk ID file.  Only do this on successful completion.
 -        with builtins.open(params['diskid_file'], 'w') as fp:
